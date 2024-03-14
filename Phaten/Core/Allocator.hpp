@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstddef>
+#include <new>
 
 namespace Pt {
 
@@ -41,8 +42,8 @@ template <typename T>
 class Allocator
 {
 public:
-    Allocator(size_t capacity = DEFAULT_ALLOCATE_INITIAL_CAPACITY)
-    : allocator(nullptr)
+    Allocator(size_t capacity = DEFAULT_ALLOCATE_INITIAL_CAPACITY) :
+        allocator(nullptr)
     {
         if (capacity)
             Reserve(capacity);
