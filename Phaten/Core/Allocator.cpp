@@ -89,7 +89,7 @@ void AllocatorFree(AllocatorBlock* allocator, void* ptr)
     unsigned char* dataPtr = static_cast<unsigned char*>(ptr);
     AllocatorNode* node = reinterpret_cast<AllocatorNode*>(dataPtr - sizeof(AllocatorNode));
 
-    assert(!node->next);
+    assert(!node->next); // Potential illegal free of object not allocated via the allocator
 
     node->next = allocator->free;
     allocator->free = node;   

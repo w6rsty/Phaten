@@ -362,4 +362,314 @@ WeakPtr<T> DynamicCast(const WeakPtr<U>& rhs)
     return ret;
 }
 
+/// Hold a strong reference to an array, non-intrusive reference counting
+template <typename T>
+class SharedArrayPtr
+{
+public:
+    SharedArrayPtr() :
+        ptr(nullptr),
+        refCount(nullptr)
+    {
+    }
+
+    /// Construct from a raw array pointer.
+    SharedArrayPtr(T* ptr_) :
+        ptr(nullptr),
+        refCount(nullptr)
+    {
+        *this = ptr_;
+    }
+
+    /// Copy construct.
+    SharedArrayPtr(const SharedArrayPtr<T>& ptr_) :
+        ptr(nullptr),
+        refCount(nullptr)
+    {
+        *this = ptr_;
+    }
+
+    ~SharedArrayPtr()
+    {
+        Reset();
+    }
+
+    /// Assign from a raw array pointer.
+    SharedArrayPtr<T>& operator = (T* rhs)
+    {
+        if (Get() == rhs) // Self check.
+            return *this;
+
+        Reset();
+        if (rhs) // Check nullptr.
+        {
+            ptr = rhs;
+            refCount = RefCounted::AllocateRefCount(); // Allocate reference counting structure here.
+            if (refCount)
+                ++(refCount->refs);
+        }
+
+        return *this;
+    }
+
+    /// Assign from another SharedArrayPtr.
+    SharedArrayPtr<T>& operator = (const SharedArrayPtr<T>& rhs)
+    {
+        if (*this == rhs) // Self check.
+            return *this;
+
+        Reset();
+        ptr = rhs.ptr;
+        refCount = rhs.refCount;
+        if (refCount)
+            ++(refCount->refs);
+        
+        return *this;
+    }
+
+    bool operator == (const SharedArrayPtr<T>& rhs) const { return ptr == rhs.ptr; }
+    bool operator != (const SharedArrayPtr<T>& rhs) const { return !(*this == rhs); }
+    T* operator -> () const { assert(ptr); return ptr; }
+    T& operator * () const { assert(ptr); return ptr; }
+    operator T* () const { return Get(); }
+
+    void Reset()
+    {
+        if (refCount)
+        {   
+            --(refCount->refs);
+            if (refCount->refs == 0) // Because T is not based on RefCounted, we need to handle the deconstruct manually.
+            {
+                refCount->expired = true; // Mark expired, may still have WeakPtr references.
+                delete[] ptr;
+                if (refCount->weakRefs == 0) // When no WeakPtr reference, free the reference counting structure.
+                    RefCounted::FreeRefCount(refCount);
+            }
+        }
+
+        ptr = nullptr;
+        refCount = nullptr;
+    }
+
+    template <typename U>
+    void StaticCast(const SharedArrayPtr<U>& rhs)
+    {
+        Reset();
+        ptr = static_cast<T*>(rhs.Get());
+        refCount = rhs.RefCountPtr();
+        if (refCount)
+            ++(refCount->refs);
+    }
+
+    template <typename U>
+    void ReinterpretCast(const SharedArrayPtr<U>& rhs)
+    {
+        Reset();
+        ptr = dynamic_cast<T*>(rhs.Get());
+        refCount = rhs.RefCountPtr();
+        if (refCount)
+            ++(refCount->refs);
+    }
+
+    /// Return raw pointer.
+    T* Get() const { return ptr; }
+    /// Return numbers of strong reference counting.
+    unsigned Refs() const { return refCount ? refCount->refs : 0; }
+    /// Return numbers of weak reference counting.
+    unsigned WeakRefs() const { return refCount ? refCount->weakRefs : 0; }
+    /// Return reference counting structure pointer.
+    RefCount* RefCountPtr() const { return refCount; } 
+    /// Return if ptr is null.
+    bool IsNull() const { return ptr == nullptr; }
+private:
+    /// Prevent direct assignment form an array pointer of different type.
+    template <typename U> SharedArrayPtr<T>& operator = (const SharedPtr<U>& rhs);
+    /// Object pointer.
+    T* ptr;
+    /// reference counting structure.
+    RefCount* refCount;
+};
+
+template <typename T, typename U>
+SharedArrayPtr<T> StaticCast(const SharedArrayPtr<U>& rhs)
+{
+    SharedArrayPtr<T> ret;
+    ret.StaticCast(rhs);
+    return ret;
+}
+
+template <typename T, typename U>
+SharedArrayPtr<T> ReinterpretCast(const SharedArrayPtr<U>& rhs)
+{
+    SharedArrayPtr<T> ret;
+    ret.ReinterpretCast(rhs);
+    return ret;
+}
+
+template <typename T>
+class WeakArrayPtr
+{
+public:
+    WeakArrayPtr() :
+        ptr(nullptr),
+        refCount(nullptr)
+    {
+    }
+
+    WeakArrayPtr(const WeakArrayPtr<T>& ptr_) :
+        ptr(nullptr),
+        refCount(nullptr)
+    {
+        *this = ptr_;
+    }
+
+    WeakArrayPtr(const SharedArrayPtr<T>& ptr_) :
+        ptr(nullptr),
+        refCount(nullptr)
+    {
+        *this = ptr_;
+    }
+
+    ~WeakArrayPtr()
+    {
+        Reset();
+    }
+
+    WeakArrayPtr<T>& operator = (const WeakArrayPtr<T>& rhs)
+    {
+        if (ptr == rhs.ptr && refCount == rhs.refCount)
+            return *this;
+
+        Reset();
+        ptr = rhs.ptr;
+        refCount = rhs.refCount;
+        if (refCount)
+            ++(refCount->weakRefs);
+
+        return *this;
+    }
+
+    WeakArrayPtr<T>& operator = (const SharedArrayPtr<T>& rhs)
+    {
+        if (ptr == rhs.Get() && refCount == rhs.RefCountPtr())
+            return *this;
+
+        Reset();
+        ptr = rhs.Get();
+        refCount = rhs.RefCountPtr();
+        if (refCount)
+            ++(refCount->weakRefs);
+
+        return *this;
+    }
+
+    T* operator -> () const
+    {
+        T* rawPtr = Get();
+        assert(rawPtr);
+        return rawPtr;
+    }
+
+    T& operator * () const
+    {
+        T* rawPtr = Get();
+        assert(rawPtr);
+        return *rawPtr;
+    }
+
+    T& operator [] (size_t index)
+    {
+        T* rawPtr = Get();
+        assert(rawPtr);
+        return rawPtr[index];
+    }
+
+    const T& operator [] (size_t index) const
+    {
+        const T* rawPtr = Get();
+        assert(rawPtr);
+        return rawPtr[index];
+    }
+
+    bool operator == (const WeakArrayPtr<T>& rhs) const { return ptr == rhs.ptr && refCount == rhs.refCount; }
+    bool operator == (const SharedArrayPtr<T>& rhs) const { return ptr == rhs.ptr && refCount == rhs.refCount; }
+    bool operator != (const WeakArrayPtr<T>& rhs) const { return !(*this == rhs); }
+    bool operator != (const SharedArrayPtr<T>& rhs) const { return !(*this == rhs); }
+    operator bool () const { return Get() != nullptr; }
+
+    void Reset()
+    {
+        if (refCount)
+        {
+            --(refCount->weakRefs);
+            // expired flag set to true means all strong reference have gone,
+            // so last WeakPtr is responsible for deallocating the RefCount.
+            if (refCount->expired && refCount->weakRefs == 0)
+                RefCounted::FreeRefCount(refCount);
+        }
+
+        ptr = nullptr;
+        refCount = nullptr;
+    }
+
+    template <typename U>
+    void StaticCast(const WeakArrayPtr<U>& rhs)
+    {
+        Reset();
+        ptr = static_cast<T*>(rhs.Get());
+        refCount = rhs.refCount;
+        if (refCount)
+            ++(refCount->weakRefs);
+    }
+
+    template <typename U>
+    void ReinterpretCast(const WeakArrayPtr<U>& rhs)
+    {
+        Reset();
+        ptr = reinterpret_cast<T*>(rhs);
+        refCount = rhs.refCount;
+        if (refCount)
+            ++(refCount->weakRefs);
+    }
+
+    /// Return raw pointer.
+    T* Get() const
+    {
+        if (!refCount || refCount->expired)
+            return nullptr;
+        else
+            return ptr;
+    }
+    /// Return numbers of strong reference counting.
+    unsigned Refs() const { return (refCount && refCount->refs >= 0) ? refCount->refs : 0; }
+    /// Return numbers of weak reference counting.
+    unsigned WeakRefs() const { return refCount ? refCount->weakRefs : 0; }
+    /// Return if ptr is null.
+    bool IsNull() const { return ptr == nullptr; }
+    /// Return whether the array has been destroyed.
+    bool IsExpired() const { return refCount ? refCount->expired : false; }
+private:
+    template <typename U> WeakArrayPtr(const WeakArrayPtr<U>& rhs);
+    /// Pointer to array
+    T* ptr;
+    /// Pointer to reference counting structure
+    RefCount* refCount;
+};
+
+template <typename T, typename U>
+WeakArrayPtr<T> StaticCast(const WeakArrayPtr<U>& rhs)
+{
+    WeakArrayPtr<T> ret;
+    ret.StaticCast(rhs);
+    return ret;
+}
+
+template <typename T, typename U>
+WeakArrayPtr<T> ReinterpretCast(const SharedArrayPtr<U> &rhs)
+{
+    WeakArrayPtr<T> ret;
+    ret.ReinterpretCast(rhs);
+    return ret;
+}
+
 } // namespace Pt
