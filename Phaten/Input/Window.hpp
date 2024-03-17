@@ -1,6 +1,9 @@
 #pragma once
 
+#include <string_view>
+
 #include "Graphics/GraphicsDefs.hpp"
+#include "Math/IntVector.hpp"
 
 struct SDL_Window;
 
@@ -9,16 +12,13 @@ namespace Pt {
 class Window 
 {
 public:
-    Window();
+    Window(std::string_view title, const IntV2& windowSize, ScreenMode mode);
     ~Window();
 
-    void OnUpdate();
-
-    void Init(ScreenMode mode);
-    void Clean();
+    void Flush();
 private:
-    bool running {true};
-    SDL_Window* window {nullptr};
+    SDL_Window* windowHandle {nullptr};
+    class GraphicsContext* graphicsContext;
 };
 
 } // namespace Pt

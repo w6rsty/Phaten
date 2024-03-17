@@ -1,26 +1,15 @@
 #include "Window.hpp"
-#include "SDL_video.h"
-
-#include <chrono>
-#include <thread>
 
 #include <SDL.h>
 #include <SDL_opengl.h>
 
+#include "Core/Assert.hpp"
+#include "Graphics/GraphicsContext.hpp"
+
 namespace Pt
 {
 
-Window::Window()
-{
-    Init(ScreenMode::WINDOWED);
-}
-
-Window::~Window()
-{
-    Clean();
-}
-
-void Window::Init(ScreenMode mode)
+Window::Window(std::string_view title, const IntV2& windowSize, ScreenMode mode)
 {
     SDL_SetHint(SDL_HINT_WINDOWS_DPI_AWARENESS, "permonitor");
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS);
@@ -38,56 +27,59 @@ void Window::Init(ScreenMode mode)
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE); 
 
+    SDL_DisplayMode displayMode;
+    SDL_GetDesktopDisplayMode(0, &displayMode);
+
+    IntV2 initialSize = windowSize;
+
+    if (!initialSize.x || !initialSize.y || initialSize.x > displayMode.w || initialSize.y > displayMode.h)
+        initialSize = IntV2(displayMode.w, displayMode.h);
+
     unsigned windowFlags = SDL_WINDOW_OPENGL | SDL_WINDOW_ALLOW_HIGHDPI;
     if (mode == ScreenMode::FULLSCREEN)
         windowFlags |= SDL_WINDOW_FULLSCREEN;
     else if (mode == ScreenMode::BORDERLESS_FULLSCREEN)
         windowFlags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
     
-    window = SDL_CreateWindow(
-        "Phaten",
+    windowHandle = SDL_CreateWindow(
+        title.data(),
         SDL_WINDOWPOS_UNDEFINED,
         SDL_WINDOWPOS_UNDEFINED,
-        800,
-        600,
-        windowFlags);
+        initialSize.x,
+        initialSize.y,
+        windowFlags
+    );
+
+    if (!windowHandle) {
+        PT_LOG_ERROR("Failed to create window");
+        return;
+    }
+
+    graphicsContext = new GraphicsContext(windowHandle);
+    if (!graphicsContext->IsValid())
+    {
+        PT_LOG_ERROR("Failed to create graphics context");
+        return;
+    }
 }
 
-void Window::Clean()
+Window::~Window()
 {
-    SDL_DestroyWindow(window);
+    if (windowHandle)
+        SDL_DestroyWindow(windowHandle);
+
+    if (graphicsContext)
+    {
+        delete graphicsContext;
+        graphicsContext = nullptr;
+    }
+
     SDL_Quit();
 }
 
-void Window::OnUpdate()
+void Window::Flush()
 {
-    SDL_Event event;
-    bool bQuit {false};
-
-    while (!bQuit)
-    {
-        while (SDL_PollEvent(&event))
-        {
-            if (event.type == SDL_QUIT)
-             bQuit = true;
-
-            if (event.type == SDL_WINDOWEVENT)
-            {
-                if (event.window.type == SDL_WINDOWEVENT_MINIMIZED)
-                    running = false;
-                if (event.window.event == SDL_WINDOWEVENT_RESTORED)
-                    running = true;
-            }
-        }
-
-        if (!running)
-        {
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
-            continue;
-        }
-
-        // render
-    }
+    graphicsContext->SwapBuffers();
 }
 
 } // namespace Pt

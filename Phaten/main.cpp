@@ -1,16 +1,27 @@
-#include <iostream>
-#include <cassert>
-#include <string>
+#include <glad/glad.h>
+#include <SDL.h>
 
-#include "Math/Vector.hpp"
+
+#include "Input/Window.hpp"
 
 int main()
 {
-    Pt::Vector3 v1{"1 2 3"};
-    Pt::Vector3 v2{"4 5 6"};
+    Pt::Window window{"Phaten", Pt::IntV2{800, 600}, Pt::ScreenMode::WINDOWED};
 
-    Pt::Vector3 v3 = v1.Cross(v2);
+    bool running = true;
+    SDL_Event event;
+    while (running)
+    {
+        while (SDL_PollEvent(&event))
+        {
+            if (event.type == SDL_QUIT) running = false;
+        }
 
-    std::cout << v3.ToString() << std::endl;
+        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        window.Flush();
+    }
+
     return 0;
 }
