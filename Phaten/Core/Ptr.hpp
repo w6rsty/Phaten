@@ -1,7 +1,8 @@
 #pragma once
 
-#include <type_traits>
 #include <cassert>
+#include <utility>
+#include <type_traits>
 
 namespace Pt {
 
@@ -163,7 +164,7 @@ public:
     /// Point to the object
     T* operator -> () const { assert(ptr); return ptr; }
     /// Dereference
-    T& operator * () const { assert(ptr); return ptr; }
+    T& operator * () const { assert(ptr); return *ptr; }
     /// Convert to T pointer
     operator T* () const { return ptr; }
 
@@ -195,6 +196,12 @@ SharedPtr<T> DynamicCast(const SharedPtr<U>& rhs)
     SharedPtr<T> ret;
     ret.DynamicCast(rhs); // This pointer should have DynamicCast() function.
     return ret;    
+}
+
+template <typename T, typename... Args>
+SharedPtr<T> CreateShared(Args&&... args)
+{
+    return SharedPtr<T>(new T(std::forward<Args>(args)...));
 }
 
 /// Pointer which holds a weak reference to a RefCounted subclass.
