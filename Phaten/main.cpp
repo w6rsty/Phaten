@@ -1,10 +1,16 @@
-#include "Core/Logger.hpp"
+#include <iostream>
+#include <cassert>
+#include <string>
 
-using namespace Pt;
+#include "Math/Vector.hpp"
 
 int main()
 {
-    PT_LOG_DEBUG("Test");
+    Pt::Vector3 v1{"1 2 3"};
+    Pt::Vector3 v2{"4 5 6"};
 
+    Pt::Vector3 v3 = v1.Cross(v2);
+
+    std::cout << v3.ToString() << std::endl;
     return 0;
 }

@@ -5,5 +5,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 project(${PROJECT_NAME} LANGUAGES CXX C)
 
+include(CMake/Tools.cmake)
+
 add_subdirectory(3rdlibs)
 add_subdirectory(Phaten)

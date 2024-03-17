@@ -1,8 +1,20 @@
-#include "Graphics/VertexBuffer.hpp"
+#include "VertexBuffer.hpp"
 
-#include "glad/glad.h"
+#include <glad/glad.h>
+
+#include "GraphicsDefs.hpp"
 
 namespace Pt {
+
+VertexBuffer::VertexBuffer()
+{
+
+}
+
+VertexBuffer::~VertexBuffer()
+{
+
+}
 
 bool VertexBuffer::Create(const void* data)
 {

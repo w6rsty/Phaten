@@ -1,15 +1,17 @@
-aux_source_directory(./ SRC_LIST)
-aux_source_directory(./Core SRC_LIST)
-aux_source_directory(./Graphics SRC_LIST)
-aux_source_directory(./Input SRC_LIST)
+set(TARGET_NAME Phaten)
 
-add_executable(main ${SRC_LIST})
-
-target_include_directories(main PRIVATE ./)
+add_engine_directory(Core)
+add_engine_directory(Graphics)
+add_engine_directory(Input)
+add_engine_directory(Math)
 
 set(PT_LIBS
-    debugbreak
     glad
+    SDL2-static
 )
 
-target_link_libraries(main ${PT_LIBS})
+add_executable(${TARGET_NAME} ${SOURCE_FILES} main.cpp)
+
+target_include_directories(${TARGET_NAME} PUBLIC .)
+
+target_link_libraries(${TARGET_NAME} PRIVATE ${PT_LIBS})
