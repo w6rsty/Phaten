@@ -4,6 +4,7 @@
 #include <utility>
 #include <type_traits>
 
+
 namespace Pt {
 
 /*
@@ -677,6 +678,80 @@ WeakArrayPtr<T> ReinterpretCast(const SharedArrayPtr<U> &rhs)
     WeakArrayPtr<T> ret;
     ret.ReinterpretCast(rhs);
     return ret;
+}
+
+/// A pointer which deletes the object when it leaves the scope.
+template <typename T>
+class ScopedPtr
+{
+public:
+    ScopedPtr() :
+        ptr(nullptr)
+    {
+    }
+
+    /// Construct from a raw pointer
+    ScopedPtr(T* ptr_) :
+        ptr(ptr_)
+    {
+    }
+
+    /// Copy construct, Transfer ownership.
+    ScopedPtr(const ScopedPtr<T>& ptr_) :
+        ptr(ptr_.ptr)
+    {
+        const_cast<ScopedPtr<T>&>(ptr_).ptr = nullptr;
+    }
+
+    ~ScopedPtr()
+    {
+        delete ptr;
+    }
+
+    ScopedPtr<T>& operator = (T* rhs)
+    {
+        delete ptr; 
+        ptr = rhs;
+        return *this;
+    }
+
+    ScopedPtr<T>& operator = (const ScopedPtr<T>& rhs)
+    {
+        delete ptr;
+        ptr = rhs.ptr;
+        const_cast<ScopedPtr<T>&>(rhs).ptr = nullptr;
+        return *this;
+    }
+
+    /// Detach the object and return the raw pointer.
+    T* Detach()
+    {
+        T* ret = ptr;
+        ptr = nullptr;
+        return ret;
+    }
+
+    /// Reset to null, delete the object if has.
+    void Reset()
+    {
+        *this = nullptr;
+    }
+
+    T* operator -> () const { assert(ptr); return ptr; }
+    T& operator *  () const { assert(ptr); return *this; }
+    operator T* () const { return ptr; }
+
+    T* Get() const { return ptr; }
+    bool IsNull() const { return ptr == nullptr; } 
+private:
+    /// Pointer to the object.
+    T* ptr;
+};
+
+template <typename T, typename... Args>
+ScopedPtr<T> CreateScoped(Args&&... args)
+{
+    return ScopedPtr<T>(new T(std::forward<Args>(args)...));
 }
 
 } // namespace Pt

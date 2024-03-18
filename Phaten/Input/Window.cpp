@@ -55,7 +55,7 @@ Window::Window(std::string_view title, const IntV2& windowSize, ScreenMode mode)
         return;
     }
 
-    graphicsContext = new GraphicsContext(windowHandle);
+    graphicsContext = CreateScoped<GraphicsContext>(windowHandle);
     if (!graphicsContext->IsValid())
     {
         PT_LOG_ERROR("Failed to create graphics context");
@@ -67,12 +67,6 @@ Window::~Window()
 {
     if (windowHandle)
         SDL_DestroyWindow(windowHandle);
-
-    if (graphicsContext)
-    {
-        delete graphicsContext;
-        graphicsContext = nullptr;
-    }
 
     SDL_Quit();
 }

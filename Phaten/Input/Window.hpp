@@ -2,8 +2,9 @@
 
 #include <string_view>
 
-#include "Graphics/GraphicsDefs.hpp"
+#include "Core/Ptr.hpp"
 #include "Math/IntVector.hpp"
+#include "Graphics/GraphicsDefs.hpp"
 
 struct SDL_Window;
 
@@ -18,7 +19,7 @@ public:
     void Flush();
 private:
     SDL_Window* windowHandle {nullptr};
-    class GraphicsContext* graphicsContext;
+    ScopedPtr<class GraphicsContext> graphicsContext;
 };
 
 } // namespace Pt

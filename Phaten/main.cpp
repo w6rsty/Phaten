@@ -1,12 +1,11 @@
 #include <glad/glad.h>
 #include <SDL.h>
 
-
 #include "Input/Window.hpp"
 
 int main()
 {
-    Pt::Window window{"Phaten", Pt::IntV2{800, 600}, Pt::ScreenMode::WINDOWED};
+    Pt::Window window{"Phaten", Pt::IntV2{1000, 600}, Pt::ScreenMode::WINDOWED};
 
     bool running = true;
     SDL_Event event;
