@@ -7,8 +7,12 @@ add_engine_directory(Math)
 
 set(PT_LIBS
     glad
-    SDL2-static SDL2main
+    SDL2-static
 )
+
+if (WIN32)
+    list(APPEND PT_LIBS SDL2main)
+endif()
 
 add_library(${TARGET_NAME} STATIC ${SOURCE_FILES})
 
