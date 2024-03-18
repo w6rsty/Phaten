@@ -7,11 +7,13 @@ add_engine_directory(Math)
 
 set(PT_LIBS
     glad
-    SDL2-static
+    SDL2-static SDL2main
 )
 
-add_executable(${TARGET_NAME} ${SOURCE_FILES} main.cpp)
+add_library(${TARGET_NAME} STATIC ${SOURCE_FILES})
 
 target_include_directories(${TARGET_NAME} PUBLIC .)
 
-target_link_libraries(${TARGET_NAME} PRIVATE ${PT_LIBS})
+target_link_libraries(${TARGET_NAME} PUBLIC ${PT_LIBS})
+
+target_compile_features(Phaten PUBLIC cxx_std_17)

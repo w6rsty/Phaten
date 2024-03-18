@@ -1,9 +1,10 @@
 #include <glad/glad.h>
+
 #include <SDL.h>
 
 #include "Input/Window.hpp"
 
-int main()
+int main(int argc, char *argv[])
 {
     Pt::Window window{"Phaten", Pt::IntV2{1000, 600}, Pt::ScreenMode::WINDOWED};
 
