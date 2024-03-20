@@ -3,22 +3,10 @@
 #include <vector>
 
 #include "Core/Ptr.hpp"
-#include "Graphics/GraphicsDefs.hpp"
+#include "Vertex.hpp"
+#include "GraphicsDefs.hpp"
 
 namespace Pt {
-
-struct VertexElement
-{
-
-};
-
-class VertexLayout
-{
-public:
-    size_t Size() const { return elements.size(); }
-private:
-    std::vector<VertexElement> elements;
-};
 
 class VertexBuffer : public RefCounted
 {
@@ -27,30 +15,34 @@ public:
     ~VertexBuffer();
 
     bool Define(BufferUsage usage, size_t numVertices, const VertexLayout& layout, const void* data = nullptr);
-    bool SetData();
-    void Bind();
+    /// Update buffer data, dicard means discard all old data.
+    bool SetData(size_t startVtxIdx, size_t numbVertices, const void* data, bool discard = false);
+    /// Bind certain attributes
+    /// Do not use 0.
+    void Bind(unsigned attributeMask);
 
-    size_t NumVertices() const { return numVertices; }
-    size_t NumElements() const { return layout.Size(); }
-    const VertexLayout& Layout() const { return layout; }
-    size_t VertexSize() const { return vertexSize; }
-    unsigned Attributes() const { return attributes; }
-    BufferUsage Usage() const { return usage; }
-    bool IsDynamic() const { return usage == BufferUsage::DYNAMIC; }
+    /// Get OpenGL object identifier
+    unsigned GLHandle() const { return m_Handle ? m_Handle : NO_GL_HANDLE; }
+    unsigned Attributes() const { return m_EnabledAttributes; } 
 
-    /// Get buffer OpenGL object identifier
-    unsigned GLBuffer() const { return buffer; }
+    /// Use buffer layout to calculate enabled attributes to a mask
+    static unsigned CalculateAttributesMask(const VertexLayout& layout);
 private:
+    /// Create OpenGL buffer
     bool Create(const void* data);
-    bool Release();
+    /// Release OpenGL resources
+    void Release();
 
-    unsigned buffer;
-    size_t numVertices;
-    size_t vertexSize;
-    unsigned attributes;
-    BufferUsage usage;
-
-    VertexLayout layout;
+    /// OpenGL object identifier
+    unsigned m_Handle;
+    /// Usage of the buffer(static/dynamic)
+    BufferUsage m_Usage;
+    /// Total number of vertices
+    size_t m_NumVertices;
+    /// Vertex buffer layout
+    VertexLayout m_Layout;
+    /// Enbabled vertex attributes
+    unsigned m_EnabledAttributes;
 };
 
 } // namespace Pt

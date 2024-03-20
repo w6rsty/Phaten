@@ -16,10 +16,15 @@ public:
     Window(std::string_view title, const IntV2& windowSize, ScreenMode mode);
     ~Window();
 
+    /// Call SDL swap window buffer.
     void Flush();
+    /// Get SDL native window handle.
+    SDL_Window* Handle() const { return m_WindowHandle; }
 private:
-    SDL_Window* windowHandle {nullptr};
-    ScopedPtr<class GraphicsContext> graphicsContext;
+    /// SDL native window handle.
+    SDL_Window* m_WindowHandle {nullptr};
+    /// OpenGL context
+    ScopedPtr<class GraphicsContext> m_GraphicsContext;
 };
 
 } // namespace Pt

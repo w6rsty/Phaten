@@ -1,5 +1,6 @@
 #include "Window.hpp"
 
+#include <glad/glad.h>
 #include <SDL.h>
 #include <SDL_opengl.h>
 
@@ -32,16 +33,26 @@ Window::Window(std::string_view title, const IntV2& windowSize, ScreenMode mode)
 
     IntV2 initialSize = windowSize;
 
-    if (!initialSize.x || !initialSize.y || initialSize.x > displayMode.w || initialSize.y > displayMode.h)
-        initialSize = IntV2(displayMode.w, displayMode.h);
+    if (!initialSize.x ||  initialSize.x > displayMode.w)
+    {
+        initialSize.x = displayMode.w;
+    }
+    if (!initialSize.y || initialSize.y > displayMode.h)
+    {
+        initialSize.y = displayMode.h;
+    }
 
     unsigned windowFlags = SDL_WINDOW_OPENGL | SDL_WINDOW_ALLOW_HIGHDPI;
     if (mode == ScreenMode::FULLSCREEN)
+    {
         windowFlags |= SDL_WINDOW_FULLSCREEN;
+    }
     else if (mode == ScreenMode::BORDERLESS_FULLSCREEN)
+    {
         windowFlags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
+    }
     
-    windowHandle = SDL_CreateWindow(
+    m_WindowHandle = SDL_CreateWindow(
         title.data(),
         SDL_WINDOWPOS_UNDEFINED,
         SDL_WINDOWPOS_UNDEFINED,
@@ -50,30 +61,36 @@ Window::Window(std::string_view title, const IntV2& windowSize, ScreenMode mode)
         windowFlags
     );
 
-    if (!windowHandle) {
+    if (!m_WindowHandle) {
         PT_LOG_ERROR("Failed to create window");
         return;
     }
 
-    graphicsContext = CreateScoped<GraphicsContext>(windowHandle);
-    if (!graphicsContext->IsValid())
+    m_GraphicsContext = CreateScoped<GraphicsContext>(m_WindowHandle);
+    if (!m_GraphicsContext->IsValid())
     {
         PT_LOG_ERROR("Failed to create graphics context");
         return;
     }
+
+    unsigned defaultVAO;
+    glGenVertexArrays(1, &defaultVAO);
+    glBindVertexArray(defaultVAO);
 }
 
 Window::~Window()
 {
-    if (windowHandle)
-        SDL_DestroyWindow(windowHandle);
+    if (m_WindowHandle)
+    {
+        SDL_DestroyWindow(m_WindowHandle);
+    }
 
     SDL_Quit();
 }
 
 void Window::Flush()
 {
-    graphicsContext->SwapBuffers();
+    m_GraphicsContext->SwapBuffers();
 }
 
 } // namespace Pt

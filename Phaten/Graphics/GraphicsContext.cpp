@@ -12,7 +12,9 @@ GraphicsContext::GraphicsContext(SDL_Window* windowHandle) :
 {
     PT_ASSERT(windowHandle);
     if (InitWindowContext() && InitOpenGLContext())
+    {
         isValid = true;
+    }
 
     PT_LOG_INFO("Using OpenGL version: ", glGetString(GL_VERSION));
 }
