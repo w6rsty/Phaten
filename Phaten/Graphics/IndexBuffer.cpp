@@ -123,7 +123,7 @@ void IndexBuffer::Release()
 {
     if(m_Handle)
     {
-        glDeleteBuffers(GL_ELEMENT_ARRAY_BUFFER, &m_Handle);
+        glDeleteBuffers(1, &m_Handle);
         m_Handle = 0;
 
         if (boundIndexBuffer == this)

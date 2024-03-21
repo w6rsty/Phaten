@@ -17,7 +17,7 @@ VertexBuffer::VertexBuffer() :
     m_NumVertices(0),
     m_EnabledAttributes(0)
 {
-    /// TODO: Ensure graphics system loaded.
+    // TODO: Ensure graphics system loaded.
 }
 
 VertexBuffer::~VertexBuffer()

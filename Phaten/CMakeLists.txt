@@ -4,6 +4,7 @@ add_engine_directory(Core)
 add_engine_directory(Graphics)
 add_engine_directory(Input)
 add_engine_directory(Math)
+add_engine_directory(Thread)
 
 set(PT_LIBS
     glad

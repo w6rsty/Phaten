@@ -5,6 +5,8 @@
 
 namespace Pt {
 
+static const size_t MAX_UNIFORM_BUFFER_SLOTS = 16;
+
 enum class ScreenMode
 {
     WINDOWED = 0,
