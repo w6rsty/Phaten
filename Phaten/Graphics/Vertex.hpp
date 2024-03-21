@@ -44,6 +44,11 @@ public:
     {
         CalculateStride();
     }
+    VertexLayout(std::initializer_list<VertexElement> elements) :
+        m_Elements(elements), m_Stride(0)
+    {
+        CalculateStride();
+    }
 
     size_t Stride() const { return m_Stride; } 
 

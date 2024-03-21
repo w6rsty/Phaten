@@ -3,8 +3,6 @@
 #include <glad/glad.h>
 
 #include "Core/Logger.hpp"
-#include "Graphics/Vertex.hpp"
-#include "GraphicsDefs.hpp"
 
 namespace Pt {
 
@@ -13,9 +11,13 @@ static VertexBuffer* boundVertexBuffer = nullptr;
 /// Pointer to vertex buffer whose attributes are being using.
 static VertexBuffer* boundVertexAttributeSource = nullptr;
 
-VertexBuffer::VertexBuffer()
+VertexBuffer::VertexBuffer() :
+    m_Handle(0),
+    m_Usage(BufferUsage::STATIC),
+    m_NumVertices(0),
+    m_EnabledAttributes(0)
 {
-    /// TODO: Ensure graphics system loaded
+    /// TODO: Ensure graphics system loaded.
 }
 
 VertexBuffer::~VertexBuffer()
@@ -41,15 +43,15 @@ bool VertexBuffer::Define(BufferUsage usage, size_t numVertices, const VertexLay
     return Create(data);
 }
 
-bool VertexBuffer::SetData(size_t startVtxIdx, size_t numbVertices, const void *data, bool discard)
+bool VertexBuffer::SetData(size_t startIdx, size_t numbVertices, const void *data, bool discard)
 {
     if (data)
     {   
-        PT_LOG_ERROR("Data is null, you fool!");
+        PT_LOG_ERROR("Vertex data is null, you fool!");
         return false;
     }
 
-    if (startVtxIdx + numbVertices > m_NumVertices)
+    if (startIdx + numbVertices > m_NumVertices)
     {
         PT_LOG_ERROR("Invalid range of vertices");
         return false;
@@ -57,29 +59,29 @@ bool VertexBuffer::SetData(size_t startVtxIdx, size_t numbVertices, const void *
 
     if (!m_Handle)
     {
-        PT_LOG_ERROR("Buffer has not been created");
+        PT_LOG_ERROR("Index buffer has not been created");
         return false;
     }
 
     Bind(0);
 
-    GLsizeiptr vertexSize = numbVertices * m_Layout.Stride();
+    GLsizeiptr totalVertexSize = numbVertices * m_Layout.Stride();
     GLenum usage = m_Usage == BufferUsage::DYNAMIC ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW;
 
     if (numbVertices == m_NumVertices)
     {
-        glBufferData(GL_ARRAY_BUFFER, vertexSize, data, usage);
+        glBufferData(GL_ARRAY_BUFFER, totalVertexSize, data, usage);
     }
     else
     {
         if (discard)
         {
-            glBufferData( GL_ARRAY_BUFFER, vertexSize, nullptr, usage);
+            glBufferData( GL_ARRAY_BUFFER, totalVertexSize, nullptr, usage);
         }
 
         glBufferSubData(
             GL_ARRAY_BUFFER,
-            startVtxIdx * m_Layout.Stride(),
+            startIdx * m_Layout.Stride(),
             numbVertices * m_Layout.Stride(), 
             data
         );
@@ -206,17 +208,20 @@ void VertexBuffer::Release()
     if (m_Handle)
     {
         glDeleteBuffers(1, &m_Handle);
-    }
-    if (boundVertexBuffer == this)
-    {
-        boundVertexBuffer = nullptr;
-    }
-    if (boundVertexAttributeSource == this)
-    {
-        boundVertexAttributeSource = nullptr;
+        m_Handle = 0;
+
+        if (boundVertexBuffer == this)
+        {
+            boundVertexBuffer = nullptr;
+        }
+        if (boundVertexAttributeSource == this)
+        {
+            boundVertexAttributeSource = nullptr;
+        }
     }
 }
 
+/// Static function, calculate attribute mask of a vertex layout.
 unsigned VertexBuffer::CalculateAttributesMask(const VertexLayout &layout)
 {
     unsigned attributes = 0;

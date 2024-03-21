@@ -5,8 +5,6 @@
 
 namespace Pt {
 
-static const unsigned NO_GL_HANDLE = -1;
-
 enum class ScreenMode
 {
     WINDOWED = 0,
