@@ -4,7 +4,13 @@
 #include <string>
 #include <string_view>
 
+#include "Core/Core.hpp"
+
 namespace Pt {
+
+/// Process ===================================================================
+/// ===========================================================================
+
 
 std::string FormatString(const char* format, ...);
 
@@ -41,5 +47,20 @@ void ReplaceIn(std::string& str, std::string_view from, std::string_view to);
 void CommentFunction(std::string& sourceCode, std::string_view signature);
 /// Remove a function in shader source code.
 void RemoveFunction(std::string& sourceCode, std::string_view signature);
+
+/// Return item index of the list
+size_t IndexOfList(std::string_view str, const std::string* list, size_t defaultIdx);
+
+int ParseInt(std::string_view str);
+
+/// Output ====================================================================
+/// ===========================================================================
+
+
+/// For shader source code debuging.
+#ifdef PT_SHADER_DEBUG
+void PrintShaderByLine(std::string_view str, std::string_view error);
+#endif
+
 
 } // namespace Pt

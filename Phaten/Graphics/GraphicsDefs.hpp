@@ -5,6 +5,7 @@
 
 namespace Pt {
 
+static const std::string PT_GL_VERSION = "410 core";
 static const size_t MAX_UNIFORM_BUFFER_SLOTS = 16;
 
 enum class ScreenMode
@@ -59,11 +60,20 @@ enum class PresetUniform : size_t
     MAX_PRESET_UNIFORMS
 };
 
+enum class ShaderType
+{
+    Vertex,
+    Fragment
+};
 
 extern const unsigned VertexElementGLCount[];
 extern const unsigned VertexElementGLType[];
 extern const unsigned VertexElementSize[];
 extern const unsigned VertexAttributeIdx[];
+
+extern const std::string VertexAttributeName[];
+extern const std::string VertexElementSemanticName[];
+extern const std::string PresetUniformName[];
 
 std::string AttributesToString(unsigned attributes);
 

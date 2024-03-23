@@ -17,9 +17,8 @@ Perform some post processing. Then compile and link to generate a
 OpenGL shader program.
 Most in:
 ShaderProgram::Create()
-1. Handle process codes and macros
-    - Macro subsitution.
-    - Add #define for vertex and fragment shader.
+1. Handle macros
+    - Add macro definition for vertex and fragment shader.
 2. Compile shaders
 3. Link shader program
 4. Collect shader infos
@@ -55,9 +54,15 @@ public:
     int Uniform(PresetUniform name) const;
 
     unsigned GLHandle() const { return m_Handle; }
+
+    static std::pair<unsigned, int> CreateShader(
+        ShaderType type,
+        std::string_view sourceCode,
+        const std::vector<std::string>& defines
+    );
 private:
     /// Compile and linked. Core function.
-    bool Create(
+    void Create(
         std::string_view sourceCode,
         const std::vector<std::string>& vsDefines, 
         const std::vector<std::string>& fsDefines

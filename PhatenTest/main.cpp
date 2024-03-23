@@ -10,6 +10,7 @@
 #include "Graphics/UniformBuffer.hpp"
 #include "Graphics/ShaderProgram.hpp"
 #include "Input/Window.hpp"
+#include "Math/Vector.hpp"
 
 using namespace Pt;
 
@@ -31,35 +32,40 @@ std::string ReadFile(std::string_view path)
 
 int main(int argc, char *argv[])
 {
-    Pt::Window window{"Phaten", Pt::IntV2{800, 600}, Pt::ScreenMode::WINDOWED};
+    Window window{"Phaten", IntV2{800, 600}, ScreenMode::WINDOWED};
 
     float vertices[] = {
-        -0.5f, -0.5f, 1.0f,
-         0.5f, -0.5f, 1.0f,
-         0.5f,  0.5f, 1.0f,
-        -0.5f,  0.5f, 1.0f,
+        -0.5f, -0.5f, 1.0f, 1.0f, 0.0f, 0.0f,
+         0.5f, -0.5f, 1.0f, 0.0f, 1.0f, 0.0f,
+         0.5f,  0.5f, 1.0f, 0.0f, 0.0f, 1.0f,
     };
 
-    Pt::VertexBuffer vertexBuffer;
+    VertexBuffer vertexBuffer;
 
-    Pt::VertexLayout layout = {
-        {Pt::VertexElementType::FLOAT3, Pt::VertexElementSemantic::POSITION},
+    VertexLayout layout = {
+        {VertexElementType::FLOAT3, VertexElementSemantic::POSITION},
+        {VertexElementType::FLOAT3, VertexElementSemantic::VERTEX_COLOR},
     };
 
-    vertexBuffer.Define(Pt::BufferUsage::STATIC, 4, layout, vertices);
+    vertexBuffer.Define(BufferUsage::STATIC, 3, layout, vertices);
     vertexBuffer.Bind(vertexBuffer.Attributes());
 
     unsigned indices[] = {
         0, 1, 2,
-        2, 3, 0
     };
 
-    Pt::IndexBuffer indexBuffer;
-    indexBuffer.Define(Pt::BufferUsage::STATIC, 6, indices);
+    IndexBuffer indexBuffer;
+    indexBuffer.Define(BufferUsage::STATIC, 3, indices);
     indexBuffer.Bind();
+    
+    Pt::Vector4 color {1, 0, 1, 1};
+
+    UniformBuffer uniformBuffer;
+    uniformBuffer.Define(BufferUsage::STATIC, sizeof(float) * 4, &color);
+    uniformBuffer.Bind(0);
 
     std::string shaderSource = ReadFile("Shaders/test.glsl");
-    ShaderProgram shader(shaderSource, "test", std::string(), std::string());
+    ShaderProgram shader(shaderSource, "Test", "", "");
 
     bool running = true;
     SDL_Event event;
@@ -72,7 +78,7 @@ int main(int argc, char *argv[])
 
         glClear(GL_COLOR_BUFFER_BIT);
         shader.Bind();
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, indexBuffer.NumIndices(), GL_UNSIGNED_INT, 0);
 
         window.Flush();
     }

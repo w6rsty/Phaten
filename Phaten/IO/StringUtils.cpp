@@ -1,8 +1,16 @@
 #include "StringUtils.hpp"
 
+#include <iomanip>
+#include <iostream>
+#include <sstream>
+#include <string>
+
 #include "Core/Assert.hpp"
 
 namespace Pt {
+
+/// Process ===================================================================
+/// ===========================================================================
 
 std::string FormatString(const char* format, ...)
 {
@@ -17,6 +25,10 @@ std::string FormatString(const char* format, ...)
 std::vector<std::string> Split(std::string_view str, char delimiter)
 {
     std::vector<std::string> ret;
+    if (str.empty())
+    {
+        return ret;
+    }
     size_t start = 0;
     size_t end = 0;
     while ((end = str.find(delimiter, start)) != std::string::npos)
@@ -120,5 +132,65 @@ void RemoveFunction(std::string& sourceCode, std::string_view signature)
         }
     }
 }
+
+size_t IndexOfList(std::string_view str, const std::string* list, size_t defaultIdx)
+{
+    size_t idx = 0;
+    for (const std::string* ptr = list; ptr->size() > 0; ++ptr)
+    {
+        if (ptr->compare(str) == 0)
+        {
+            return idx;
+        }
+        ++idx;
+    }
+    return defaultIdx;
+}
+
+int ParseInt(std::string_view str)
+{
+    return std::stoi(std::string(str));
+}
+
+/// Output ====================================================================
+/// ===========================================================================
+
+#ifdef PT_SHADER_DEBUG
+static int FindErrorLineNumber(std::string_view str)
+{
+    std::string errorToken = "ERROR:";
+    size_t errorTokenPos = str.find(errorToken);
+    if (errorTokenPos == std::string::npos)
+    {
+        return -1;
+    }
+
+    size_t lineNumStart = str.find_first_of(":", errorTokenPos + errorToken.size());
+    size_t lineNumEnd = str.find_first_of(":", lineNumStart + 1);
+
+    return ParseInt(str.substr(lineNumStart + 1, lineNumEnd - lineNumStart - 1));
+}
+
+void PrintShaderByLine(std::string_view str, std::string_view error)
+{
+    int errorLine = FindErrorLineNumber(error);
+
+    std::istringstream stream(str.data());
+    std::string line;
+    int lineNum = 1;
+    while (std::getline(stream, line))
+    {
+        if (lineNum == errorLine && errorLine > 0)
+        {
+            std::cout << "\x1b[31m" << std::setw(3) << lineNum << ": " << line << "\x1b[0m" << std::endl;
+        }
+        else
+        {
+            std::cout << std::setw(3) << lineNum << ": " << line << std::endl;
+        }
+        ++lineNum;
+    }
+}
+#endif
 
 } // namespace Pt

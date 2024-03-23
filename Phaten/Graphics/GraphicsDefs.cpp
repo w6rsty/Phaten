@@ -45,6 +45,31 @@ const unsigned VertexAttributeIdx[]
     4, // TEXCOORD
 };
 
+const std::string VertexAttributeName[]
+{
+    "aPosition",
+    "aNormal",
+    "aTangent",
+    "aVertexColor",
+    "aTexCoord"
+};
+
+const std::string VertexElementSemanticName[]
+{
+    "POSITION",
+    "NORMAL",
+    "TANGENT",
+    "VERTEX_COLOR",
+    "TEXCOORD",
+    ""
+};
+
+const std::string PresetUniformName[]
+{
+    "uWorldMatrix",
+    ""
+};
+
 std::string AttributesToString(unsigned attributes)
 {
     return std::bitset<8>(attributes).to_string();

@@ -1,6 +1,6 @@
-#include "Core/Ptr.hpp"
+#include "Ptr.hpp"
 
-#include "Core/Allocator.hpp"
+#include "Allocator.hpp"
 
 #include <cassert>
 

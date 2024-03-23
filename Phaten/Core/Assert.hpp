@@ -2,9 +2,8 @@
 
 #include <cassert>
 
-#include "Core/Logger.hpp"
-
-#define PT_ENABLE_ASSERTION 1
+#include "Core.hpp"
+#include "Logger.hpp"
 
 namespace Pt
 {
