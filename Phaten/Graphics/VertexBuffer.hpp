@@ -26,7 +26,7 @@ public:
     BufferUsage Usage() const { return m_Usage; }
     bool IsDynamic() const { return m_Usage == BufferUsage::DYNAMIC; }
     size_t NumVertices() const { return m_NumVertices; }
-    unsigned Attributes() const { return m_EnabledAttributes; } 
+    unsigned Attributes() const { return m_Attributes; } 
 
     /// Use buffer layout to calculate enabled attributes to a mask
     static unsigned CalculateAttributesMask(const VertexLayout& layout);
@@ -45,7 +45,7 @@ private:
     /// Vertex buffer layout
     VertexLayout m_Layout;
     /// Enbabled vertex attributes
-    unsigned m_EnabledAttributes;
+    unsigned m_Attributes;
 };
 
 } // namespace Pt

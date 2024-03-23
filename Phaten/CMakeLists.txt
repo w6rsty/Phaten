@@ -3,7 +3,9 @@ set(TARGET_NAME Phaten)
 add_engine_directory(Core)
 add_engine_directory(Graphics)
 add_engine_directory(Input)
+add_engine_directory(IO)
 add_engine_directory(Math)
+add_engine_directory(Resource)
 add_engine_directory(Thread)
 
 set(PT_LIBS

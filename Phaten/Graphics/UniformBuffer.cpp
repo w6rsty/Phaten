@@ -6,6 +6,7 @@
 
 namespace Pt {
 
+/// Store all uniform buffer binding point.
 static UniformBuffer* boundUniformBuffers[MAX_UNIFORM_BUFFER_SLOTS] {nullptr};
 
 UniformBuffer::UniformBuffer() :
@@ -18,6 +19,7 @@ UniformBuffer::UniformBuffer() :
 
 UniformBuffer::~UniformBuffer()
 {
+    // TODO: Ensure graphics system loaded.
     Release();
 }
 
@@ -39,23 +41,22 @@ bool UniformBuffer::Define(BufferUsage usage, size_t sizeByte, const void* data)
 
 bool UniformBuffer::SetData(size_t offsetByte, size_t sizeByte, const void *data, bool discard)
 {
+    if (!m_Handle)
+    {
+        PT_LOG_ERROR("Uniform buffer has no been created");
+        return false;
+    }
     if (!data)
     {
         PT_LOG_ERROR("Uniform data is null, you fool!");
         return false;
     }
-
     if (offsetByte + sizeByte > m_SizeByte)
     {
         PT_LOG_ERROR("Setting uniform data out of range");
         return false;
     }
 
-    if (!m_Handle)
-    {
-        PT_LOG_ERROR("Uniform buffer has no been created");
-        return false;
-    }
 
     GLenum usage = m_Usage == BufferUsage::DYNAMIC ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW;
     glBindBuffer(GL_UNIFORM_BUFFER, m_Handle);

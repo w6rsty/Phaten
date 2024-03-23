@@ -19,6 +19,7 @@ IndexBuffer::IndexBuffer() :
 
 IndexBuffer::~IndexBuffer()
 {
+    // TODO: Ensure graphics system loaded.
     Release();
 }
 
@@ -40,21 +41,19 @@ bool IndexBuffer::Define(BufferUsage usage, size_t numIndices, const void* data)
 
 bool IndexBuffer::SetData(size_t startIdx, size_t numIndices, const void *data, bool discard)
 {
+    if (!m_Handle)
+    {
+        PT_LOG_ERROR("Index buffer has not been created");
+        return false;
+    }
     if (data)
     {   
         PT_LOG_ERROR("Index data is null, you fool!");
         return false;
     }
-
     if (startIdx + numIndices > m_NumIndices)
     {
         PT_LOG_ERROR("Invalid range of indices");
-        return false;
-    }
-
-    if (!m_Handle)
-    {
-        PT_LOG_ERROR("Index buffer has not been created");
         return false;
     }
 

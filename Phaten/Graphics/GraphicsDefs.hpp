@@ -21,7 +21,7 @@ enum class BufferUsage
 };
 
 /// element type for vertex element
-enum class VertexElementType
+enum class VertexElementType : size_t
 {
     INT = 0,
     FLOAT,
@@ -33,7 +33,7 @@ enum class VertexElementType
 };
 
 /// Vertex attribute semantic
-enum class VertexElementSemantic
+enum class VertexElementSemantic : size_t
 {
     POSITION = 0,
     NORMAL,
@@ -43,7 +43,7 @@ enum class VertexElementSemantic
     MAX_ELEMENT_SEMANTIC
 };
 
-enum class VertexAttributeType
+enum class VertexAttributeType : size_t
 {
     POSTION = 0,
     NORMAL,
@@ -52,6 +52,13 @@ enum class VertexAttributeType
     TEXCOORD,
     MAX_ATTRIBUTE
 };
+
+enum class PresetUniform : size_t
+{
+    U_WORLD_MATRIX,
+    MAX_PRESET_UNIFORMS
+};
+
 
 extern const unsigned VertexElementGLCount[];
 extern const unsigned VertexElementGLType[];

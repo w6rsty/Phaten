@@ -15,13 +15,14 @@ VertexBuffer::VertexBuffer() :
     m_Handle(0),
     m_Usage(BufferUsage::STATIC),
     m_NumVertices(0),
-    m_EnabledAttributes(0)
+    m_Attributes(0)
 {
     // TODO: Ensure graphics system loaded.
 }
 
 VertexBuffer::~VertexBuffer()
 {
+    // TODO: Ensure graphics system loaded.
     Release();    
 }
 
@@ -37,7 +38,7 @@ bool VertexBuffer::Define(BufferUsage usage, size_t numVertices, const VertexLay
     // Read layout and set enabled vertex attributes
     if (m_Layout)
     {
-        m_EnabledAttributes = CalculateAttributesMask(m_Layout);
+        m_Attributes = CalculateAttributesMask(m_Layout);
     }
     
     return Create(data);
@@ -45,21 +46,19 @@ bool VertexBuffer::Define(BufferUsage usage, size_t numVertices, const VertexLay
 
 bool VertexBuffer::SetData(size_t startIdx, size_t numbVertices, const void *data, bool discard)
 {
+    if (!m_Handle)
+    {
+        PT_LOG_ERROR("Index buffer has not been created");
+        return false;
+    }
     if (data)
     {   
         PT_LOG_ERROR("Vertex data is null, you fool!");
         return false;
     }
-
     if (startIdx + numbVertices > m_NumVertices)
     {
         PT_LOG_ERROR("Invalid range of vertices");
-        return false;
-    }
-
-    if (!m_Handle)
-    {
-        PT_LOG_ERROR("Index buffer has not been created");
         return false;
     }
 
@@ -96,7 +95,6 @@ void VertexBuffer::Bind(unsigned int attributeMask)
     {
         return;
     }
-
     // This 0 condition is only for creating vertex buffer
     // bescase glBufferData needs this buffer being bound. 
     // Just bind and return.
@@ -111,7 +109,7 @@ void VertexBuffer::Bind(unsigned int attributeMask)
     }
 
     // Filter attributes which don't have.
-    attributeMask &= m_EnabledAttributes;
+    attributeMask &= m_Attributes;
 
     // Return if has been bound
     if (attributeMask == boundVertexAttributes 
@@ -119,7 +117,6 @@ void VertexBuffer::Bind(unsigned int attributeMask)
     {
         return;
     }
-
     // Ensure binding for later operations.
     if (boundVertexBuffer != this)
     {
