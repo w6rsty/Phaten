@@ -11,6 +11,7 @@ namespace Pt {
 /// Process ===================================================================
 /// ===========================================================================
 
+std::string ReadFile(std::string_view path);
 
 std::string FormatString(const char* format, ...);
 
@@ -42,7 +43,6 @@ std::string Replace(std::string_view str, char from, char to);
 /// Replace a string in a string
 void ReplaceIn(std::string& str, std::string_view from, std::string_view to);
 
-
 /// Comment out a function in shader source code.
 void CommentFunction(std::string& sourceCode, std::string_view signature);
 /// Remove a function in shader source code.
@@ -52,6 +52,9 @@ void RemoveFunction(std::string& sourceCode, std::string_view signature);
 size_t IndexOfList(std::string_view str, const std::string* list, size_t defaultIdx);
 
 int ParseInt(std::string_view str);
+
+bool StartWith(std::string_view str, std::string_view substr);
+void TrimSpace(std::string& str);
 
 /// Output ====================================================================
 /// ===========================================================================

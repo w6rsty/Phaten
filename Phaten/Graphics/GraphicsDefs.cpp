@@ -70,9 +70,23 @@ const std::string PresetUniformName[]
     ""
 };
 
-std::string AttributesToString(unsigned attributes)
+std::string AttributesBitToString(unsigned attributes)
 {
     return std::bitset<8>(attributes).to_string();
+}
+
+std::string ShowAttributes(unsigned attributes)
+{
+    std::string result = "";
+    int max = static_cast<int>(VertexAttributeType::MAX_ATTRIBUTE);
+    for (int i = 0; i < max; ++i)
+    {
+        if (attributes & (1 << i))
+        {
+            result += VertexAttributeName[i] + "\n";
+        }
+    }
+    return result;
 }
 
 } // namespace Pt

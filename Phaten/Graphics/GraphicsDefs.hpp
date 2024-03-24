@@ -75,6 +75,9 @@ extern const std::string VertexAttributeName[];
 extern const std::string VertexElementSemanticName[];
 extern const std::string PresetUniformName[];
 
-std::string AttributesToString(unsigned attributes);
+std::string AttributesBitToString(unsigned attributes);
+
+/// Generate attribute information deubg string.
+std::string ShowAttributes(unsigned attributes);
 
 } // namespace Pt

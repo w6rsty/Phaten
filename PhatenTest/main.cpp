@@ -1,61 +1,42 @@
-#include <iostream>
-#include <fstream>
-
 #include <glad/glad.h>
 #include <SDL.h>
 
-#include "Graphics/GraphicsDefs.hpp"
+#include "Graphics/Shader.hpp"
 #include "Graphics/VertexBuffer.hpp"
 #include "Graphics/IndexBuffer.hpp"
 #include "Graphics/UniformBuffer.hpp"
-#include "Graphics/ShaderProgram.hpp"
 #include "Input/Window.hpp"
 #include "Math/Vector.hpp"
 
 using namespace Pt;
-
-std::string ReadFile(std::string_view path)
-{
-    std::ifstream file(path.data(), std::ios::in | std::ios::ate);
-    if (!file.is_open())
-    {
-        return "";
-    }
-    std::string content;
-    size_t size = file.tellg();
-    content.resize(size);
-    file.seekg(0, std::ios::beg);
-    file.read(&content[0], size);
-    file.close();
-    return content;
-}
 
 int main(int argc, char *argv[])
 {
     Window window{"Phaten", IntV2{800, 600}, ScreenMode::WINDOWED};
 
     float vertices[] = {
-        -0.5f, -0.5f, 1.0f, 1.0f, 0.0f, 0.0f,
-         0.5f, -0.5f, 1.0f, 0.0f, 1.0f, 0.0f,
-         0.5f,  0.5f, 1.0f, 0.0f, 0.0f, 1.0f,
+        -1.0f, -1.0f, 1.0f,
+         1.0f, -1.0f, 1.0f,
+         1.0f,  1.0f, 1.0f,
+        -1.0f,  1.0f, 1.0f,
     };
 
     VertexBuffer vertexBuffer;
 
     VertexLayout layout = {
         {VertexElementType::FLOAT3, VertexElementSemantic::POSITION},
-        {VertexElementType::FLOAT3, VertexElementSemantic::VERTEX_COLOR},
     };
 
-    vertexBuffer.Define(BufferUsage::STATIC, 3, layout, vertices);
+    vertexBuffer.Define(BufferUsage::STATIC, 4, layout, vertices);
     vertexBuffer.Bind(vertexBuffer.Attributes());
 
     unsigned indices[] = {
         0, 1, 2,
+        2, 3, 0,
     };
 
     IndexBuffer indexBuffer;
-    indexBuffer.Define(BufferUsage::STATIC, 3, indices);
+    indexBuffer.Define(BufferUsage::STATIC, 6, indices);
     indexBuffer.Bind();
     
     Pt::Vector4 color {1, 0, 1, 1};
@@ -64,8 +45,9 @@ int main(int argc, char *argv[])
     uniformBuffer.Define(BufferUsage::STATIC, sizeof(float) * 4, &color);
     uniformBuffer.Bind(0);
 
-    std::string shaderSource = ReadFile("Shaders/test.glsl");
-    ShaderProgram shader(shaderSource, "Test", "", "");
+    Shader shader;
+    shader.Define("Shaders/Test.glsl");
+    auto program = SharedPtr(shader.CreateProgram("Test", "", ""));
 
     bool running = true;
     SDL_Event event;
@@ -77,7 +59,7 @@ int main(int argc, char *argv[])
         }
 
         glClear(GL_COLOR_BUFFER_BIT);
-        shader.Bind();
+        program->Bind();
         glDrawElements(GL_TRIANGLES, indexBuffer.NumIndices(), GL_UNSIGNED_INT, 0);
 
         window.Flush();

@@ -1,9 +1,6 @@
 #pragma once
 
 #include <map>
-#include <vector>
-#include <string>
-#include <string_view>
 
 #include "Core/Ptr.hpp"
 #include "IO/StringHash.hpp"
@@ -24,7 +21,8 @@ ShaderProgram::Create()
 4. Collect shader infos
     - Get used attributes and convert into a bitmask.
     - Get used uniform.
-    - Get used uniform blokcks, bind them to related binding point.
+    - Bind sampler.
+    - Get used uniform blocks, bind them to related binding point.
 */
 
 /// Linked shader program.

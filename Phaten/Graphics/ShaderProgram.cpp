@@ -165,6 +165,9 @@ void ShaderProgram::Create(
             m_Attributes |= (1 << attributeIdx);
         }
     }
+#ifdef PT_SHADER_DEBUG
+        PT_LOG_DEBUG("Active attributes:\n", ShowAttributes(m_Attributes));
+#endif
 
     // Get used uniforms ============================================
 
@@ -290,7 +293,7 @@ std::pair<unsigned, int> ShaderProgram::CreateShader(
 
 // print shader source code
 #ifdef PT_SHADER_DEBUG_SHOW
-    PrintByLine(shaderSourceStr);
+    PrintShaderByLine(shaderSourceStr, "");        
 #endif
 
     int shaderCompiled;

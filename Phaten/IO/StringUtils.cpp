@@ -3,7 +3,7 @@
 #include <iomanip>
 #include <iostream>
 #include <sstream>
-#include <string>
+#include <fstream>
 
 #include "Core/Assert.hpp"
 
@@ -11,6 +11,22 @@ namespace Pt {
 
 /// Process ===================================================================
 /// ===========================================================================
+
+std::string ReadFile(std::string_view path)
+{
+    std::ifstream file(path.data(), std::ios::in | std::ios::ate);
+    if (!file.is_open())
+    {
+        return "";
+    }
+    std::string content;
+    size_t size = file.tellg();
+    content.resize(size);
+    file.seekg(0, std::ios::beg);
+    file.read(&content[0], size);
+    file.close();
+    return content;
+}
 
 std::string FormatString(const char* format, ...)
 {
@@ -152,6 +168,22 @@ int ParseInt(std::string_view str)
     return std::stoi(std::string(str));
 }
 
+bool StartWith(std::string_view str, std::string_view substr)
+{
+    return str.find(substr) == 0;
+}
+
+void TrimSpace(std::string& str)
+{
+    size_t start = str.find_first_not_of(" \t\n\r");
+    if (start == std::string::npos)
+    {
+        str.clear();
+        return;
+    }
+    size_t end = str.find_last_not_of(" \t\n\r");
+    str = str.substr(start, end - start + 1);
+}
 /// Output ====================================================================
 /// ===========================================================================
 
