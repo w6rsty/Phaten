@@ -4,23 +4,23 @@ struct SDL_Window;
 
 namespace Pt {
 
+/// Consists of a window handle and an OpenGL context handle.
 class GraphicsContext
 {
+    friend class Graphics;
 public:
     GraphicsContext(SDL_Window* windowHandle);
     ~GraphicsContext();
 
+    bool IsValid() const { return m_IsValid; }
+private:
     bool InitWindowContext();
     bool InitOpenGLContext();
-    void Clean();
+    void Release();
 
-    void SwapBuffers();
-
-    bool IsValid() const { return isValid; }
-private:
-    SDL_Window* windowHandle {nullptr};
-    void* contextHandle {nullptr};
-    bool isValid {false};
+    SDL_Window* m_WindowHandle;
+    void* m_GLContextHandle;
+    bool m_IsValid;
 };
 
-} // namespaec Pt
+} // namespace Pt

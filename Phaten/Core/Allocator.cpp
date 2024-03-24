@@ -92,7 +92,7 @@ void AllocatorFree(AllocatorBlock* allocator, void* ptr)
     assert(!node->next); // Potential illegal free of object not allocated via the allocator
 
     node->next = allocator->free;
-    allocator->free = node;   
+    allocator->free = node;
 }
 
 } // namespace Pt

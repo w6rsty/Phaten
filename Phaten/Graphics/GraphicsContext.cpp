@@ -8,27 +8,34 @@
 namespace Pt {
 
 GraphicsContext::GraphicsContext(SDL_Window* windowHandle) :
-    windowHandle(windowHandle)
+    m_WindowHandle(windowHandle),
+    m_GLContextHandle(nullptr),
+    m_IsValid(false)
 {
-    PT_ASSERT(windowHandle);
-    if (InitWindowContext() && InitOpenGLContext())
+    if (!InitWindowContext())
     {
-        isValid = true;
+        PT_ASSERT_MSG(false, "Failed to create window context");
+    } 
+    if (!InitOpenGLContext())
+    {
+        PT_ASSERT_MSG(false, "Failed to create OpenGL context");
     }
 
-    PT_LOG_INFO("Using OpenGL version: ", glGetString(GL_VERSION));
+    m_IsValid = true;
+
+    PT_LOG_INFO("OpenGL version: ", glGetString(GL_VERSION));
 }
 
 GraphicsContext::~GraphicsContext()
 {
-    Clean();
+    Release();
 }
 
 bool GraphicsContext::InitWindowContext()
 {
-    PT_ASSERT(windowHandle);
-    contextHandle = SDL_GL_CreateContext(windowHandle);
-    if (!contextHandle)
+    PT_ASSERT_MSG(m_WindowHandle, "Window handle is null");
+    m_GLContextHandle = SDL_GL_CreateContext(m_WindowHandle);
+    if (!m_GLContextHandle)
     {
         PT_LOG_FATAL("Failed to create OpenGL context: ", SDL_GetError());
         return false;
@@ -46,17 +53,12 @@ bool GraphicsContext::InitOpenGLContext()
     return true;
 }
 
-void GraphicsContext::SwapBuffers()
+void GraphicsContext::Release()
 {
-    SDL_GL_SwapWindow(windowHandle);
-}
-
-void GraphicsContext::Clean()
-{
-    if (contextHandle)
+    if (m_GLContextHandle)
     {
-        SDL_GL_DeleteContext(contextHandle);
-        contextHandle = nullptr;
+        SDL_GL_DeleteContext(m_GLContextHandle);
+        m_GLContextHandle = nullptr;
     }
 }
 

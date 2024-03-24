@@ -287,7 +287,7 @@ std::pair<unsigned, int> ShaderProgram::CreateShader(
         shaderSourceCode += "#define " + define + "\n";
     }
     shaderSourceCode += std::string(sourceCode);
-    CommentFunction(shaderSourceCode, (type == ShaderType::Vertex) ? "void frag()" : "void vert()");
+    RemoveFunction(shaderSourceCode, (type == ShaderType::Vertex) ? "void frag()" : "void vert()");
     ReplaceIn(shaderSourceCode, (type == ShaderType::Vertex) ? "vert()" : "frag()", "main()");
     const char* shaderSourceStr = shaderSourceCode.c_str();
 

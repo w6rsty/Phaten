@@ -1,11 +1,9 @@
 #include "Window.hpp"
 
-#include <glad/glad.h>
 #include <SDL.h>
 #include <SDL_opengl.h>
 
 #include "Core/Assert.hpp"
-#include "Graphics/GraphicsContext.hpp"
 
 namespace Pt
 {
@@ -66,16 +64,7 @@ Window::Window(std::string_view title, const IntV2& windowSize, ScreenMode mode)
         return;
     }
 
-    m_GraphicsContext = CreateScoped<GraphicsContext>(m_WindowHandle);
-    if (!m_GraphicsContext->IsValid())
-    {
-        PT_LOG_ERROR("Failed to create graphics context");
-        return;
-    }
-
-    unsigned defaultVAO;
-    glGenVertexArrays(1, &defaultVAO);
-    glBindVertexArray(defaultVAO);
+    PT_LOG_INFO("Created Window: ", title, " ", initialSize.x, "x", initialSize.y);
 }
 
 Window::~Window()
@@ -86,11 +75,6 @@ Window::~Window()
     }
 
     SDL_Quit();
-}
-
-void Window::Flush()
-{
-    m_GraphicsContext->SwapBuffers();
 }
 
 } // namespace Pt

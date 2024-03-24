@@ -1,30 +1,38 @@
 #include <glad/glad.h>
 #include <SDL.h>
 
+#include "Core/Logger.hpp"
 #include "Graphics/Shader.hpp"
 #include "Graphics/VertexBuffer.hpp"
 #include "Graphics/IndexBuffer.hpp"
 #include "Graphics/UniformBuffer.hpp"
 #include "Input/Window.hpp"
+#include "Graphics/Graphics.hpp"
 #include "Math/Vector.hpp"
+#include "Thread/ThreadUtils.hpp"
 
 using namespace Pt;
 
 int main(int argc, char *argv[])
 {
-    Window window{"Phaten", IntV2{800, 600}, ScreenMode::WINDOWED};
+    PT_LOG_INFO("Hardware concurrency: ", CPUCount());
+    
+    Graphics graphics {
+        {"Phaten", IntV2{800, 600}, ScreenMode::WINDOWED}
+    };
 
     float vertices[] = {
-        -1.0f, -1.0f, 1.0f,
-         1.0f, -1.0f, 1.0f,
-         1.0f,  1.0f, 1.0f,
-        -1.0f,  1.0f, 1.0f,
+        -1.0f, -1.0f, 1.0f, 0.0f, 0.0f,
+         1.0f, -1.0f, 1.0f, 1.0f, 0.0f,
+         1.0f,  1.0f, 1.0f, 1.0f, 1.0f,
+        -1.0f,  1.0f, 1.0f, 0.0f, 1.0f,
     };
 
     VertexBuffer vertexBuffer;
 
     VertexLayout layout = {
         {VertexElementType::FLOAT3, VertexElementSemantic::POSITION},
+        {VertexElementType::FLOAT2, VertexElementSemantic::TEXCOORD},
     };
 
     vertexBuffer.Define(BufferUsage::STATIC, 4, layout, vertices);
@@ -39,14 +47,8 @@ int main(int argc, char *argv[])
     indexBuffer.Define(BufferUsage::STATIC, 6, indices);
     indexBuffer.Bind();
     
-    Pt::Vector4 color {1, 0, 1, 1};
-
-    UniformBuffer uniformBuffer;
-    uniformBuffer.Define(BufferUsage::STATIC, sizeof(float) * 4, &color);
-    uniformBuffer.Bind(0);
-
     Shader shader;
-    shader.Define("Shaders/Test.glsl");
+    shader.Define("Phaten/Shaders/Test.glsl");
     auto program = SharedPtr(shader.CreateProgram("Test", "", ""));
 
     bool running = true;
@@ -62,7 +64,7 @@ int main(int argc, char *argv[])
         program->Bind();
         glDrawElements(GL_TRIANGLES, indexBuffer.NumIndices(), GL_UNSIGNED_INT, 0);
 
-        window.Flush();
+        graphics.Present();
     }
 
     return 0;

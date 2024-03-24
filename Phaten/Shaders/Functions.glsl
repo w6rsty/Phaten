@@ -1,0 +1,1 @@
+const vec2 iResolution = vec2(800, 600);
