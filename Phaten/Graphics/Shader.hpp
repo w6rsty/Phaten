@@ -3,7 +3,7 @@
 #include <map>
 #include <utility>
 
-#include "Core/Ptr.hpp"
+#include "Object/Ptr.hpp"
 #include "IO/StringHash.hpp"
 #include "ShaderProgram.hpp"
 #include "GraphicsDefs.hpp"

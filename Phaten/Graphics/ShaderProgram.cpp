@@ -5,7 +5,7 @@
 #include <glad/glad.h>
 
 #include "Core/Core.hpp"
-#include "Core/Assert.hpp"
+#include "IO/Assert.hpp"
 #include "IO/StringUtils.hpp"
 
 namespace Pt {

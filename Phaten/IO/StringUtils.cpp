@@ -5,7 +5,7 @@
 #include <sstream>
 #include <fstream>
 
-#include "Core/Assert.hpp"
+#include "IO/Assert.hpp"
 
 namespace Pt {
 

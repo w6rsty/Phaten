@@ -3,7 +3,7 @@
 #include <string_view>
 
 #include "Math.hpp"
-#include "Core/Assert.hpp"
+#include "IO/Assert.hpp"
 
 namespace Pt {
 

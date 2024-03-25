@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "Core/Ptr.hpp"
+#include "Object/Ptr.hpp"
 #include "Vertex.hpp"
 #include "GraphicsDefs.hpp"
 

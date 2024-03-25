@@ -84,7 +84,7 @@ std::string ShowAttributes(unsigned attributes)
     {
         if (attributes & (1 << i))
         {
-            result += VertexAttributeName[i] + "\n";
+            result += " " + VertexAttributeName[i] ;
         }
     }
     return result;

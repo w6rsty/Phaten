@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Core/Ptr.hpp"
+#include "Object/Ptr.hpp"
 #include "GraphicsDefs.hpp"
 
 namespace Pt {

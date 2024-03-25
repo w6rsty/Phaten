@@ -2,7 +2,7 @@
 
 #include <map>
 
-#include "Core/Ptr.hpp"
+#include "Object/Ptr.hpp"
 #include "IO/StringHash.hpp"
 #include "GraphicsDefs.hpp"
 

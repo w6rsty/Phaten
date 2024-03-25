@@ -4,7 +4,7 @@
 #include <SDL.h>
 #include <SDL_opengl.h>
 
-#include "Core/Assert.hpp"
+#include "IO/Assert.hpp"
 #include "ShaderProgram.hpp"
 #include "VertexBuffer.hpp"
 #include "IndexBuffer.hpp"
@@ -30,10 +30,12 @@ struct CanvasData
     };
 };
 
-static CanvasData s_CanvasData;
+static CanvasData* s_CanvasData = nullptr;
 
 Graphics::Graphics(WindowCreateInfo windowInfo)
 {
+    PT_TAG_INFO("Graphics", "Created graphics system");
+
     // TODO: Add another struct to store window properties.
     m_Window = CreateScoped<Window>(windowInfo.title, windowInfo.windowSize, windowInfo.mode);
     // Use the window handle to create the graphics context.
@@ -47,6 +49,26 @@ Graphics::Graphics(WindowCreateInfo windowInfo)
 
     // Initialization Done ====================================================
     
+    if (!s_CanvasData)
+    {
+        s_CanvasData = new CanvasData{};
+    }
+}
+
+Graphics::~Graphics()
+{
+    if (s_CanvasData)
+    {
+        delete s_CanvasData;
+    }
+
+    PT_TAG_INFO("Graphics", "Exited graphics system");
+}
+
+void Graphics::SetVSync(bool enable)
+{
+    SDL_GL_SetSwapInterval(enable ? 1 : 0);
+    m_VSync = enable;
 }
 
 SharedPtr<Shader> Graphics::LoadShader(std::string_view name)
@@ -120,28 +142,45 @@ void Graphics::SetUniform(ShaderProgram* program, PresetUniform uniform, const V
 
 void Graphics::SetupCanvas()
 {
-    s_CanvasData.vertexBuffer = CreateShared<VertexBuffer>();
-    s_CanvasData.vertexBuffer->Define(BufferUsage::STATIC, 4, VertexLayout{
+    s_CanvasData->vertexBuffer = CreateShared<VertexBuffer>();
+    s_CanvasData->vertexBuffer->Define(BufferUsage::STATIC, 4, VertexLayout{
         {VertexElementType::FLOAT3, VertexElementSemantic::POSITION},
-    }, s_CanvasData.vertices);
-    s_CanvasData.vertexBuffer->Bind(s_CanvasData.vertexBuffer->Attributes());
+    }, s_CanvasData->vertices);
+    s_CanvasData->vertexBuffer->Bind(s_CanvasData->vertexBuffer->Attributes());
 
-    s_CanvasData.indexBuffer = CreateShared<IndexBuffer>();
-    s_CanvasData.indexBuffer->Define(BufferUsage::STATIC, 6, s_CanvasData.indices);
-    s_CanvasData.indexBuffer->Bind();
+    s_CanvasData->indexBuffer = CreateShared<IndexBuffer>();
+    s_CanvasData->indexBuffer->Define(BufferUsage::STATIC, 6, s_CanvasData->indices);
+    s_CanvasData->indexBuffer->Bind();
 
     LoadShader("Basic");
-    s_CanvasData.program = CreateProgram("Basic", "", "");
+    s_CanvasData->program = CreateProgram("Basic", "", "");
 }
 
 void Graphics::RenderCanvas()
 {
-    auto& program = s_CanvasData.program;
+    auto& program = s_CanvasData->program;
     glClear(GL_COLOR_BUFFER_BIT);
     program->Bind();
     float time = SDL_GetTicks() / 1000.0f;
     SetUniform(program.Get(), PresetUniform::U_TIME, time);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+}
+
+IntV2 Graphics::Size() const
+{
+    IntV2 size;
+    SDL_GetWindowSize(m_Window->NativeHandle(), (int*)&size.x, (int*)&size.y);
+    return size;
+}
+
+int Graphics::Width() const
+{
+    return Size().x;
+}
+
+int Graphics::Height() const
+{
+    return Size().y;
 }
 
 void Graphics::Present()

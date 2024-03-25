@@ -1,6 +1,6 @@
 #include <SDL.h>
 
-#include "Core/Logger.hpp"
+#include "IO/Logger.hpp"
 #include "Graphics/Graphics.hpp"
 #include "Thread/ThreadUtils.hpp"
 

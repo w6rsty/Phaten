@@ -2,7 +2,7 @@
 
 #include <string_view>
 
-#include "Core/Ptr.hpp"
+#include "Object/Ptr.hpp"
 #include "Math/IntVector.hpp"
 #include "Graphics/GraphicsDefs.hpp"
 

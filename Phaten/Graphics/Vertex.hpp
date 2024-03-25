@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "Core/Logger.hpp"
+#include "IO/Logger.hpp"
 #include "GraphicsDefs.hpp"
 
 namespace Pt {

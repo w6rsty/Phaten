@@ -3,7 +3,7 @@
 #include <glad/glad.h>
 #include <SDL.h>
 
-#include "Core/Assert.hpp"
+#include "IO/Assert.hpp"
 
 namespace Pt {
 

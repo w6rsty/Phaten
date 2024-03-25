@@ -2,7 +2,7 @@
 
 #include <cassert>
 
-#include "Core.hpp"
+#include "Core/Core.hpp"
 #include "Logger.hpp"
 
 namespace Pt

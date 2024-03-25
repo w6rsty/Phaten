@@ -1,6 +1,6 @@
 #include "Shader.hpp"
 
-#include "Core/Assert.hpp"
+#include "IO/Assert.hpp"
 #include "IO/StringUtils.hpp"
 
 namespace Pt {

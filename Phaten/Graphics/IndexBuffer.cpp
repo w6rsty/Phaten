@@ -2,7 +2,7 @@
 
 #include <glad/glad.h>
 
-#include "Core/Logger.hpp"
+#include "IO/Logger.hpp"
 
 namespace Pt {
 

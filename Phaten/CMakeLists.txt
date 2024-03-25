@@ -6,6 +6,7 @@ add_engine_directory(Input)
 add_engine_directory(IO)
 add_engine_directory(Math)
 add_engine_directory(Resource)
+add_engine_directory(Object)
 add_engine_directory(Thread)
 
 set(PT_LIBS

@@ -1,6 +1,6 @@
 #include "Resource.hpp"
 
-#include "Core/Assert.hpp"
+#include "IO/Assert.hpp"
 
 namespace Pt {
 

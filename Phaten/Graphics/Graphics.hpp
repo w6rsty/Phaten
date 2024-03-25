@@ -2,8 +2,9 @@
 
 #include <map>
 
-#include "Core/Ptr.hpp"
+#include "Object/Ptr.hpp"
 #include "Input/Window.hpp"
+#include "Math/IntVector.hpp"
 #include "Math/Vector.hpp"
 #include "IO/StringHash.hpp"
 #include "GraphicsContext.hpp"
@@ -20,6 +21,10 @@ class Graphics
 {
 public:
     Graphics(WindowCreateInfo windowInfo);
+    ~Graphics();
+
+    void SetVSync(bool enable);
+
     /// Load a shader from file. Or return the existing one.
     SharedPtr<Shader> LoadShader(std::string_view name);
     /// Create a shader program from the shader soure code.
@@ -32,8 +37,14 @@ public:
     void SetupCanvas();
     void RenderCanvas();
 
+    IntV2 Size() const;
+    int Width() const;
+    int Height() const;
+
     void Present();
 private:
+    bool m_VSync;
+
     ScopedPtr<Window> m_Window;
     ScopedPtr<GraphicsContext> m_GraphicsContext;
 

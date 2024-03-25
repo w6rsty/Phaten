@@ -7,8 +7,8 @@
 #include <functional>
 #include <unordered_map>
 
-#include "Core.hpp"
-#include "Ptr.hpp"
+#include "Core/Core.hpp"
+#include "Object/Ptr.hpp"
 
 namespace Pt
 {
@@ -170,12 +170,12 @@ private:
     #define PT_LOG_ERROR(...) ::Pt::LoggerManager::Instance().GetDefaultLogger().Error(__FILE__, __FUNCTION__, __LINE__, __VA_ARGS__)
     #define PT_LOG_FATAL(...) ::Pt::LoggerManager::Instance().GetDefaultLogger().Fatal(__FILE__, __FUNCTION__, __LINE__, __VA_ARGS__)
 
-    #define PT_TAG_DEBUG(tag, ...) ::Pt::LoggerManager::Instance().GetDefaultLogger().Debug(__FILE__, __FUNCTION__, __LINE__, "\x1b[32m[", tag "]\x1b[0m\n", __VA_ARGS__)
-    #define PT_TAG_TRACE(tag, ...) ::Pt::LoggerManager::Instance().GetDefaultLogger().Trace(__FILE__, __FUNCTION__, __LINE__, "\x1b[35m[", tag "]\x1b[0m\n", __VA_ARGS__)
-    #define PT_TAG_INFO(tag, ...)  ::Pt::LoggerManager::Instance().GetDefaultLogger().Info(__FILE__,  __FUNCTION__, __LINE__, "\x1b[35m[", tag "]\x1b[0m\n", __VA_ARGS__)
-    #define PT_TAG_WARN(tag, ...)  ::Pt::LoggerManager::Instance().GetDefaultLogger().Warn(__FILE__,  __FUNCTION__, __LINE__, "\x1b[35m[", tag "]\x1b[0m\n", __VA_ARGS__)
-    #define PT_TAG_ERROR(tag, ...) ::Pt::LoggerManager::Instance().GetDefaultLogger().Error(__FILE__, __FUNCTION__, __LINE__, "\x1b[35m[", tag "]\x1b[0m\n", __VA_ARGS__)
-    #define PT_TAG_FATAL(tag, ...) ::Pt::LoggerManager::Instance().GetDefaultLogger().Fatal(__FILE__, __FUNCTION__, __LINE__, "\x1b[35m[", tag "]\x1b[0m\n", __VA_ARGS__)
+    #define PT_TAG_DEBUG(tag, ...) ::Pt::LoggerManager::Instance().GetDefaultLogger().Debug(__FILE__, __FUNCTION__, __LINE__, "\x1b[32m[", tag "]\x1b[0m ", __VA_ARGS__)
+    #define PT_TAG_TRACE(tag, ...) ::Pt::LoggerManager::Instance().GetDefaultLogger().Trace(__FILE__, __FUNCTION__, __LINE__, "\x1b[35m[", tag "]\x1b[0m ", __VA_ARGS__)
+    #define PT_TAG_INFO(tag, ...)  ::Pt::LoggerManager::Instance().GetDefaultLogger().Info(__FILE__,  __FUNCTION__, __LINE__, "\x1b[35m[", tag "]\x1b[0m ", __VA_ARGS__)
+    #define PT_TAG_WARN(tag, ...)  ::Pt::LoggerManager::Instance().GetDefaultLogger().Warn(__FILE__,  __FUNCTION__, __LINE__, "\x1b[35m[", tag "]\x1b[0m ", __VA_ARGS__)
+    #define PT_TAG_ERROR(tag, ...) ::Pt::LoggerManager::Instance().GetDefaultLogger().Error(__FILE__, __FUNCTION__, __LINE__, "\x1b[35m[", tag "]\x1b[0m ", __VA_ARGS__)
+    #define PT_TAG_FATAL(tag, ...) ::Pt::LoggerManager::Instance().GetDefaultLogger().Fatal(__FILE__, __FUNCTION__, __LINE__, "\x1b[35m[", tag "]\x1b[0m ", __VA_ARGS__)
 #else
     #define PT_LOG_DEBUG(...)
     #define PT_LOG_TRACE(...)

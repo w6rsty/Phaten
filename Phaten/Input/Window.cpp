@@ -3,7 +3,7 @@
 #include <SDL.h>
 #include <SDL_opengl.h>
 
-#include "Core/Assert.hpp"
+#include "IO/Assert.hpp"
 
 namespace Pt
 {
