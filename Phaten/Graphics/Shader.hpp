@@ -10,7 +10,8 @@
 
 namespace Pt {
 
-class Shader
+/// Shader soure code class that manages shader programs variations.
+class Shader : public RefCounted
 {
 public:
     Shader();

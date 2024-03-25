@@ -54,8 +54,11 @@ enum class VertexAttributeType : size_t
     MAX_ATTRIBUTE
 };
 
+/// Don't forget to update PresetUniformName[] in 
+/// GraphicsDefs.cpp when adding new preset uniform.
 enum class PresetUniform : size_t
 {
+    U_TIME,
     U_WORLD_MATRIX,
     MAX_PRESET_UNIFORMS
 };

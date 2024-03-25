@@ -1,4 +1,5 @@
-#include "Phaten/Shaders/Functions.glsl"
+#include "Phaten/Shaders/Common.glsl"
+#include "Phaten/Shaders/Uniform.glsl"
 
 #if defined(COMPILE_VS)
 layout (location = 0) in vec3 aPosition;
@@ -20,7 +21,10 @@ void vert()
 
 void frag()
 {
-    vec4 finalColor = vec4(vTexCoord, 0.0, 1.0);
+    vec2 uv = vTexCoord * 2.0 - 1.0;
+    uv.y /= iAspect;
 
-    FragColor = finalColor;
+    vec3 finalColor = vec3(1.0, 0.0, 1.0);
+    
+    FragColor = vec4(finalColor, 1.0);
 }

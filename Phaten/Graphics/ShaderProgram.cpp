@@ -176,6 +176,10 @@ void ShaderProgram::Create(
     int status = Bind(); 
 
     glGetProgramiv(m_Handle, GL_ACTIVE_UNIFORMS, &numUniforms);
+
+#ifdef PT_SHADER_DEBUG
+        PT_LOG_DEBUG("Active uniform count: ", numUniforms);
+#endif
     // Reset preset uniforms
     for (int& presetUniform : m_PresetUniforms)
     {
