@@ -4,6 +4,7 @@
 #include <SDL_opengl.h>
 
 #include "IO/Assert.hpp"
+#include "Math/IntVector.hpp"
 
 namespace Pt
 {
@@ -76,5 +77,28 @@ Window::~Window()
 
     SDL_Quit();
 }
+
+void Window::SetVSync(bool enable)
+{
+    SDL_GL_SetSwapInterval(enable ? 1 : 0);
+}
+
+IntV2 Window::Size() const
+{
+    IntV2 size;
+    SDL_GetWindowSize(m_WindowHandle, (int*)&size.x, (int*)&size.y);
+    return size;
+}
+
+unsigned Window::Time() const
+{
+    return SDL_GetTicks();
+}
+
+void Window::Swap()
+{
+    SDL_GL_SwapWindow(m_WindowHandle);
+}
+
 
 } // namespace Pt

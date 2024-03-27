@@ -23,6 +23,11 @@ public:
     Window(std::string_view title, const IntV2& windowSize, ScreenMode mode);
     ~Window();
 
+    void Swap();
+
+    void SetVSync(bool enable);
+    IntV2 Size() const;
+    unsigned Time() const;
     /// Get SDL native window handle.
     SDL_Window* NativeHandle() const { return m_WindowHandle; }
 private:

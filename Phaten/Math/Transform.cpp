@@ -13,6 +13,11 @@ Matrix3 ScaleMatrix3(const Vector3& scale)
     return ret;
 }
 
+Matrix3 ScaleMatrix3(float scaleX, float scaleY, float scaleZ)
+{
+    return ScaleMatrix3(Vector3{scaleX, scaleY, scaleZ});
+}
+
 Matrix3 ScaleMatrix3(float scale)
 {
     return ScaleMatrix3(Vector3{scale, scale, scale});
@@ -90,9 +95,14 @@ Matrix4 ScaleMatrix4(const Vector3& scale)
     return ret;
 }
 
-Matrix4 ScaleMatrix4(float x, float y, float z)
+Matrix4 ScaleMatrix4(float scaleX, float scaleY, float scaleZ)
 {
-    return ScaleMatrix4(Vector3{x, y, z});
+    return ScaleMatrix4(Vector3{scaleX, scaleY, scaleZ});
+}
+
+Matrix4 ScaleMatrix4(float scale)
+{
+    return ScaleMatrix4(Vector3{scale, scale, scale});
 }
 
 Matrix4 RotationMatrix4(float degree, const Vector3 &rotation)

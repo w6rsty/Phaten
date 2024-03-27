@@ -6,6 +6,7 @@
 #include "Input/Window.hpp"
 #include "Math/IntVector.hpp"
 #include "Math/Vector.hpp"
+#include "Math/Matrix.hpp"
 #include "IO/StringHash.hpp"
 #include "GraphicsContext.hpp"
 #include "Shader.hpp"
@@ -33,13 +34,12 @@ public:
     void SetUniform(ShaderProgram* program, PresetUniform uniform, const Vector2& value);
     void SetUniform(ShaderProgram* program, PresetUniform uniform, const Vector3& value);
     void SetUniform(ShaderProgram* program, PresetUniform uniform, const Vector4& value);
+    void SetUniform(ShaderProgram* program, PresetUniform uniform, const Matrix4& value);
 
-    void SetupCanvas();
-    void RenderCanvas();
+    void Draw(PrimitiveType type, size_t first, size_t count);
+    void DrawIndexed(PrimitiveType type, size_t first, size_t count);
 
     IntV2 Size() const;
-    int Width() const;
-    int Height() const;
 
     void Present();
 private:

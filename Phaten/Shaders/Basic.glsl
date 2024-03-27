@@ -16,7 +16,8 @@ in vec3 vPos;
 
 void vert()
 {
-    gl_Position = vec4(aPosition, 1.0);
+    vec4 pos = uWorldMatrix * vec4(aPosition, 1.0);
+    gl_Position = pos;
     vPos = aPosition;
 }
 

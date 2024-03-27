@@ -1,36 +1,14 @@
 #include "Graphics.hpp"
 
 #include <glad/glad.h>
-#include <SDL.h>
-#include <SDL_opengl.h>
 
+#include "Graphics/GraphicsDefs.hpp"
 #include "IO/Assert.hpp"
 #include "ShaderProgram.hpp"
 #include "VertexBuffer.hpp"
 #include "IndexBuffer.hpp"
 
 namespace Pt {
-
-struct CanvasData
-{
-    SharedPtr<VertexBuffer> vertexBuffer;
-    SharedPtr<IndexBuffer> indexBuffer;
-    SharedPtr<ShaderProgram> program;
-
-    static constexpr float vertices[] = {
-        -1.0f, -1.0f, 1.0f,
-         1.0f, -1.0f, 1.0f,
-         1.0f,  1.0f, 1.0f,
-        -1.0f,  1.0f, 1.0f,
-    };
-    
-    static constexpr unsigned indices[] = {
-        0, 1, 2,
-        2, 3, 0,
-    };
-};
-
-static CanvasData* s_CanvasData = nullptr;
 
 Graphics::Graphics(WindowCreateInfo windowInfo)
 {
@@ -48,26 +26,16 @@ Graphics::Graphics(WindowCreateInfo windowInfo)
     glBindVertexArray(defaultVAO);
 
     // Initialization Done ====================================================
-    
-    if (!s_CanvasData)
-    {
-        s_CanvasData = new CanvasData{};
-    }
 }
 
 Graphics::~Graphics()
 {
-    if (s_CanvasData)
-    {
-        delete s_CanvasData;
-    }
-
     PT_TAG_INFO("Graphics", "Exited graphics system");
 }
 
 void Graphics::SetVSync(bool enable)
 {
-    SDL_GL_SetSwapInterval(enable ? 1 : 0);
+    m_Window->SetVSync(enable);
     m_VSync = enable;
 }
 
@@ -140,52 +108,40 @@ void Graphics::SetUniform(ShaderProgram* program, PresetUniform uniform, const V
     }
 }
 
-void Graphics::SetupCanvas()
+void Graphics::SetUniform(ShaderProgram* program, PresetUniform uniform, const Matrix4& value)
 {
-    s_CanvasData->vertexBuffer = CreateShared<VertexBuffer>();
-    s_CanvasData->vertexBuffer->Define(BufferUsage::STATIC, 4, VertexLayout{
-        {VertexElementType::FLOAT3, VertexElementSemantic::POSITION},
-    }, s_CanvasData->vertices);
-    s_CanvasData->vertexBuffer->Bind(s_CanvasData->vertexBuffer->Attributes());
-
-    s_CanvasData->indexBuffer = CreateShared<IndexBuffer>();
-    s_CanvasData->indexBuffer->Define(BufferUsage::STATIC, 6, s_CanvasData->indices);
-    s_CanvasData->indexBuffer->Bind();
-
-    LoadShader("Basic");
-    s_CanvasData->program = CreateProgram("Basic", "", "");
-}
-
-void Graphics::RenderCanvas()
-{
-    auto& program = s_CanvasData->program;
-    glClear(GL_COLOR_BUFFER_BIT);
-    program->Bind();
-    float time = SDL_GetTicks() / 1000.0f;
-    SetUniform(program.Get(), PresetUniform::U_TIME, time);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    if (program)
+    {
+        int location = program->Uniform(uniform);
+        if (location >= 0)
+        {
+            glUniformMatrix4fv(location, 1, GL_FALSE, value.Data());
+        }
+    }
 }
 
 IntV2 Graphics::Size() const
 {
-    IntV2 size;
-    SDL_GetWindowSize(m_Window->NativeHandle(), (int*)&size.x, (int*)&size.y);
-    return size;
+    return m_Window->Size();
 }
 
-int Graphics::Width() const
+void Graphics::Draw(PrimitiveType type, size_t first, size_t count)
 {
-    return Size().x;
+    glDrawArrays(PrimitiveGLType[static_cast<size_t>(type)], first, count);
 }
-
-int Graphics::Height() const
-{
-    return Size().y;
+void Graphics::DrawIndexed(PrimitiveType type, size_t first, size_t count)
+{   
+    glDrawElements(
+        PrimitiveGLType[static_cast<size_t>(type)],
+        count,
+        GL_UNSIGNED_INT,
+        (void*)(first * sizeof(unsigned))
+    );
 }
 
 void Graphics::Present()
 {
-    SDL_GL_SwapWindow(m_GraphicsContext->m_WindowHandle);
+    m_Window->Swap();
 }
 
 } // namespace Pt

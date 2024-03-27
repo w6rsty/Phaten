@@ -71,6 +71,27 @@ const std::string PresetUniformName[]
     ""
 };
 
+const std::string PrimitiveName[]
+{
+    "POINTS",
+    "LINES",
+    "LINE_STRIP",
+    "TRIANGLES",
+    "TRIANGLE_STRIP",
+    "TRIANGLE_FAN"
+};
+
+const GLenum PrimitiveGLType[]
+{
+    GL_POINTS,
+    GL_LINES,
+    GL_LINE_STRIP,
+    GL_TRIANGLES,
+    GL_TRIANGLE_STRIP,
+    GL_TRIANGLE_FAN
+};
+
+
 std::string AttributesBitToString(unsigned attributes)
 {
     return std::bitset<8>(attributes).to_string();
