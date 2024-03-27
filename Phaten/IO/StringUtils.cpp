@@ -4,6 +4,7 @@
 #include <iostream>
 #include <sstream>
 #include <fstream>
+#include <cstdarg>
 
 #include "IO/Assert.hpp"
 
@@ -184,6 +185,31 @@ void TrimSpace(std::string& str)
     size_t end = str.find_last_not_of(" \t\n\r");
     str = str.substr(start, end - start + 1);
 }
+
+std::string Trimed(std::string_view str)
+{
+    size_t start = str.find_first_not_of(" \t\n\r");
+    if (start == std::string::npos)
+    {
+        return "";
+    }
+    size_t end = str.find_last_not_of(" \t\n\r");
+    return std::string(str.substr(start, end - start + 1));
+}
+
+int CountElements(std::string_view str, char delimiter)
+{
+    int count = 1;
+    for (char c : str)
+    {
+        if (c == delimiter)
+        {
+            ++count;
+        }
+    }
+    return count;
+}
+
 /// Output ====================================================================
 /// ===========================================================================
 

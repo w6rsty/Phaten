@@ -23,7 +23,6 @@ public:
 
     Vector2()
     {
-        PT_LOG_WARN("Uninitialized Vector2 object.");
     }
 
     Vector2(float value) :
@@ -110,7 +109,7 @@ public:
     void Normalize()
     {
         float lengthSquared = LengthSquared();
-        if (!::Equal(lengthSquared, 1.0f) && lengthSquared > 0.0f)
+        if (!::EpsilonEqual(lengthSquared, 1.0f) && lengthSquared > 0.0f)
         {
             float invLength = 1.0f / sqrtf(lengthSquared);
             x *= invLength;
@@ -130,11 +129,11 @@ public:
 
     Vector2 Abs() const { return Vector2(::Abs(x), ::Abs(y)); }
     Vector2 LinearLerp(const Vector2& rhs, float t) const { return *this + (rhs - *this) * t; }
-    bool Equal(const Vector2& rhs, float epsilon = ::M_EPSILON) const { return ::Equal(x, rhs.x, epsilon) && ::Equal(y, rhs.y, epsilon); }
+    bool Equal(const Vector2& rhs, float epsilon = ::M_EPSILON) const { return ::EpsilonEqual(x, rhs.x, epsilon) && ::EpsilonEqual(y, rhs.y, epsilon); }
     bool IsNaN() const { return ::IsNaN(x) || ::IsNaN(y); }
 
-    const static Vector2 Zero;
-    const static Vector2 One;
+    const static Vector2 ZERO;
+    const static Vector2 ONE;
     const static Vector2 X;
     const static Vector2 Y;
 private:
@@ -153,7 +152,6 @@ public:
 
     Vector3()
     {
-        PT_LOG_WARN("Uninitialized Vector3 object.");
     }
 
     Vector3(float value) :
@@ -189,6 +187,22 @@ public:
         if (!FromString(str)) Vector3();
     }
 
+    Vector3(const Vector2& vector, float z_) :
+        x(vector.x),
+        y(vector.y),
+        z(z_)
+    {
+    }
+
+    Vector3(float x_, const Vector2& vector) :
+        x(x_),
+        y(vector.x),
+        z(vector.y)
+    {
+    }
+
+    Vector3(const Vector4& vector);
+
     Vector3& operator = (const Vector3& rhs)
     {
         x = rhs.x;
@@ -196,6 +210,8 @@ public:
         z = rhs.z;
         return *this;
     }
+
+    Vector3& operator = (const Vector4& rhs);
 
     Vector3& operator += (const Vector3& rhs)
     {
@@ -248,7 +264,7 @@ public:
     void Normalize()
     {
         float lengthSquared = LengthSquared();
-        if (!::Equal(lengthSquared, 1.0f) && lengthSquared > 0.0f)
+        if (!::EpsilonEqual(lengthSquared, 1.0f) && lengthSquared > 0.0f)
         {
             float invLength = 1.0f / sqrtf(lengthSquared);
             x *= invLength;
@@ -269,11 +285,11 @@ public:
 
     Vector3 Abs() const { return Vector3(::Abs(x), ::Abs(y), ::Abs(z)); }
     Vector3 LinearLerp(const Vector3& rhs, float t) const { return *this + (rhs - *this) * t; }
-    bool Equal(const Vector3& rhs, float epsilon = ::M_EPSILON) const { return ::Equal(x, rhs.x, epsilon) && ::Equal(y, rhs.y, epsilon) && ::Equal(z, rhs.z, epsilon); }
+    bool Equal(const Vector3& rhs, float epsilon = ::M_EPSILON) const { return ::EpsilonEqual(x, rhs.x, epsilon) && ::EpsilonEqual(y, rhs.y, epsilon) && ::EpsilonEqual(z, rhs.z, epsilon); }
     bool IsNaN() const { return ::IsNaN(x) || ::IsNaN(y) || ::IsNaN(z); }
 
-    const static Vector3 Zero;
-    const static Vector3 One;
+    const static Vector3 ZERO;
+    const static Vector3 ONE;
     const static Vector3 X;
     const static Vector3 Y;
     const static Vector3 Z;
@@ -293,7 +309,6 @@ public:
 
     Vector4()
     {
-        PT_LOG_WARN("Uninitialized Vector4 object.");
     }
 
     Vector4(float value) :
@@ -331,6 +346,54 @@ public:
     Vector4(std::string_view str)
     {
         if (!FromString(str)) Vector4();
+    }
+
+    Vector4(const Vector2& vector, float z_, float w_) :
+        x(vector.x),
+        y(vector.y),
+        z(z_),
+        w(w_)
+    {
+    }
+
+    Vector4(float x_, const Vector2& vector, float w_) :
+        x(x_),
+        y(vector.x),
+        z(vector.y),
+        w(w_)
+    {
+    }
+
+    Vector4(float x_, float y_, const Vector2& vector) :
+        x(x_),
+        y(y_),
+        z(vector.x),
+        w(vector.y)
+    {
+    }
+
+    Vector4(const Vector2& vector1, const Vector2& vector2) :
+        x(vector1.x),
+        y(vector1.y),
+        z(vector2.x),
+        w(vector2.y)
+    {
+    }
+
+    Vector4(const Vector3& vector, float w_) :
+        x(vector.x),
+        y(vector.y),
+        z(vector.z),
+        w(w_)
+    {
+    }
+
+    Vector4(float x_, const Vector3& vector) :
+        x(x_),
+        y(vector.x),
+        z(vector.y),
+        w(vector.z)
+    {
     }
 
     Vector4& operator = (const Vector4& rhs)
@@ -398,7 +461,7 @@ public:
     void Normalize()
     {
         float lengthSquared = LengthSquared();
-        if (!::Equal(lengthSquared, 1.0f) && lengthSquared > 0.0f)
+        if (!::EpsilonEqual(lengthSquared, 1.0f) && lengthSquared > 0.0f)
         {
             float invLength = 1.0f / sqrtf(lengthSquared);
             x *= invLength;
@@ -419,11 +482,11 @@ public:
 
     Vector4 Abs() const { return Vector4(::Abs(x), ::Abs(y), ::Abs(z), ::Abs(w)); }
     Vector4 LinearLerp(const Vector4& rhs, float t) const { return *this + (rhs - *this) * t; }
-    bool Equal(const Vector4& rhs, float epsilon = ::M_EPSILON) const { return ::Equal(x, rhs.x, epsilon) && ::Equal(y, rhs.y, epsilon) && ::Equal(z, rhs.z, epsilon) && ::Equal(w, rhs.w, epsilon); }
+    bool Equal(const Vector4& rhs, float epsilon = ::M_EPSILON) const { return ::EpsilonEqual(x, rhs.x, epsilon) && ::EpsilonEqual(y, rhs.y, epsilon) && ::EpsilonEqual(z, rhs.z, epsilon) && ::EpsilonEqual(w, rhs.w, epsilon); }
     bool IsNaN() const { return ::IsNaN(x) || ::IsNaN(y) || ::IsNaN(z) || ::IsNaN(w); }
 
-    const static Vector4 Zero;
-    const static Vector4 One;
+    const static Vector4 ZERO;
+    const static Vector4 ONE;
     const static Vector4 X;
     const static Vector4 Y;
     const static Vector4 Z;
@@ -431,5 +494,12 @@ public:
 private:
     bool FromString(std::string_view str);
 };
+
+// ============================================================================
+// ============================================================================
+
+float Dot(const Vector3& lhs, const Vector3& rhs);
+Vector3 Cross(const Vector3& lhs, const Vector3& rhs);
+Vector3 Normalize(const Vector3& vector);
 
 } // namespace Pt

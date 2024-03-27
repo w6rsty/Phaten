@@ -1,6 +1,7 @@
 #pragma once
 
 #include <map>
+#include <vector>
 
 #include "Object/Ptr.hpp"
 #include "IO/StringHash.hpp"

@@ -4,8 +4,8 @@
 
 namespace Pt {
 
-const Vector2 Vector2::Zero = Vector2{0, 0};
-const Vector2 Vector2::One = Vector2{1, 1};
+const Vector2 Vector2::ZERO = Vector2{0, 0};
+const Vector2 Vector2::ONE = Vector2{1, 1};
 const Vector2 Vector2::X = Vector2{1, 0};
 const Vector2 Vector2::Y = Vector2{0, 1};
 
@@ -19,16 +19,31 @@ bool Vector2::FromString(std::string_view str)
     return true;
 }
 
+Vector3& Vector3::operator = (const Vector4& rhs)
+{
+    x = rhs.x;
+    y = rhs.y;
+    z = rhs.z;
+    return *this;
+}
+
 std::string Vector2::ToString() const
 {
     return std::to_string(x) + " " + std::to_string(y);
 }
 
-const Vector3 Vector3::Zero = Vector3{0, 0, 0};
-const Vector3 Vector3::One = Vector3{1, 1, 1};
+const Vector3 Vector3::ZERO = Vector3{0, 0, 0};
+const Vector3 Vector3::ONE = Vector3{1, 1, 1};
 const Vector3 Vector3::X = Vector3{1, 0, 0};
 const Vector3 Vector3::Y = Vector3{0, 1, 0};
 const Vector3 Vector3::Z = Vector3{0, 0, 1};
+
+Vector3::Vector3(const Vector4& vector) :
+    x(vector.x),
+    y(vector.y),
+    z(vector.z)
+{
+}
 
 bool Vector3::FromString(std::string_view str)
 {
@@ -49,8 +64,8 @@ std::string Vector3::ToString() const
     return std::to_string(x) + " " + std::to_string(y) + " " + std::to_string(z);
 }
 
-const Vector4 Vector4::Zero = Vector4{0, 0, 0, 0};
-const Vector4 Vector4::One = Vector4{1, 1, 1, 1};
+const Vector4 Vector4::ZERO = Vector4{0, 0, 0, 0};
+const Vector4 Vector4::ONE = Vector4{1, 1, 1, 1};
 const Vector4 Vector4::X = Vector4{1, 0, 0, 0};
 const Vector4 Vector4::Y = Vector4{0, 1, 0, 0};
 const Vector4 Vector4::Z = Vector4{0, 0, 1, 0};
@@ -77,6 +92,28 @@ bool Vector4::FromString(std::string_view str)
 std::string Vector4::ToString() const
 {
     return std::to_string(x) + " " + std::to_string(y) + " " + std::to_string(z) + " " + std::to_string(w);
+}
+
+// ============================================================================
+// ============================================================================
+
+float Dot(const Vector3& lhs, const Vector3& rhs)
+{
+    return lhs.x * rhs.x + lhs.y * rhs.y + lhs.z * rhs.z;
+}
+Vector3 Cross(const Vector3& lhs, const Vector3& rhs)
+{
+    return Vector3{
+        lhs.y * rhs.z - lhs.z * rhs.y,
+        lhs.z * rhs.x - lhs.x * rhs.z,
+        lhs.x * rhs.y - lhs.y * rhs.x
+    };
+}
+
+Vector3 Normalize(const Vector3& vec)
+{
+    float length = vec.Length();
+    return Vector3{vec.x / length, vec.y / length, vec.z / length};
 }
 
 } // namespace Pt

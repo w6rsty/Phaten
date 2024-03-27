@@ -1,10 +1,14 @@
-#include "Phaten/Shaders/Common.glsl"
 #include "Phaten/Shaders/Uniform.glsl"
 
 #if defined(COMPILE_VS)
+
 layout (location = 0) in vec3 aPosition;
 out vec3 vPos;
+
 #else
+
+#include "Phaten/Shaders/Common.glsl"
+
 layout (location = 0) out vec4 FragColor;
 in vec3 vPos;
 
@@ -25,7 +29,7 @@ void frag()
     ray.direction = normalize(pixelCenter - iCameraCenter);
 
     vec3 finalColor = vec3(0.0);
-    finalColor = ray_color(ray);
+    finalColor = tracer(ray);
 
     FragColor = vec4(finalColor, 1.0);
 }
