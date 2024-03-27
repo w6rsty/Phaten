@@ -1,3 +1,6 @@
 3rdlibs/* linguist-vendored
 
+
+*.c linguist-vendored=false
+*.h linguist-vendored=false
 *.html linguist-vendored=false
