@@ -1,2 +1,7 @@
 add_executable(PhatenTest main.cpp)
-target_link_libraries(PhatenTest PRIVATE Phaten)
+
+set(TEST_LIBS
+    Phaten
+)
+
+target_link_libraries(PhatenTest PRIVATE ${TEST_LIBS})

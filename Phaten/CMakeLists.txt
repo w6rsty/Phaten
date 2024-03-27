@@ -12,6 +12,7 @@ add_engine_directory(Thread)
 set(PT_LIBS
     glad
     SDL2-static
+    imgui
 )
 
 if (WIN32)

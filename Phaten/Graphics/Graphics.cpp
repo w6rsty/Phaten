@@ -2,7 +2,6 @@
 
 #include <glad/glad.h>
 
-#include "Graphics/GraphicsDefs.hpp"
 #include "IO/Assert.hpp"
 #include "ShaderProgram.hpp"
 #include "VertexBuffer.hpp"
@@ -26,6 +25,8 @@ Graphics::Graphics(WindowCreateInfo windowInfo)
     glBindVertexArray(defaultVAO);
 
     // Initialization Done ====================================================
+
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 }
 
 Graphics::~Graphics()
@@ -125,6 +126,13 @@ IntV2 Graphics::Size() const
     return m_Window->Size();
 }
 
+void* Graphics::NativeWindow() const
+{
+    return m_Window->NativeHandle();
+
+}
+
+
 void Graphics::Draw(PrimitiveType type, size_t first, size_t count)
 {
     glDrawArrays(PrimitiveGLType[static_cast<size_t>(type)], first, count);
@@ -142,6 +150,12 @@ void Graphics::DrawIndexed(PrimitiveType type, size_t first, size_t count)
 void Graphics::Present()
 {
     m_Window->Swap();
+}
+
+void Graphics::Clear()
+{
+    /// TODO: use bitmask to select which buffer to clear.
+    glClear(GL_COLOR_BUFFER_BIT);
 }
 
 } // namespace Pt

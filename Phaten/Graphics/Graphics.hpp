@@ -11,6 +11,7 @@
 #include "GraphicsContext.hpp"
 #include "Shader.hpp"
 
+
 struct SDL_Window;
 
 namespace Pt {
@@ -40,8 +41,10 @@ public:
     void DrawIndexed(PrimitiveType type, size_t first, size_t count);
 
     IntV2 Size() const;
+    void* NativeWindow() const;
 
     void Present();
+    void Clear();
 private:
     bool m_VSync;
 
