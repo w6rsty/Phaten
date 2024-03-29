@@ -1,7 +1,9 @@
 #pragma once
 
+#include <ostream>
 #include <string>
 #include <string_view>
+#include <iostream>
 
 #include "Math.hpp"
 #include "Vector.hpp"
@@ -55,7 +57,7 @@ public:
     }
 
     Matrix3(const float* data)
-    {
+    {   
         this->data[0][0] = data[0];
         this->data[1][0] = data[1];
         this->data[2][0] = data[2];
@@ -67,6 +69,15 @@ public:
         this->data[0][2] = data[6];
         this->data[1][2] = data[7];
         this->data[2][2] = data[8];
+    }
+
+    Matrix3(float value)
+    {
+        *this = Matrix3::IDENTITY;
+
+        this->data[0][0] = value;
+        this->data[1][1] = value;
+        this->data[2][2] = value;
     }
 
     Matrix3(std::string_view str)
@@ -227,7 +238,7 @@ public:
 
     std::string ToString() const;
 
-    Matrix3 Transpose() const
+    Matrix3 Transposed() const
     {
         return Matrix3(
             Vector3(data[0][0], data[0][1], data[0][2]),
@@ -281,6 +292,8 @@ public:
 private:
     bool FromString(std::string_view str);
 };
+
+std::ostream& operator << (std::ostream& os, const Matrix3& matrix);
 
 class Matrix4
 {
@@ -386,6 +399,16 @@ public:
         this->data[1][3] = m13;
         this->data[2][3] = m23;
         this->data[3][3] = m33;
+    }
+
+    Matrix4(float value)
+    {
+        *this = Matrix4::IDENTITY;
+
+        this->data[0][0] = value;
+        this->data[1][1] = value;
+        this->data[2][2] = value;
+        this->data[3][3] = value;
     }
 
     Matrix4(std::string_view str)
@@ -572,7 +595,7 @@ public:
 
     std::string ToString() const;
 
-    Matrix4 Transpose() const
+    Matrix4 Transposed() const
     {
         return Matrix4(
             Vector4(data[0][0], data[0][1], data[0][2], data[0][3]),
@@ -609,13 +632,65 @@ public:
     }
     
     // TODO: Implement Inverse() function
-    // Matrix4 Inverse() const;
+    Matrix4 Inverse() const
+    {
+        float Coef00 = this->data[2][2] * this->data[3][3] - this->data[3][2] * this->data[2][3];
+        float Coef02 = this->data[1][2] * this->data[3][3] - this->data[3][2] * this->data[1][3];
+        float Coef03 = this->data[1][2] * this->data[2][3] - this->data[2][2] * this->data[1][3];
+        float Coef04 = this->data[2][1] * this->data[3][3] - this->data[3][1] * this->data[2][3];
+        float Coef06 = this->data[1][1] * this->data[3][3] - this->data[3][1] * this->data[1][3];
+        float Coef07 = this->data[1][1] * this->data[2][3] - this->data[2][1] * this->data[1][3];
+        float Coef08 = this->data[2][1] * this->data[3][2] - this->data[3][1] * this->data[2][2];
+        float Coef10 = this->data[1][1] * this->data[3][2] - this->data[3][1] * this->data[1][2];
+        float Coef11 = this->data[1][1] * this->data[2][2] - this->data[2][1] * this->data[1][2];
+        float Coef12 = this->data[2][0] * this->data[3][3] - this->data[3][0] * this->data[2][3];
+        float Coef14 = this->data[1][0] * this->data[3][3] - this->data[3][0] * this->data[1][3];
+        float Coef15 = this->data[1][0] * this->data[2][3] - this->data[2][0] * this->data[1][3];
+        float Coef16 = this->data[2][0] * this->data[3][2] - this->data[3][0] * this->data[2][2];
+        float Coef18 = this->data[1][0] * this->data[3][2] - this->data[3][0] * this->data[1][2];
+        float Coef19 = this->data[1][0] * this->data[2][2] - this->data[2][0] * this->data[1][2];
+        float Coef20 = this->data[2][0] * this->data[3][1] - this->data[3][0] * this->data[2][1];
+        float Coef22 = this->data[1][0] * this->data[3][1] - this->data[3][0] * this->data[1][1];
+        float Coef23 = this->data[1][0] * this->data[2][1] - this->data[2][0] * this->data[1][1];
+
+        Vector4 Fac0(Coef00, Coef00, Coef02, Coef03);
+        Vector4 Fac1(Coef04, Coef04, Coef06, Coef07);
+        Vector4 Fac2(Coef08, Coef08, Coef10, Coef11);
+        Vector4 Fac3(Coef12, Coef12, Coef14, Coef15);
+        Vector4 Fac4(Coef16, Coef16, Coef18, Coef19);
+        Vector4 Fac5(Coef20, Coef20, Coef22, Coef23);
+
+        Vector4 Vec0(this->data[1][0], this->data[0][0], this->data[0][0], this->data[0][0]);
+        Vector4 Vec1(this->data[1][1], this->data[0][1], this->data[0][1], this->data[0][1]);
+        Vector4 Vec2(this->data[1][2], this->data[0][2], this->data[0][2], this->data[0][2]);
+        Vector4 Vec3(this->data[1][3], this->data[0][3], this->data[0][3], this->data[0][3]);
+
+        Vector4 Inv0(Vec1 * Fac0 - Vec2 * Fac1 + Vec3 * Fac2);
+        Vector4 Inv1(Vec0 * Fac0 - Vec2 * Fac3 + Vec3 * Fac4);
+        Vector4 Inv2(Vec0 * Fac1 - Vec1 * Fac3 + Vec3 * Fac5);
+        Vector4 Inv3(Vec0 * Fac2 - Vec1 * Fac4 + Vec2 * Fac5);
+
+        Vector4 SignA(+1, -1, +1, -1);
+        Vector4 SignB(-1, +1, -1, +1);
+        Matrix4 Inverse(Inv0 * SignA, Inv1 * SignB, Inv2 * SignA, Inv3 * SignB);
+
+        Vector4 Row0(Inverse[0][0], Inverse[1][0], Inverse[2][0], Inverse[3][0]);
+
+        Vector4 Dot0(Column(0) * Row0);
+        float Dot1 = (Dot0.x + Dot0.y) + (Dot0.z + Dot0.w);
+
+        float OneOverDeterminant = 1.0f / Dot1;
+
+        return Inverse * OneOverDeterminant;
+    }
 
     static const Matrix4 ZERO;
     static const Matrix4 IDENTITY;
 private:
     bool FromString(std::string_view str);
 };
+
+std::ostream& operator << (std::ostream& os, const Matrix4& matrix);
 
 /// 3x4 matrix for scene node transform calculations.
 class Matrix3x4

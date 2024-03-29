@@ -1,7 +1,7 @@
-const vec2 iResolution = vec2(800, 600);
-const float iAspect = iResolution.x / iResolution.y;
-const float iFocusLength = 1.0;
-const vec3 iCameraCenter = vec3(0, 0, 1);
+const vec2 cResolution = vec2(1200, 600);
+const float cAspect = cResolution.x / cResolution.y;
+const float cFocusLength = 1.0;
+const vec3 cCameraCenter = vec3(0, 0, 1);
 
 const float MAX_DIST = 1000.0;
 

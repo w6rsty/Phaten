@@ -19,6 +19,11 @@ bool Vector2::FromString(std::string_view str)
     return true;
 }
 
+Vector2 operator * (float lhs, const Vector2& rhs)
+{
+    return rhs * lhs;
+}
+
 Vector3& Vector3::operator = (const Vector4& rhs)
 {
     x = rhs.x;
@@ -64,6 +69,11 @@ std::string Vector3::ToString() const
     return std::to_string(x) + " " + std::to_string(y) + " " + std::to_string(z);
 }
 
+Vector3 operator * (float lhs, const Vector3& rhs)
+{
+    return rhs * lhs;
+}
+
 const Vector4 Vector4::ZERO = Vector4{0, 0, 0, 0};
 const Vector4 Vector4::ONE = Vector4{1, 1, 1, 1};
 const Vector4 Vector4::X = Vector4{1, 0, 0, 0};
@@ -92,6 +102,11 @@ bool Vector4::FromString(std::string_view str)
 std::string Vector4::ToString() const
 {
     return std::to_string(x) + " " + std::to_string(y) + " " + std::to_string(z) + " " + std::to_string(w);
+}
+
+Vector4 operator * (float lhs, const Vector4& rhs)
+{
+    return rhs * lhs;
 }
 
 // ============================================================================

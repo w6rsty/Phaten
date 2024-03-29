@@ -67,7 +67,8 @@ const std::string VertexElementSemanticName[]
 const std::string PresetUniformName[]
 {
     "uTime",
-    "uWorldMatrix",
+    "uProjectionView",
+    "uModel",
     ""
 };
 

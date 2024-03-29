@@ -105,6 +105,7 @@ public:
 
     std::string ToString() const;
     const float* Data() const { return data; }
+    float* Data() { return data; }
 
     void Normalize()
     {
@@ -139,6 +140,8 @@ public:
 private:
     bool FromString(std::string_view str);
 };
+
+Vector2 operator * (float lhs, const Vector2& rhs);
 
 class Vector3
 {
@@ -260,6 +263,7 @@ public:
 
     std::string ToString() const;
     const float* Data() const { return data; }
+    float* Data() { return data; }
 
     void Normalize()
     {
@@ -296,6 +300,8 @@ public:
 private:
     bool FromString(std::string_view str);
 };
+
+Vector3 operator * (float lhs, const Vector3& rhs);
 
 class Vector4
 {
@@ -441,6 +447,8 @@ public:
         return *this;
     }
 
+    Vector4 operator * (const Vector4& rhs) const { return Vector4(x * rhs.x, y * rhs.y, z * rhs.z, w * rhs.w); }
+
     bool operator == (const Vector4& rhs) const { return x == rhs.x && y == rhs.y && z == rhs.z && w == rhs.w; }
     bool operator != (const Vector4& rhs) const { return x != rhs.x || y != rhs.y || z != rhs.z || w != rhs.w; }
     Vector4 operator + (const Vector4& rhs) const { return Vector4(x + rhs.x, y + rhs.y, z + rhs.z, w + rhs.w); 
@@ -457,6 +465,7 @@ public:
 
     std::string ToString() const;
     const float* Data() const { return data; }
+    float* Data() { return data; }
 
     void Normalize()
     {
@@ -494,6 +503,8 @@ public:
 private:
     bool FromString(std::string_view str);
 };
+
+Vector4 operator * (float lhs, const Vector4& rhs);
 
 // ============================================================================
 // ============================================================================

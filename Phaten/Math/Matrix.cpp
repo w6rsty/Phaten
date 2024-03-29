@@ -52,6 +52,19 @@ std::string Matrix3::ToString() const
         this->data[0][2], this->data[1][2], this->data[2][2]);
 }
 
+std::ostream& operator << (std::ostream& os, const Matrix3& matrix)
+{
+    for (int j = 0; j < 3; ++j)
+    {
+        for (int i = 0; i < 3; ++i)
+        {
+            os << matrix.data[i][j] << " ";
+        }
+        os << std::endl;
+    }
+    return os;
+}
+
 const Matrix4 Matrix4::ZERO = {{0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}};
 const Matrix4 Matrix4::IDENTITY = {{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 1}};
 
@@ -82,6 +95,19 @@ std::string Matrix4::ToString() const
         this->data[0][1], this->data[1][1], this->data[2][1], this->data[3][1],
         this->data[0][2], this->data[1][2], this->data[2][2], this->data[3][2],
         this->data[0][3], this->data[1][3], this->data[2][3], this->data[3][3]);
+}
+
+std::ostream& operator << (std::ostream& os, const Matrix4& matrix)
+{
+    for (int j = 0; j < 4; ++j)
+    {
+        for (int i = 0; i < 4; ++i)
+        {
+            os << matrix.data[i][j] << " ";
+        }
+        os << std::endl;
+    }
+    return os;
 }
 
 const Matrix3x4 Matrix3x4::ZERO = {{0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}};

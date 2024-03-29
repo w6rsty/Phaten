@@ -3,7 +3,9 @@
 #if defined(COMPILE_VS)
 
 layout (location = 0) in vec3 aPosition;
+layout (location = 4) in vec2 aTexCoord;
 out vec3 vPos;
+out vec2 vTexCoord;
 
 #else
 
@@ -11,26 +13,18 @@ out vec3 vPos;
 
 layout (location = 0) out vec4 FragColor;
 in vec3 vPos;
+in vec2 vTexCoord;
 
 #endif
 
 void vert()
 {
-    vec4 pos = uWorldMatrix * vec4(aPosition, 1.0);
-    gl_Position = pos;
+    gl_Position = uProjectionView * vec4(aPosition, 1.0);
     vPos = aPosition;
+    vTexCoord = aTexCoord;
 }
 
 void frag()
 {
-    vec3 pixelCenter = vec3(vPos.x, vPos.y / iAspect, iCameraCenter.z - iFocusLength);
-
-    Ray ray;
-    ray.origin = iCameraCenter;
-    ray.direction = normalize(pixelCenter - iCameraCenter);
-
-    vec3 finalColor = vec3(0.0);
-    finalColor = tracer(ray);
-
-    FragColor = vec4(finalColor, 1.0);
+    FragColor = vec4(vTexCoord, 0.5, 1.0);
 }
