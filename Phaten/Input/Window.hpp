@@ -17,7 +17,7 @@ struct WindowCreateInfo
     ScreenMode mode;
 };
 
-class Window 
+class Window : public RefCounted
 {
 public:
     Window(std::string_view title, const IntV2& windowSize, ScreenMode mode);

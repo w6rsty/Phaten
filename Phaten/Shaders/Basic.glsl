@@ -19,7 +19,7 @@ in vec2 vTexCoord;
 
 void vert()
 {
-    gl_Position = uProjectionView * vec4(aPosition, 1.0);
+    gl_Position = uProjectionView * uModel * vec4(aPosition, 1.0);
     vPos = aPosition;
     vTexCoord = aTexCoord;
 }

@@ -14,7 +14,7 @@ Graphics::Graphics(WindowCreateInfo windowInfo)
     PT_TAG_INFO("Graphics", "Created graphics system");
 
     // TODO: Add another struct to store window properties.
-    m_Window = CreateScoped<Window>(windowInfo.title, windowInfo.windowSize, windowInfo.mode);
+    m_Window = CreateShared<Window>(windowInfo.title, windowInfo.windowSize, windowInfo.mode);
     // Use the window handle to create the graphics context.
     m_GraphicsContext = CreateScoped<GraphicsContext>(m_Window->NativeHandle());
 
@@ -131,7 +131,7 @@ IntV2 Graphics::Size() const
     return m_Window->Size();
 }
 
-void* Graphics::NativeWindow() const
+void* Graphics::GetNativeWindow() const
 {
     return m_Window->NativeHandle();
 

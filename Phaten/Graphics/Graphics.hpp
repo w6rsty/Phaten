@@ -3,12 +3,12 @@
 #include <map>
 
 #include "Object/Ptr.hpp"
+#include "IO/StringHash.hpp"
 #include "Input/Window.hpp"
 #include "Math/IntVector.hpp"
 #include "Math/Matrix.hpp"
-#include "IO/StringHash.hpp"
-#include "GraphicsContext.hpp"
 #include "Shader.hpp"
+#include "GraphicsContext.hpp"
 
 
 struct SDL_Window;
@@ -41,14 +41,15 @@ public:
     void DrawIndexed(PrimitiveType type, size_t first, size_t count);
 
     IntV2 Size() const;
-    void* NativeWindow() const;
+    void* GetNativeWindow() const;
+    WeakPtr<Window> GetWindow() const { return m_Window; }
 
     void Present();
     void Clear();
 private:
     bool m_VSync;
 
-    ScopedPtr<Window> m_Window;
+    SharedPtr<Window> m_Window;
     ScopedPtr<GraphicsContext> m_GraphicsContext;
 
     std::map<StringHash, SharedPtr<Shader>> m_Shaders;

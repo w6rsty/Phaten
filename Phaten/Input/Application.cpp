@@ -3,8 +3,10 @@
 #include <SDL.h>
 #include <imgui.h>
 
-#include "Math/Space.hpp"
+#include "Graphics/GraphicsDefs.hpp"
 #include "Input/ImGuiPlugin.hpp"
+#include "Math/Space.hpp"
+#include "Math/Vector.hpp"
 
 namespace Pt {
 
@@ -30,6 +32,8 @@ struct GraphicsData
         0, 4, 5, 5, 1, 0,
         3, 7, 6, 6, 2, 3
     };
+
+    Matrix4 model {1.0f};
 };
 
 static GraphicsData s_Data;
@@ -63,9 +67,8 @@ Application::Application()
     m_Camera->SetPosition({ 0.0f, 0.0f, 3.0f });
 
     m_Texture = CreateShared<Texture2D>();
-    unsigned white = 0xffffffff;
     m_Texture->Define("Assets/Textures/face.jpg");
-    m_Texture->Bind();
+    m_Texture->Bind();  
 }
 
 Application::~Application()
@@ -78,8 +81,6 @@ void Application::Run()
     bool running = true;
     SDL_Event event;
 
-    bool rot = false;
-
     while (running)
     {
         m_Graphics->Clear();
@@ -90,30 +91,27 @@ void Application::Run()
             {
                 running = false;
             }
-            // keyboard wasd move
+            
             if (event.type == SDL_KEYDOWN)
             {
                 switch (event.key.keysym.sym)
                 {
                 case SDLK_w:
-                    m_Camera->Move({ 0.0f, 0.0f, -0.1f });
+                    m_Camera->Move(SceneCamera::Movement::FORWARD);
                     break;
                 case SDLK_s:
-                    m_Camera->Move({ 0.0f, 0.0f, 0.1f });
+                    m_Camera->Move(SceneCamera::Movement::BACKWARD);
                     break;
                 case SDLK_a:
-                    m_Camera->Move({ -0.1f, 0.0f, 0.0f });
+                    m_Camera->Move(SceneCamera::Movement::LEFT);
                     break;
                 case SDLK_d:
-                    m_Camera->Move({ 0.1f, 0.0f, 0.0f });
-                    break;
-                case SDLK_r:
-                    rot = !rot;
+                    m_Camera->Move(SceneCamera::Movement::RIGHT);
                     break;
                 }
             }
-            // mouse move when presssing middle button
-            if (event.type == SDL_MOUSEMOTION && rot)
+
+            if (event.type == SDL_MOUSEMOTION && event.motion.state & SDL_BUTTON(SDL_BUTTON_MIDDLE))
             {
                 m_Camera->Rotate(event.motion.xrel, -event.motion.yrel);
             }
@@ -128,12 +126,12 @@ void Application::Run()
         ImGui::Text("Rotation: %.2f %.2f %.2f", m_Camera->GetRotation().x, m_Camera->GetRotation().y, m_Camera->GetRotation().z);
         ImGui::End();
 
-        m_Program->Bind();
-
         m_UB->Bind(0);
         Matrix4 mat = m_Camera->GetProjection() * m_Camera->GetView();
         m_UB->SetData(0, sizeof(Matrix4), &mat);
 
+        m_Program->Bind();
+        m_Graphics->SetUniform(m_Program, PresetUniform::U_MODEL, s_Data.model);
         m_Graphics->DrawIndexed(PrimitiveType::TRIANGLES, 0, 36);
 
         ImGuiEnd();
