@@ -5,14 +5,17 @@ add_engine_directory(Graphics)
 add_engine_directory(Input)
 add_engine_directory(IO)
 add_engine_directory(Math)
-add_engine_directory(Resource)
 add_engine_directory(Object)
+add_engine_directory(Renderer)
+add_engine_directory(Resource)
+add_engine_directory(Scene)
 add_engine_directory(Thread)
 
 set(PT_LIBS
     glad
     SDL2-static
     imgui
+    STB
 )
 
 if (WIN32)

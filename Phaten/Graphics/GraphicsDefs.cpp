@@ -92,6 +92,19 @@ const GLenum PrimitiveGLType[]
     GL_TRIANGLE_FAN
 };
 
+const GLenum TextureWrapModeGLType[]
+{
+    GL_REPEAT,
+    GL_MIRRORED_REPEAT,
+    GL_CLAMP_TO_EDGE,
+    GL_CLAMP_TO_BORDER
+};
+
+const GLenum TextureFilterModeGLType[]
+{
+    GL_NEAREST,
+    GL_LINEAR
+};
 
 std::string AttributesBitToString(unsigned attributes)
 {

@@ -75,14 +75,14 @@ public:
         return *this;
     }
 
-    Vector2& operator * (float rhs)
+    Vector2& operator *= (float rhs)
     {
         x *= rhs;
         y *= rhs;
         return *this;
     }
 
-    Vector2& operator / (float rhs)
+    Vector2& operator /= (float rhs)
     {
         x /= rhs;
         y /= rhs;
@@ -97,6 +97,8 @@ public:
     Vector2 operator * (float rhs) const { return Vector2(x * rhs, y * rhs); }
     Vector2 operator / (float rhs) const { return Vector2(x / rhs, y / rhs); }
     
+    Vector2 operator * (const Vector2& rhs) const { return Vector2(x * rhs.x, y * rhs.y); }
+
     float& operator [] (size_t index) { return data[index]; }
     const float& operator [] (size_t index) const { return data[index]; }
 
@@ -232,7 +234,7 @@ public:
         return *this;
     }
 
-    Vector3& operator * (float rhs)
+    Vector3& operator *= (float rhs)
     {
         x *= rhs;
         y *= rhs;
@@ -240,7 +242,7 @@ public:
         return *this;
     }
 
-    Vector3& operator / (float rhs)
+    Vector3& operator /= (float rhs)
     {
         x /= rhs;
         y /= rhs;
@@ -254,6 +256,8 @@ public:
     Vector3 operator - () const { return Vector3(-x, -y, -z); }
     Vector3 operator - (const Vector3& rhs) const { return Vector3(x - rhs.x, y - rhs.y, z - rhs.z); }
     Vector3 operator * (float rhs) const { return Vector3(x * rhs, y * rhs, z * rhs); }
+
+    Vector3 operator * (const Vector3& rhs) const { return Vector3(x * rhs.x, y * rhs.y, z * rhs.z); }
 
     float& operator [] (size_t index) { return data[index]; }
     const float& operator [] (size_t index) const { return data[index]; }
@@ -429,7 +433,7 @@ public:
         return *this;
     }
 
-    Vector4& operator * (float rhs)
+    Vector4& operator *= (float rhs)
     {
         x *= rhs;
         y *= rhs;
@@ -438,7 +442,7 @@ public:
         return *this;
     }
 
-    Vector4& operator / (float rhs)
+    Vector4& operator /= (float rhs)
     {
         x /= rhs;
         y /= rhs;
@@ -447,8 +451,6 @@ public:
         return *this;
     }
 
-    Vector4 operator * (const Vector4& rhs) const { return Vector4(x * rhs.x, y * rhs.y, z * rhs.z, w * rhs.w); }
-
     bool operator == (const Vector4& rhs) const { return x == rhs.x && y == rhs.y && z == rhs.z && w == rhs.w; }
     bool operator != (const Vector4& rhs) const { return x != rhs.x || y != rhs.y || z != rhs.z || w != rhs.w; }
     Vector4 operator + (const Vector4& rhs) const { return Vector4(x + rhs.x, y + rhs.y, z + rhs.z, w + rhs.w); 
@@ -456,6 +458,8 @@ public:
     Vector4 operator - () const { return Vector4(-x, -y, -z, -w); }
     Vector4 operator - (const Vector4& rhs) const { return Vector4(x - rhs.x, y - rhs.y, z - rhs.z, w - rhs.w); }
     Vector4 operator * (float rhs) const { return Vector4(x * rhs, y * rhs, z * rhs, w * rhs); }
+
+    Vector4 operator * (const Vector4& rhs) const { return Vector4(x * rhs.x, y * rhs.y, z * rhs.z, w * rhs.w); }
 
     float& operator [] (size_t index) { return data[index]; }
     const float& operator [] (size_t index) const { return data[index]; }

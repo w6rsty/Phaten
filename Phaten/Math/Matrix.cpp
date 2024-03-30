@@ -5,8 +5,8 @@
 
 namespace Pt {
 
-const Matrix3 Matrix3::ZERO = {{0, 0, 0}, {0, 0, 0}, {0, 0, 0}};
-const Matrix3 Matrix3::IDENTITY = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
+const Matrix3 Matrix3::ZERO {{0, 0, 0}, {0, 0, 0}, {0, 0, 0}};
+const Matrix3 Matrix3::IDENTITY {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
 
 Matrix3::Matrix3(const Matrix4& matrix)
 {
@@ -65,8 +65,8 @@ std::ostream& operator << (std::ostream& os, const Matrix3& matrix)
     return os;
 }
 
-const Matrix4 Matrix4::ZERO = {{0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}};
-const Matrix4 Matrix4::IDENTITY = {{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 1}};
+const Matrix4 Matrix4::ZERO {{0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}};
+const Matrix4 Matrix4::IDENTITY {{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 1}};
 
 bool Matrix4::FromString(std::string_view str)
 {
@@ -110,8 +110,8 @@ std::ostream& operator << (std::ostream& os, const Matrix4& matrix)
     return os;
 }
 
-const Matrix3x4 Matrix3x4::ZERO = {{0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}};
-const Matrix3x4 Matrix3x4::IDENTITY = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}, {0, 0, 0}};
+const Matrix3x4 Matrix3x4::ZERO {{0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}};
+const Matrix3x4 Matrix3x4::IDENTITY {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}, {0, 0, 0}};
 
 bool Matrix3x4::FromString(std::string_view str)
 {

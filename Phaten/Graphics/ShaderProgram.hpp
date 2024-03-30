@@ -75,7 +75,7 @@ private:
     /// Store all uniform locations.
     std::map<StringHash, int> m_Uniforms;
     /// Store preset uniform locations.
-    int m_PresetUniforms[static_cast<size_t>(PresetUniform::MAX_PRESET_UNIFORMS)];
+    int m_PresetUniforms[EnumAsIndex(PresetUniform::MAX_PRESET_UNIFORMS)];
     /// Shader name.
     std::string m_ShaderName;
 };

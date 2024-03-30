@@ -26,8 +26,6 @@ Graphics::Graphics(WindowCreateInfo windowInfo)
 
     // Initialization Done ====================================================
     glEnable(GL_DEPTH_TEST);
-
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 }
 
 Graphics::~Graphics()
@@ -40,6 +38,12 @@ void Graphics::SetVSync(bool enable)
     m_Window->SetVSync(enable);
     m_VSync = enable;
 }
+
+void Graphics::SetClearColor(const Vector4& color)
+{
+    glClearColor(color.x, color.y, color.z, color.w);
+}
+
 
 SharedPtr<Shader> Graphics::LoadShader(std::string_view name)
 {
@@ -136,12 +140,12 @@ void* Graphics::NativeWindow() const
 
 void Graphics::Draw(PrimitiveType type, size_t first, size_t count)
 {
-    glDrawArrays(PrimitiveGLType[static_cast<size_t>(type)], first, count);
+    glDrawArrays(PrimitiveGLType[EnumAsIndex(type)], first, count);
 }
 void Graphics::DrawIndexed(PrimitiveType type, size_t first, size_t count)
 {   
     glDrawElements(
-        PrimitiveGLType[static_cast<size_t>(type)],
+        PrimitiveGLType[EnumAsIndex(type)],
         count,
         GL_UNSIGNED_INT,
         (void*)(first * sizeof(unsigned))

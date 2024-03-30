@@ -63,7 +63,7 @@ private:
         for (VertexElement& element : m_Elements)
         {
             element.offset = stride;
-            stride += VertexElementSize[static_cast<size_t>(element.type)];
+            stride += VertexElementSize[EnumAsIndex(element.type)];
         }
         m_Stride = stride;
     }

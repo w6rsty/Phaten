@@ -1,4 +1,4 @@
-const vec2 cResolution = vec2(1200, 600);
+const vec2 cResolution = vec2(1280, 720);
 const float cAspect = cResolution.x / cResolution.y;
 const float cFocusLength = 1.0;
 const vec3 cCameraCenter = vec3(0, 0, 1);

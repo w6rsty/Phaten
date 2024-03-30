@@ -10,6 +10,12 @@ namespace Pt {
 static const std::string PT_GL_VERSION = "410 core";
 static const size_t MAX_UNIFORM_BUFFER_SLOTS = 16;
 
+#ifdef __APPLE__
+static const size_t MAX_TEXTURE_SLOTS = 16;
+#else
+static const size_t MAX_TEXTURE_SLOTS = 32;
+#endif
+
 enum class ScreenMode
 {
     WINDOWED = 0,
@@ -83,6 +89,22 @@ enum class PrimitiveType
     MAX_PRIMITIVE_TYPE
 };
 
+enum class TextureWrapMode
+{
+    REPEAT = 0,
+    MIRRORED_REPEAT,
+    CLAMP_TO_EDGE,
+    CLAMP_TO_BORDER,
+    MAX_WRAP_MODE
+};
+
+enum class TextureFilterMode
+{
+    NEAREST = 0,
+    LINEAR,
+    MAX_FILTER_MODE
+};
+
 extern const unsigned VertexElementGLCount[];
 extern const unsigned VertexElementGLType[];
 extern const unsigned VertexElementSize[];
@@ -94,6 +116,17 @@ extern const std::string PresetUniformName[];
 
 extern const std::string PrimitiveName[];
 extern const GLenum PrimitiveGLType[];
+
+extern const GLenum TextureWrapModeGLType[];
+extern const GLenum TextureFilterModeGLType[];
+
+template <typename T>
+constexpr size_t EnumAsIndex(T type)
+{
+    return static_cast<size_t>(type);
+}
+
+/// ===================================================
 
 std::string AttributesBitToString(unsigned attributes);
 

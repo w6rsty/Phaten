@@ -113,6 +113,7 @@ bool UniformBuffer::Create(const void* data)
         data,
         m_Usage == BufferUsage::DYNAMIC ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW
     );
+    
     PT_LOG_INFO("Created uniform buffer(SizeByte: ", m_SizeByte, ")");
 
     return true;

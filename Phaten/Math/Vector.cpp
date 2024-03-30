@@ -4,10 +4,10 @@
 
 namespace Pt {
 
-const Vector2 Vector2::ZERO = Vector2{0, 0};
-const Vector2 Vector2::ONE = Vector2{1, 1};
-const Vector2 Vector2::X = Vector2{1, 0};
-const Vector2 Vector2::Y = Vector2{0, 1};
+const Vector2 Vector2::ZERO     {0, 0};
+const Vector2 Vector2::ONE      {1, 1};
+const Vector2 Vector2::X        {1, 0};
+const Vector2 Vector2::Y        {0, 1};
 
 bool Vector2::FromString(std::string_view str)
 {
@@ -37,11 +37,11 @@ std::string Vector2::ToString() const
     return std::to_string(x) + " " + std::to_string(y);
 }
 
-const Vector3 Vector3::ZERO = Vector3{0, 0, 0};
-const Vector3 Vector3::ONE = Vector3{1, 1, 1};
-const Vector3 Vector3::X = Vector3{1, 0, 0};
-const Vector3 Vector3::Y = Vector3{0, 1, 0};
-const Vector3 Vector3::Z = Vector3{0, 0, 1};
+const Vector3 Vector3::ZERO     {0, 0, 0};
+const Vector3 Vector3::ONE      {1, 1, 1};
+const Vector3 Vector3::X        {1, 0, 0};
+const Vector3 Vector3::Y        {0, 1, 0};
+const Vector3 Vector3::Z        {0, 0, 1};
 
 Vector3::Vector3(const Vector4& vector) :
     x(vector.x),
@@ -74,12 +74,12 @@ Vector3 operator * (float lhs, const Vector3& rhs)
     return rhs * lhs;
 }
 
-const Vector4 Vector4::ZERO = Vector4{0, 0, 0, 0};
-const Vector4 Vector4::ONE = Vector4{1, 1, 1, 1};
-const Vector4 Vector4::X = Vector4{1, 0, 0, 0};
-const Vector4 Vector4::Y = Vector4{0, 1, 0, 0};
-const Vector4 Vector4::Z = Vector4{0, 0, 1, 0};
-const Vector4 Vector4::W = Vector4{0, 0, 0, 1};
+const Vector4 Vector4::ZERO     {0, 0, 0, 0};
+const Vector4 Vector4::ONE      {1, 1, 1, 1};
+const Vector4 Vector4::X        {1, 0, 0, 0};
+const Vector4 Vector4::Y        {0, 1, 0, 0};
+const Vector4 Vector4::Z        {0, 0, 1, 0};
+const Vector4 Vector4::W        {0, 0, 0, 1};
 
 bool Vector4::FromString(std::string_view str)
 {

@@ -5,7 +5,6 @@
 #include "Object/Ptr.hpp"
 #include "Input/Window.hpp"
 #include "Math/IntVector.hpp"
-#include "Math/Vector.hpp"
 #include "Math/Matrix.hpp"
 #include "IO/StringHash.hpp"
 #include "GraphicsContext.hpp"
@@ -26,6 +25,7 @@ public:
     ~Graphics();
 
     void SetVSync(bool enable);
+    void SetClearColor(const Vector4& color = Vector4(0.0f, 0.0f, 0.0f, 1.0f));
 
     /// Load a shader from file. Or return the existing one.
     SharedPtr<Shader> LoadShader(std::string_view name);

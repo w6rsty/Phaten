@@ -81,7 +81,7 @@ int ShaderProgram::Uniform(StringHash name) const
 
 int ShaderProgram::Uniform(PresetUniform name) const
 {
-    return m_PresetUniforms[static_cast<size_t>(name)];
+    return m_PresetUniforms[EnumAsIndex(name)];
 }
 
 void ShaderProgram::Create(
@@ -205,7 +205,7 @@ void ShaderProgram::Create(
         m_Uniforms[StringHash(uniformName)] = location;
 
         size_t preset = IndexOfList(uniformName, PresetUniformName, MAX_NAME_LENGTH);
-        if (preset < static_cast<size_t>(PresetUniform::MAX_PRESET_UNIFORMS))
+        if (preset < EnumAsIndex(PresetUniform::MAX_PRESET_UNIFORMS))
         {
             m_PresetUniforms[preset] = location;
         }

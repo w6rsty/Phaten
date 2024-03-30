@@ -128,7 +128,7 @@ void VertexBuffer::Bind(unsigned int attributeMask)
 
     for (const VertexElement& element : m_Layout)
     {
-        unsigned attributeIdx = VertexAttributeIdx[static_cast<size_t>(element.semantic)];
+        unsigned attributeIdx = VertexAttributeIdx[EnumAsIndex(element.semantic)];
         unsigned attributeBit = 1 << attributeIdx;
         // Ignore unused attribute.
         if (!(attributeMask & attributeBit))
@@ -142,7 +142,7 @@ void VertexBuffer::Bind(unsigned int attributeMask)
             glEnableVertexAttribArray(attributeIdx);
         }
 
-        size_t typeAsIdx = static_cast<size_t>(element.type);
+        size_t typeAsIdx = EnumAsIndex(element.type);
         glVertexAttribPointer(
             attributeIdx,
             VertexElementGLCount[typeAsIdx],
@@ -224,7 +224,7 @@ unsigned VertexBuffer::CalculateAttributesMask(const VertexLayout &layout)
     unsigned attributes = 0;
     for (const VertexElement& element : layout)
     {
-        unsigned attributeBit = 1 << VertexAttributeIdx[static_cast<size_t>(element.semantic)];
+        unsigned attributeBit = 1 << VertexAttributeIdx[EnumAsIndex(element.semantic)];
         attributes |= attributeBit;
     }
     return attributes;
