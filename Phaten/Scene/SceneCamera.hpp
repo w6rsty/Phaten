@@ -2,9 +2,9 @@
 
 #include "Renderer/Camera.hpp"
 
+union SDL_Event;
+
 namespace Pt {
-
-
 
 class SceneCamera : public Camera
 {
@@ -18,6 +18,8 @@ public:
     };
 
     SceneCamera();
+
+    void OnEvent(SDL_Event& event);
 
     void SetPosition(const Vector3& pos) { m_Position = pos; UpdateView(); }
     void SetRotation(const Vector3& rot) { m_Rotation = rot; UpdateView(); }

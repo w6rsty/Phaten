@@ -33,15 +33,16 @@ private:
     SharedPtr<IndexBuffer> m_IB;
     SharedPtr<UniformBuffer> m_UB;
     SharedPtr<ShaderProgram> m_Program;
-    ScopedPtr<SceneCamera> m_Camera;
+    SharedPtr<SceneCamera> m_Camera;
     SharedPtr<Texture2D> m_Texture;
 
-    /// Application state.
+    /// Applicat state.
     bool m_Running;
     /// Render state.
     bool m_RenderState;
 
     std::thread m_RenderThread;
+    std::mutex m_RenderStateMutex;
 };
 
 } // namespace Pt

@@ -1,10 +1,11 @@
 #pragma once
 
+#include "Object/Ptr.hpp"
 #include "Math/Matrix.hpp"
 
 namespace Pt {
 
-class Camera
+class Camera : RefCounted
 {
 public:
     Camera();

@@ -1,10 +1,12 @@
 #include "Application.hpp"
 
 #include <SDL.h>
+#include <imgui.h>
 
 #include "Graphics/GraphicsDefs.hpp"
 #include "IO/Logger.hpp"
 #include "Math/Space.hpp"
+#include "ImGuiPlugin.hpp"
 
 namespace Pt {
 
@@ -45,7 +47,6 @@ Application::Application() :
 
 Application::~Application()
 {
-    m_RenderState = false;
 }
 
 void Application::Run()
@@ -60,8 +61,7 @@ void Application::Run()
 
 void Application::OnEvent()
 {
-    auto threadId = std::this_thread::get_id();
-    PT_TAG_INFO("Thread", "Launch OnEvent() on thread: ", threadId);
+    PT_TAG_INFO("Thread", "Launch OnEvent() on thread: ", std::this_thread::get_id());
 
     SDL_Event event;
     while (m_Running)
@@ -70,32 +70,15 @@ void Application::OnEvent()
         {
             if (event.type == SDL_QUIT)
             {
+                std::lock_guard<std::mutex> lock(m_RenderStateMutex);
                 m_RenderState = false;  
                 m_Running = false;
             }
-
-            if (event.type == SDL_KEYDOWN)
+            
+            if (m_RenderState)
             {
-                switch (event.key.keysym.sym)
-                {
-                case SDLK_w:
-                    m_Camera->Move(SceneCamera::Movement::FORWARD);
-                    break;
-                case SDLK_s:
-                    m_Camera->Move(SceneCamera::Movement::BACKWARD);
-                    break;
-                case SDLK_a:
-                    m_Camera->Move(SceneCamera::Movement::LEFT);
-                    break;
-                case SDLK_d:
-                    m_Camera->Move(SceneCamera::Movement::RIGHT);
-                    break;
-                }
-            }
-
-            if (event.type == SDL_MOUSEMOTION && event.motion.state & SDL_BUTTON(SDL_BUTTON_MIDDLE))
-            {
-                m_Camera->Rotate(event.motion.xrel, -event.motion.yrel);
+                m_Camera->OnEvent(event);
+                ImGuiProcessEvent(event);
             }
         }
     }
@@ -103,11 +86,12 @@ void Application::OnEvent()
 
 void Application::OnRender()
 {
-    auto threadId = std::this_thread::get_id();
-    PT_TAG_INFO("Thread", "Launch OnRender() on thread: ", threadId);
+    PT_TAG_INFO("Thread", "Launch OnRender() on thread: ", std::this_thread::get_id());
 
     {
         m_Graphics = CreateScoped<Graphics>(m_Window);
+        ImGuiInit();
+    
         m_Graphics->SetClearColor();
 
         m_VB = CreateShared<VertexBuffer>();
@@ -126,21 +110,24 @@ void Application::OnRender()
 
         m_Graphics->LoadShader("Basic");
         m_Program = m_Graphics->CreateProgram("Basic", "", "");
-
-        m_Camera = CreateScoped<SceneCamera>();
-        m_Camera->SetPerspective(45.0f, 0.1f, 100.0f);
-        m_Camera->SetPosition({ 0.0f, 0.0f, 3.0f });
-
+        
         m_Texture = CreateShared<Texture2D>();
         m_Texture->Define("Assets/Textures/face.jpg");
         m_Texture->Bind();  
 
-        m_RenderState = true;
+        m_Camera = CreateShared<SceneCamera>();
+        m_Camera->SetPerspective(45.0f, 0.1f, 100.0f);
+        m_Camera->SetPosition({ 0.0f, 0.0f, 3.0f });
+
+        {
+            std::lock_guard<std::mutex> lock(m_RenderStateMutex);
+            m_RenderState = true;
+        }
     }
 
-    while (m_RenderState)
+    SDL_GL_MakeCurrent(SDL_GL_GetCurrentWindow(), SDL_GL_GetCurrentContext());
+    while (m_RenderState & m_Running)
     {
-        SDL_GL_MakeCurrent(SDL_GL_GetCurrentWindow(), SDL_GL_GetCurrentContext());
         m_Graphics->Clear();
 
         m_UB->Bind(0);
@@ -151,8 +138,15 @@ void Application::OnRender()
         m_Graphics->SetUniform(m_Program, PresetUniform::U_MODEL, s_Data.model);
         m_Graphics->DrawIndexed(PrimitiveType::TRIANGLES, 0, 36);
 
+        ImGuiBegin();
+        ImGui::ShowDemoWindow();
+        ImGuiEnd();
+
+        // Call window to swap buffers.
         m_Graphics->Present();
     }
+
+    ImGuiShutdown();
 }
 
 } // namespace Pt

@@ -1,5 +1,7 @@
 #include "SceneCamera.hpp"
 
+#include <SDL.h>
+
 #include "Math/Space.hpp"
 
 namespace Pt {
@@ -21,6 +23,32 @@ SceneCamera::SceneCamera() :
     UpdateView();
 }
 
+void SceneCamera::OnEvent(SDL_Event& event)
+{
+    if (event.type == SDL_KEYDOWN)
+    {
+        switch (event.key.keysym.sym)
+        {
+        case SDLK_w:
+            Move(SceneCamera::Movement::FORWARD);
+            break;
+        case SDLK_s:
+            Move(SceneCamera::Movement::BACKWARD);
+            break;
+        case SDLK_a:
+            Move(SceneCamera::Movement::LEFT);
+            break;
+        case SDLK_d:
+            Move(SceneCamera::Movement::RIGHT);
+            break;
+        }
+    }
+
+    if (event.type == SDL_MOUSEMOTION && event.motion.state & SDL_BUTTON(SDL_BUTTON_MIDDLE))
+    {
+        Rotate(event.motion.xrel, -event.motion.yrel);
+    }
+}
 
 void SceneCamera::Move(Movement movement)
 {
