@@ -9,7 +9,7 @@
 namespace Pt
 {
 
-Window::Window(std::string_view title, const IntV2& windowSize, ScreenMode mode)
+Window::Window(WindowCreateInfo info)
 {
     SDL_SetHint(SDL_HINT_WINDOWS_DPI_AWARENESS, "permonitor");
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS);
@@ -30,7 +30,7 @@ Window::Window(std::string_view title, const IntV2& windowSize, ScreenMode mode)
     SDL_DisplayMode displayMode;
     SDL_GetDesktopDisplayMode(0, &displayMode);
 
-    IntV2 initialSize = windowSize;
+    IntV2 initialSize = info.windowSize;
 
     if (!initialSize.x ||  initialSize.x > displayMode.w)
     {
@@ -42,17 +42,17 @@ Window::Window(std::string_view title, const IntV2& windowSize, ScreenMode mode)
     }
 
     unsigned windowFlags = SDL_WINDOW_OPENGL | SDL_WINDOW_ALLOW_HIGHDPI;
-    if (mode == ScreenMode::FULLSCREEN)
+    if (info.mode == ScreenMode::FULLSCREEN)
     {
         windowFlags |= SDL_WINDOW_FULLSCREEN;
     }
-    else if (mode == ScreenMode::BORDERLESS_FULLSCREEN)
+    else if (info.mode == ScreenMode::BORDERLESS_FULLSCREEN)
     {
         windowFlags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
     }
     
-    m_WindowHandle = SDL_CreateWindow(
-        title.data(),
+    m_Handle = SDL_CreateWindow(
+        info.title.data(),
         SDL_WINDOWPOS_UNDEFINED,
         SDL_WINDOWPOS_UNDEFINED,
         initialSize.x,
@@ -60,19 +60,19 @@ Window::Window(std::string_view title, const IntV2& windowSize, ScreenMode mode)
         windowFlags
     );
 
-    if (!m_WindowHandle) {
+    if (!m_Handle) {
         PT_LOG_ERROR("Failed to create window");
         return;
     }
 
-    PT_LOG_INFO("Created Window: ", title, " ", initialSize.x, "x", initialSize.y);
+    PT_LOG_INFO("Created Window: ", info.title, " ", initialSize.x, "x", initialSize.y);
 }
 
 Window::~Window()
 {
-    if (m_WindowHandle)
+    if (m_Handle)
     {
-        SDL_DestroyWindow(m_WindowHandle);
+        SDL_DestroyWindow(SDL_GL_GetCurrentWindow());
     }
 
     SDL_Quit();
@@ -86,7 +86,7 @@ void Window::SetVSync(bool enable)
 IntV2 Window::Size() const
 {
     IntV2 size;
-    SDL_GetWindowSize(m_WindowHandle, (int*)&size.x, (int*)&size.y);
+    SDL_GetWindowSize(SDL_GL_GetCurrentWindow(), (int*)&size.x, (int*)&size.y);
     return size;
 }
 
@@ -97,7 +97,7 @@ unsigned Window::Time() const
 
 void Window::Swap()
 {
-    SDL_GL_SwapWindow(m_WindowHandle);
+    SDL_GL_SwapWindow(SDL_GL_GetCurrentWindow());
 }
 
 

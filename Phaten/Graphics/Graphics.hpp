@@ -10,7 +10,6 @@
 #include "Shader.hpp"
 #include "GraphicsContext.hpp"
 
-
 struct SDL_Window;
 
 namespace Pt {
@@ -21,7 +20,7 @@ class ShaderProgram;
 class Graphics
 {
 public:
-    Graphics(WindowCreateInfo windowInfo);
+    Graphics(const SharedPtr<Window>& window);
     ~Graphics();
 
     void SetVSync(bool enable);
@@ -37,15 +36,15 @@ public:
     void SetUniform(ShaderProgram* program, PresetUniform uniform, const Vector4& value);
     void SetUniform(ShaderProgram* program, PresetUniform uniform, const Matrix4& value);
 
-    void Draw(PrimitiveType type, size_t first, size_t count);
-    void DrawIndexed(PrimitiveType type, size_t first, size_t count);
+    static void Draw(PrimitiveType type, size_t first, size_t count);
+    static void DrawIndexed(PrimitiveType type, size_t first, size_t count);
 
     IntV2 Size() const;
     void* GetNativeWindow() const;
     WeakPtr<Window> GetWindow() const { return m_Window; }
 
     void Present();
-    void Clear();
+    static void Clear();
 private:
     bool m_VSync;
 

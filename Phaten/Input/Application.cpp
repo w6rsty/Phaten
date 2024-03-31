@@ -1,12 +1,10 @@
 #include "Application.hpp"
 
 #include <SDL.h>
-#include <imgui.h>
 
 #include "Graphics/GraphicsDefs.hpp"
-#include "Input/ImGuiPlugin.hpp"
+#include "IO/Logger.hpp"
 #include "Math/Space.hpp"
-#include "Math/Vector.hpp"
 
 namespace Pt {
 
@@ -38,60 +36,44 @@ struct GraphicsData
 
 static GraphicsData s_Data;
 
-Application::Application()
+Application::Application() :
+    m_Running(false),
+    m_RenderState(false)
 {
-    m_Graphics = CreateScoped<Graphics>(WindowCreateInfo{"Phaten", IntV2{1280, 720}, ScreenMode::WINDOWED});
-    m_Graphics->SetClearColor();
-
-    ImGuiInit();
-
-    m_VB = CreateShared<VertexBuffer>();
-    m_VB->Define(BufferUsage::STATIC, 8, {VertexLayout{
-        {VertexElementType::FLOAT3, VertexElementSemantic::POSITION},
-        {VertexElementType::FLOAT2, VertexElementSemantic::TEXCOORD}
-    }}, s_Data.vertices);
-    m_VB->Bind(m_VB->Attributes());
-
-    m_IB = CreateShared<IndexBuffer>();
-    m_IB->Define(BufferUsage::STATIC, 36, s_Data.indices);
-    m_IB->Bind();
-
-    m_UB = CreateShared<UniformBuffer>();
-    m_UB->Define(BufferUsage::DYNAMIC, sizeof(Matrix4));
-
-    m_Graphics->LoadShader("Basic");
-    m_Program = m_Graphics->CreateProgram("Basic", "", "");
-
-    m_Camera = CreateScoped<SceneCamera>();
-    m_Camera->SetPerspective(45.0f, 0.1f, 100.0f);
-    m_Camera->SetPosition({ 0.0f, 0.0f, 3.0f });
-
-    m_Texture = CreateShared<Texture2D>();
-    m_Texture->Define("Assets/Textures/face.jpg");
-    m_Texture->Bind();  
+    m_Window = CreateShared<Window>(WindowCreateInfo{"Phaten", IntV2{1280, 720}, ScreenMode::WINDOWED});
 }
 
 Application::~Application()
 {
-    ImGuiShutdown();
+    m_RenderState = false;
 }
 
 void Application::Run()
 {
-    bool running = true;
+    m_Running = true;
+
+    m_RenderThread = std::thread(&Application::OnRender, this);
+    OnEvent();
+
+    m_RenderThread.join();
+}
+
+void Application::OnEvent()
+{
+    auto threadId = std::this_thread::get_id();
+    PT_TAG_INFO("Thread", "Launch OnEvent() on thread: ", threadId);
+
     SDL_Event event;
-
-    while (running)
+    while (m_Running)
     {
-        m_Graphics->Clear();
-
         while (SDL_PollEvent(&event))
         {
             if (event.type == SDL_QUIT)
             {
-                running = false;
+                m_RenderState = false;  
+                m_Running = false;
             }
-            
+
             if (event.type == SDL_KEYDOWN)
             {
                 switch (event.key.keysym.sym)
@@ -115,16 +97,51 @@ void Application::Run()
             {
                 m_Camera->Rotate(event.motion.xrel, -event.motion.yrel);
             }
-
-            ImGuiProcessEvent(event);
         }
+    }
+}
 
-        ImGuiBegin();
+void Application::OnRender()
+{
+    auto threadId = std::this_thread::get_id();
+    PT_TAG_INFO("Thread", "Launch OnRender() on thread: ", threadId);
 
-        ImGui::Begin("Camera");
-        ImGui::Text("Position: %.2f %.2f %.2f", m_Camera->GetPosition().x, m_Camera->GetPosition().y, m_Camera->GetPosition().z);
-        ImGui::Text("Rotation: %.2f %.2f %.2f", m_Camera->GetRotation().x, m_Camera->GetRotation().y, m_Camera->GetRotation().z);
-        ImGui::End();
+    {
+        m_Graphics = CreateScoped<Graphics>(m_Window);
+        m_Graphics->SetClearColor();
+
+        m_VB = CreateShared<VertexBuffer>();
+        m_VB->Define(BufferUsage::STATIC, 8, {VertexLayout{
+            {VertexElementType::FLOAT3, VertexElementSemantic::POSITION},
+            {VertexElementType::FLOAT2, VertexElementSemantic::TEXCOORD}
+        }}, s_Data.vertices);
+        m_VB->Bind(m_VB->Attributes());
+
+        m_IB = CreateShared<IndexBuffer>();
+        m_IB->Define(BufferUsage::STATIC, 36, s_Data.indices);
+        m_IB->Bind();
+
+        m_UB = CreateShared<UniformBuffer>();
+        m_UB->Define(BufferUsage::DYNAMIC, sizeof(Matrix4));
+
+        m_Graphics->LoadShader("Basic");
+        m_Program = m_Graphics->CreateProgram("Basic", "", "");
+
+        m_Camera = CreateScoped<SceneCamera>();
+        m_Camera->SetPerspective(45.0f, 0.1f, 100.0f);
+        m_Camera->SetPosition({ 0.0f, 0.0f, 3.0f });
+
+        m_Texture = CreateShared<Texture2D>();
+        m_Texture->Define("Assets/Textures/face.jpg");
+        m_Texture->Bind();  
+
+        m_RenderState = true;
+    }
+
+    while (m_RenderState)
+    {
+        SDL_GL_MakeCurrent(SDL_GL_GetCurrentWindow(), SDL_GL_GetCurrentContext());
+        m_Graphics->Clear();
 
         m_UB->Bind(0);
         Matrix4 mat = m_Camera->GetProjection() * m_Camera->GetView();
@@ -133,8 +150,6 @@ void Application::Run()
         m_Program->Bind();
         m_Graphics->SetUniform(m_Program, PresetUniform::U_MODEL, s_Data.model);
         m_Graphics->DrawIndexed(PrimitiveType::TRIANGLES, 0, 36);
-
-        ImGuiEnd();
 
         m_Graphics->Present();
     }

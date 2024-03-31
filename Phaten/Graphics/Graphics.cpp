@@ -4,19 +4,16 @@
 
 #include "IO/Assert.hpp"
 #include "ShaderProgram.hpp"
-#include "VertexBuffer.hpp"
-#include "IndexBuffer.hpp"
 
 namespace Pt {
 
-Graphics::Graphics(WindowCreateInfo windowInfo)
+Graphics::Graphics(const SharedPtr<Window>& window) :
+    m_Window(window),
+    m_VSync(true)
 {
     PT_TAG_INFO("Graphics", "Created graphics system");
-
-    // TODO: Add another struct to store window properties.
-    m_Window = CreateShared<Window>(windowInfo.title, windowInfo.windowSize, windowInfo.mode);
     // Use the window handle to create the graphics context.
-    m_GraphicsContext = CreateScoped<GraphicsContext>(m_Window->NativeHandle());
+    m_GraphicsContext = CreateScoped<GraphicsContext>(m_Window->SDLHandle());
 
     // Create a default VAO and use forever :D
     // (I'd like to switch to vulkan soon)
@@ -133,7 +130,7 @@ IntV2 Graphics::Size() const
 
 void* Graphics::GetNativeWindow() const
 {
-    return m_Window->NativeHandle();
+    return m_Window->SDLHandle();
 
 }
 

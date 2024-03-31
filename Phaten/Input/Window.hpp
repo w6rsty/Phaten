@@ -20,7 +20,7 @@ struct WindowCreateInfo
 class Window : public RefCounted
 {
 public:
-    Window(std::string_view title, const IntV2& windowSize, ScreenMode mode);
+    Window(WindowCreateInfo info);
     ~Window();
 
     void Swap();
@@ -29,10 +29,10 @@ public:
     IntV2 Size() const;
     unsigned Time() const;
     /// Get SDL native window handle.
-    SDL_Window* NativeHandle() const { return m_WindowHandle; }
+    SDL_Window* SDLHandle() const { return m_Handle; }
 private:
     /// SDL native window handle.
-    SDL_Window* m_WindowHandle {nullptr};
+    SDL_Window* m_Handle {nullptr};
 };
 
 } // namespace Pt
