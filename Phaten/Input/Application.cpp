@@ -63,6 +63,8 @@ void Application::Run()
     OnEvent();
 
     m_RenderThread.join();
+
+    m_CameraController->Detach();
 }
 
 void Application::OnEvent()
@@ -73,14 +75,18 @@ void Application::OnEvent()
     {
         m_Input->Update();
 
+        float speed =m_DeltaTime;
+        if (m_Input->KeyDown(SDLK_LSHIFT))
+            speed *= 2.0f;
+
         if (m_Input->KeyDown(SDLK_w))
-            m_CameraController->Move(SceneCameraMovement::FORWARD, m_DeltaTime);
+            m_CameraController->Move(SceneCameraMovement::FORWARD, speed);
         if (m_Input->KeyDown(SDLK_s))
-            m_CameraController->Move(SceneCameraMovement::BACKWARD, m_DeltaTime);
+            m_CameraController->Move(SceneCameraMovement::BACKWARD, speed);
         if (m_Input->KeyDown(SDLK_a))
-            m_CameraController->Move(SceneCameraMovement::LEFT, m_DeltaTime);
+            m_CameraController->Move(SceneCameraMovement::LEFT, speed);
         if (m_Input->KeyDown(SDLK_d))
-            m_CameraController->Move(SceneCameraMovement::RIGHT, m_DeltaTime);
+            m_CameraController->Move(SceneCameraMovement::RIGHT, speed);
 
         SDL_Delay(8);
     }
@@ -120,8 +126,11 @@ void Application::OnRender()
         m_Texture->Bind();  
 
         m_Camera = CreateShared<Camera>();
-        m_CameraController = CreateShared<SceneCameraController>(m_Camera);
-        m_CameraController->SetPosition(Vector3(0.0f, 0.0f, 3.0f));
+        m_Camera->SetPerspective(45.0f, 0.1f, 100.0f);
+        m_Camera->SetPosition(Vector3(0.0f, 0.0f, 3.0f));
+
+        m_CameraController = CreateShared<SceneCameraController>();
+        m_CameraController->Attach(m_Camera);
 
         {
             std::lock_guard<std::mutex> lock(m_RenderStateMutex);

@@ -18,15 +18,19 @@ enum class SceneCameraMovement
 class SceneCameraController : public RefCounted
 {
 public:
+    SceneCameraController();
 
-    SceneCameraController(const SharedPtr<Camera>& camera);
+    void Attach(const SharedPtr<Camera>& camera);
+    void Detach();
+    bool IsAttached() const { return m_Camera.IsNull(); }
 
     void OnEvent(float delta);
 
     void SetPosition(const Vector3& pos);
-    void SetRotation(int x, int y);
+    void SetRotation(const Vector3& rot);
 
-    void Move(SceneCameraMovement dir, float speed);    
+    void Move(SceneCameraMovement dir, float speed = 1.0f);    
+    void Rotate(const Vector3& move, float speed = 1.0f);
 private:
     SharedPtr<Camera> m_Camera;
     Vector3 m_Position;

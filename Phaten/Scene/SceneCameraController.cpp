@@ -6,37 +6,35 @@
 
 namespace Pt {
 
-static const float MOVE_SENSITIVITY = 2.0f;
-static const float ROTATE_SENSITIVITY = 0.1f;
-
-SceneCameraController::SceneCameraController(const SharedPtr<Camera>& camera) :
-    m_Camera(camera),
+SceneCameraController::SceneCameraController() :
     m_Position(Vector3::ZERO),
     m_Rotation(Vector3 {0.0, -90.0, 0.0})
 {
-    m_Camera->SetPerspective(45.0f, 0.1f, 100.0f);
 }
 
-void SceneCameraController::OnEvent(float delta)
+void SceneCameraController::Attach(const SharedPtr<Camera>& camera)
 {
-    float speed = MOVE_SENSITIVITY * delta;
-    
-    const Uint8* keyState = SDL_GetKeyboardState(nullptr);
+    m_Camera = camera;
+    m_Position = m_Camera->GetPosition();
+    m_Rotation = m_Camera->GetRotation();
+}
 
-    if (keyState[SDL_SCANCODE_W])
-        Move(SceneCameraMovement::FORWARD, speed);
-    if (keyState[SDL_SCANCODE_S])
-        Move(SceneCameraMovement::BACKWARD, speed);
-    if (keyState[SDL_SCANCODE_A])
-        Move(SceneCameraMovement::LEFT, speed);
-    if (keyState[SDL_SCANCODE_D])
-        Move(SceneCameraMovement::RIGHT, speed);
+void SceneCameraController::Detach()
+{
+    m_Camera.Reset();
+    m_Position = Vector3::ZERO;
+    m_Rotation = Vector3 {0.0, -90.0, 0.0};
 }
 
 void SceneCameraController::SetPosition(const Vector3& pos)
 {
     m_Position = pos;
     m_Camera->SetPosition(m_Position);
+}
+
+void SceneCameraController::SetRotation(const Vector3& rot)
+{
+    m_Camera->SetRotation(rot);
 }
 
 void SceneCameraController::Move(SceneCameraMovement dir, float speed)
@@ -60,10 +58,10 @@ void SceneCameraController::Move(SceneCameraMovement dir, float speed)
     m_Camera->SetPosition(m_Position);
 }
 
-void SceneCameraController::SetRotation(int x, int y)
+void SceneCameraController::Rotate(const Vector3& move, float speed)
 {
-    m_Rotation.x += (float)x;
-    m_Rotation.y += (float)y;
+    m_Rotation += move * speed;
+    
     m_Camera->SetRotation(m_Rotation);
 }
 
