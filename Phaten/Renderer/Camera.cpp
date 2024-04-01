@@ -1,6 +1,7 @@
 #include "Camera.hpp"
 
 #include "Math/Space.hpp"
+#include "Math/Vector.hpp"
 
 namespace Pt {
 
@@ -21,8 +22,15 @@ Camera::Camera() :
     m_NearOrtho(DEFAULT_ORTHO_NEAR_FAR.x),
     m_FarOrtho(DEFAULT_ORTHO_NEAR_FAR.y),
     m_ProjectionPersp(1.0f),
-    m_ProjectionOrtho(1.0f)
+    m_ProjectionOrtho(1.0f),
+    m_View(1.0f),
+    m_Position(Vector3::ZERO),
+    m_Rotation(Vector3{0, -90, 0}),
+    m_Direction(Vector3::FORWARD),
+    m_Up(Vector3::UP)
 {
+    UpdateProjection();
+    UpdateView();
 }
 
 void Camera::SetPerspective(float fov, float near, float far)
@@ -45,6 +53,18 @@ void Camera::SetOrthographic(float size, float near, float far)
     UpdateProjection();
 }
 
+void Camera::SetPosition(const Vector3& pos)
+{
+    m_Position = pos;
+    UpdateView();
+}
+
+void Camera::SetRotation(const Vector3& rot)
+{
+    m_Rotation = rot;
+    UpdateView();
+}
+
 void Camera::UpdateProjection()
 {
     if (m_IsPerspective)
@@ -57,9 +77,30 @@ void Camera::UpdateProjection()
     }
 }
 
+void Camera::UpdateView()
+{
+    Vector3 front;
+    front.x = cos(Radians(m_Rotation.y)) * cos(Radians(m_Rotation.x));
+    front.y = sin(Radians(m_Rotation.x));
+    front.z = sin(Radians(m_Rotation.y)) * cos(Radians(m_Rotation.x));
+    m_Direction = Normalize(front);
+
+    // normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
+    Vector3 right = Normalize(Cross(m_Direction, Vector3::UP));  
+    // Update up
+    m_Up = Normalize(Cross(right, m_Direction));
+
+    LookAt(m_View, m_Position, m_Position + m_Direction, m_Up);
+}
+
 const Matrix4& Camera::GetProjection() const
 {
     return m_IsPerspective ? m_ProjectionPersp : m_ProjectionOrtho;
+}
+
+const Matrix4& Camera::GetView() const
+{
+    return m_View;
 }
 
 } // namespace Pt

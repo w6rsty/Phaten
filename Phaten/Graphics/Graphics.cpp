@@ -16,7 +16,6 @@ Graphics::Graphics(const SharedPtr<Window>& window) :
     m_GraphicsContext = CreateScoped<GraphicsContext>(m_Window->SDLHandle());
 
     // Create a default VAO and use forever :D
-    // (I'd like to switch to vulkan soon)
     unsigned defaultVAO;
     glGenVertexArrays(1, &defaultVAO);
     glBindVertexArray(defaultVAO);

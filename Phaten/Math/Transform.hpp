@@ -30,6 +30,7 @@ Matrix4 TransformMatrix4(const Vector3& rotation, const Vector3& scale, const Ve
 Matrix4 TransformMatrix4(const Vector3& rotation, float scale, const Vector3& translation);
 // Matrix4 TransformMatrix4(const Vector3& translation, const Quaternion& rotation, float scale);
 
+// FIXME
 bool DecomposeSRT(const Matrix4& matrix, Vector3& scale, Vector3& rotation, Vector3& translation);
 
 } // namespace Pt

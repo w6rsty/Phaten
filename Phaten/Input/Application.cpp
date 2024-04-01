@@ -5,7 +5,6 @@
 
 #include "Graphics/GraphicsDefs.hpp"
 #include "IO/Logger.hpp"
-#include "Math/Space.hpp"
 #include "ImGuiPlugin.hpp"
 
 namespace Pt {
@@ -43,6 +42,13 @@ Application::Application() :
     m_RenderState(false)
 {
     m_Window = CreateShared<Window>(WindowCreateInfo{"Phaten", IntV2{1280, 720}, ScreenMode::WINDOWED});
+
+    m_Input = CreateScoped<Input>();
+    m_Input->SetOnExit([this]() {
+        std::lock_guard<std::mutex> lock(m_RenderStateMutex);
+        m_RenderState = false;
+        m_Running = false;
+    });
 }
 
 Application::~Application()
@@ -63,24 +69,20 @@ void Application::OnEvent()
 {
     PT_TAG_INFO("Thread", "Launch OnEvent() on thread: ", std::this_thread::get_id());
 
-    SDL_Event event;
     while (m_Running)
     {
-        while (SDL_PollEvent(&event))
-        {
-            if (event.type == SDL_QUIT)
-            {
-                std::lock_guard<std::mutex> lock(m_RenderStateMutex);
-                m_RenderState = false;  
-                m_Running = false;
-            }
-            
-            if (m_RenderState)
-            {
-                m_Camera->OnEvent(event);
-                ImGuiProcessEvent(event);
-            }
-        }
+        m_Input->Update();
+
+        if (m_Input->KeyDown(SDLK_w))
+            m_CameraController->Move(SceneCameraMovement::FORWARD, m_DeltaTime);
+        if (m_Input->KeyDown(SDLK_s))
+            m_CameraController->Move(SceneCameraMovement::BACKWARD, m_DeltaTime);
+        if (m_Input->KeyDown(SDLK_a))
+            m_CameraController->Move(SceneCameraMovement::LEFT, m_DeltaTime);
+        if (m_Input->KeyDown(SDLK_d))
+            m_CameraController->Move(SceneCameraMovement::RIGHT, m_DeltaTime);
+
+        SDL_Delay(8);
     }
 }
 
@@ -90,6 +92,8 @@ void Application::OnRender()
 
     {
         m_Graphics = CreateScoped<Graphics>(m_Window);
+        m_Graphics->SetVSync(true);
+        m_Frequency = (double)SDL_GetPerformanceFrequency();
         ImGuiInit();
     
         m_Graphics->SetClearColor();
@@ -115,9 +119,9 @@ void Application::OnRender()
         m_Texture->Define("Assets/Textures/face.jpg");
         m_Texture->Bind();  
 
-        m_Camera = CreateShared<SceneCamera>();
-        m_Camera->SetPerspective(45.0f, 0.1f, 100.0f);
-        m_Camera->SetPosition({ 0.0f, 0.0f, 3.0f });
+        m_Camera = CreateShared<Camera>();
+        m_CameraController = CreateShared<SceneCameraController>(m_Camera);
+        m_CameraController->SetPosition(Vector3(0.0f, 0.0f, 3.0f));
 
         {
             std::lock_guard<std::mutex> lock(m_RenderStateMutex);
@@ -128,6 +132,11 @@ void Application::OnRender()
     SDL_GL_MakeCurrent(SDL_GL_GetCurrentWindow(), SDL_GL_GetCurrentContext());
     while (m_RenderState & m_Running)
     {
+        uint64_t currentTime = SDL_GetPerformanceCounter();
+        m_DeltaTime = (currentTime - m_LastTime) / m_Frequency;
+        m_LastTime = currentTime;
+        m_FPS = 1.0 / m_DeltaTime;
+
         m_Graphics->Clear();
 
         m_UB->Bind(0);
@@ -139,7 +148,11 @@ void Application::OnRender()
         m_Graphics->DrawIndexed(PrimitiveType::TRIANGLES, 0, 36);
 
         ImGuiBegin();
-        ImGui::ShowDemoWindow();
+        ImGui::Begin("Camera");
+        ImGui::Text("Position: %.2f, %.2f, %.2f", m_Camera->GetPosition().x, m_Camera->GetPosition().y, m_Camera->GetPosition().z);
+        ImGui::Text("Rotation: %.2f, %.2f, %.2f", m_Camera->GetRotation().x, m_Camera->GetRotation().y, m_Camera->GetRotation().z);
+        ImGui::Text("FPS: %.2f", m_FPS);
+        ImGui::End();
         ImGuiEnd();
 
         // Call window to swap buffers.

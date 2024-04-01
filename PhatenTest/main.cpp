@@ -2,9 +2,9 @@
 
 int main(int argc, char *argv[])
 {
-    Pt::Application app;
+    auto app = Pt::CreateScoped<Pt::Application>();
 
-    app.Run();
+    app->Run();
 
     return 0;
 }

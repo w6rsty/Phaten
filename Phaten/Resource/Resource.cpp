@@ -16,12 +16,6 @@ bool Resource::EndLoad()
     return true;
 }
 
-bool Resource::Save()
-{
-    PT_ASSERT_MSG(false, "Do not use base Save");
-    return false;
-}
-
 bool Resource::Load()
 {
     bool success = BeginLoad();

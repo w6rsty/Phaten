@@ -43,6 +43,13 @@ const Vector3 Vector3::X        {1, 0, 0};
 const Vector3 Vector3::Y        {0, 1, 0};
 const Vector3 Vector3::Z        {0, 0, 1};
 
+const Vector3 Vector3::UP         { 0,  1,  0};
+const Vector3 Vector3::DOWN       { 0, -1,  0};
+const Vector3 Vector3::RIGHT      { 1,  0,  0};
+const Vector3 Vector3::LEFT       {-1,  0,  0};
+const Vector3 Vector3::FORWARD    { 0,  0,  1};
+const Vector3 Vector3::BACKWARD   { 0,  0, -1};
+
 Vector3::Vector3(const Vector4& vector) :
     x(vector.x),
     y(vector.y),

@@ -13,7 +13,6 @@ class Resource
 public:
     virtual bool BeginLoad() = 0;
     virtual bool EndLoad();
-    virtual bool Save();
 
     bool Load();
     void SetName(std::string_view newName);

@@ -95,8 +95,8 @@ public:
     std::string ToString() const;
     const uint32_t* Data() const { return data; }
 
-    static const IntV2 Zero;
-    static const IntV2 One;
+    static const IntV2 ZERO;
+    static const IntV2 ONE;
     static const IntV2 X;
     static const IntV2 Y;
 private:

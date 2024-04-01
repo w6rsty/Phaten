@@ -12,7 +12,7 @@ namespace Pt
 Window::Window(WindowCreateInfo info)
 {
     SDL_SetHint(SDL_HINT_WINDOWS_DPI_AWARENESS, "permonitor");
-    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS);
+    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_GAMECONTROLLER);
 
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);

@@ -4,10 +4,10 @@
 
 namespace Pt {
 
-const IntV2 IntV2::Zero = IntV2{0, 0};
-const IntV2 IntV2::One = IntV2{1, 1};
-const IntV2 IntV2::X = IntV2{1, 0};
-const IntV2 IntV2::Y = IntV2{0, 1};
+const IntV2 IntV2::ZERO {0, 0};
+const IntV2 IntV2::ONE {1, 1};
+const IntV2 IntV2::X {1, 0};
+const IntV2 IntV2::Y {0, 1};
 
 bool IntV2::FromString(std::string_view str)
 {

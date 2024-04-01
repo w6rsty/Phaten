@@ -301,6 +301,12 @@ public:
     const static Vector3 X;
     const static Vector3 Y;
     const static Vector3 Z;
+    const static Vector3 UP;
+    const static Vector3 DOWN;
+    const static Vector3 RIGHT;
+    const static Vector3 LEFT;
+    const static Vector3 FORWARD;
+    const static Vector3 BACKWARD;
 private:
     bool FromString(std::string_view str);
 };
