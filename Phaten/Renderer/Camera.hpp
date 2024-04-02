@@ -2,6 +2,7 @@
 
 #include "Object/Ptr.hpp"
 #include "Math/Matrix.hpp"
+#include "Math/Quaternion.hpp"
 
 namespace Pt {
 
@@ -17,7 +18,7 @@ public:
     bool IsPerspective() const { return m_IsPerspective; }
 
     // Setter
-    void SetProjMode(bool persp) { m_IsPerspective = persp; }
+    void SetPerspMode(bool persp) { m_IsPerspective = persp; }
     void SetAspectRatio(float aspect) { m_AspectRatio = aspect; UpdateProjection(); }
     void SetFov(float fov) { m_Fov = fov; UpdateProjection(); }
     void SetOrthoSize(float size) { m_OrthoSize = size; UpdateProjection(); }
@@ -37,10 +38,11 @@ public:
 
     const Vector3& GetPosition() const { return m_Position; }
     const Vector3& GetDirection() const { return m_Direction; }
-    const Vector3& GetRotation() const { return m_Rotation; }
+    const Quaternion& GetRotation() const { return m_Rotation; }
+    const Vector3 GetRotationEuler() const { return m_Rotation.EulerAngles(); }
 
     void SetPosition(const Vector3& pos);
-    void SetRotation(const Vector3& rot);
+    void SetRotation(const Quaternion& delta);
 
     const Matrix4& GetProjection() const;
     const Matrix4& GetView() const;
@@ -68,7 +70,7 @@ private:
 
     Vector3 m_Position;
     Vector3 m_Direction;
-    Vector3 m_Rotation;
+    Quaternion m_Rotation;
     Vector3 m_Up;
 };
 

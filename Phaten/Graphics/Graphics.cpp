@@ -122,6 +122,18 @@ void Graphics::SetUniform(ShaderProgram* program, PresetUniform uniform, const M
     }
 }
 
+void Graphics::SetFrameBuffer(FrameBuffer* frameBuffer)
+{
+    if (frameBuffer)
+    {
+        frameBuffer->Bind();
+    }
+    else
+    {
+        FrameBuffer::Unbind();
+    }
+}
+
 IntV2 Graphics::Size() const
 {
     return m_Window->Size();
@@ -130,7 +142,6 @@ IntV2 Graphics::Size() const
 void* Graphics::GetNativeWindow() const
 {
     return m_Window->SDLHandle();
-
 }
 
 

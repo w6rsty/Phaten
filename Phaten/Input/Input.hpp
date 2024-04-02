@@ -5,6 +5,8 @@
 
 #include "Math/IntVector.hpp"
 
+union SDL_Event;
+
 namespace Pt {
 
 enum ButtonState
@@ -37,6 +39,8 @@ public:
 
     void SetOnExit(std::function<void()> onExit) { m_OnExit = onExit; }
     bool ShouldExit() const {return m_ShouldExit; }
+
+    void SetPluginUpdate(std::function<void(const SDL_Event&)> pluginUpdate) { m_PluginUpdate = pluginUpdate; }
 private:
     bool m_ShouldExit;
     IntV2 m_MouseMove;
@@ -45,6 +49,8 @@ private:
     std::map<unsigned, ButtonState> m_MouseButtonStates;
 
     std::function<void()> m_OnExit;
+    using PluginUpdateFn = std::function<void(const SDL_Event&)>;
+    PluginUpdateFn m_PluginUpdate;
 };
 
 } // namespace Pt

@@ -17,7 +17,6 @@ Texture2D::Texture2D() :
     m_Width(0),
     m_Height(0),
     m_Channels(0),
-    m_Loaded(false),
     m_WrapMode(TextureWrapMode::REPEAT),
     m_MinFilterMode(TextureFilterMode::LINEAR),
     m_MagFilterMode(TextureFilterMode::LINEAR)
@@ -36,10 +35,7 @@ void Texture2D::Define(std::string_view path, bool flip)
 
     m_Flip = flip;
 
-    if (Create(path))
-    {
-        m_Loaded = true;
-    }
+    Create(path);
 }
 
 void Texture2D::Define(int width, int height, int channels, const void* data)
@@ -51,10 +47,7 @@ void Texture2D::Define(int width, int height, int channels, const void* data)
     m_Height = height;
     m_Channels = channels;
 
-    if (Create(data))
-    {
-        m_Loaded = true;
-    }
+    Create(data);
 }
 
 void Texture2D::Bind() const

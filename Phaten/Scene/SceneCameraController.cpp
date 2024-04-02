@@ -7,8 +7,7 @@
 namespace Pt {
 
 SceneCameraController::SceneCameraController() :
-    m_Position(Vector3::ZERO),
-    m_Rotation(Vector3 {0.0, -90.0, 0.0})
+    m_Position(Vector3::ZERO)
 {
 }
 
@@ -16,14 +15,12 @@ void SceneCameraController::Attach(const SharedPtr<Camera>& camera)
 {
     m_Camera = camera;
     m_Position = m_Camera->GetPosition();
-    m_Rotation = m_Camera->GetRotation();
 }
 
 void SceneCameraController::Detach()
 {
     m_Camera.Reset();
     m_Position = Vector3::ZERO;
-    m_Rotation = Vector3 {0.0, -90.0, 0.0};
 }
 
 void SceneCameraController::SetPosition(const Vector3& pos)
@@ -32,9 +29,9 @@ void SceneCameraController::SetPosition(const Vector3& pos)
     m_Camera->SetPosition(m_Position);
 }
 
-void SceneCameraController::SetRotation(const Vector3& rot)
+void SceneCameraController::SetRotation(const Quaternion& quat)
 {
-    m_Camera->SetRotation(rot);
+    m_Camera->SetRotation(quat);
 }
 
 void SceneCameraController::Move(SceneCameraMovement dir, float speed)
@@ -58,11 +55,10 @@ void SceneCameraController::Move(SceneCameraMovement dir, float speed)
     m_Camera->SetPosition(m_Position);
 }
 
-void SceneCameraController::Rotate(const Vector3& move, float speed)
-{
-    m_Rotation += move * speed;
-    
-    m_Camera->SetRotation(m_Rotation);
+void SceneCameraController::Rotate(float xOffset, float yOffset, float speed)
+{    
+    speed *= 0.003f;
+    m_Camera->SetRotation({yOffset * speed, xOffset * speed, 0.0});
 }
 
 } // namespace Pt

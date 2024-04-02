@@ -1,4 +1,5 @@
 #include "Vector.hpp"
+#include "IO/StringUtils.hpp"
 
 #include <string>
 
@@ -11,11 +12,18 @@ const Vector2 Vector2::Y        {0, 1};
 
 bool Vector2::FromString(std::string_view str)
 {
-    size_t space = str.find(' ');
-    if (space == std::string::npos) return false;
+    std::string trimed = Trimed(str);
+    int count = CountElements(trimed, ' ');
 
-    x = std::stof(std::string{str.substr(0, space)});
-    y = std::stof(std::string{str.substr(space + 1)});
+    if (count != 2)
+    {
+        PT_ASSERT_MSG(false, "Invalid string format");
+        return false;
+    }
+
+    char* ptr = trimed.data();
+    x = strtof(ptr, &ptr);
+    y = strtof(ptr, &ptr);
     return true;
 }
 
@@ -34,7 +42,7 @@ Vector3& Vector3::operator = (const Vector4& rhs)
 
 std::string Vector2::ToString() const
 {
-    return std::to_string(x) + " " + std::to_string(y);
+    return FormatString("%f %f", x, y);
 }
 
 const Vector3 Vector3::ZERO     {0, 0, 0};
@@ -59,21 +67,25 @@ Vector3::Vector3(const Vector4& vector) :
 
 bool Vector3::FromString(std::string_view str)
 {
-    size_t space1 = str.find(' ');
-    if (space1 == std::string::npos) return false;
+    std::string trimed = Trimed(str);
+    int count = CountElements(trimed, ' ');
 
-    size_t space2 = str.find(' ', space1 + 1);
-    if (space2 == std::string::npos) return false; 
+    if (count != 3)
+    {
+        PT_ASSERT_MSG(false, "Invalid string format");
+        return false;
+    }
 
-    x = std::stof(std::string{str.substr(0, space1)});
-    y = std::stof(std::string{str.substr(space1 + 1, space2 - space1 - 1)});
-    z = std::stof(std::string{str.substr(space2 + 1)});
+    char* ptr = trimed.data();
+    x = strtof(ptr, &ptr);
+    y = strtof(ptr, &ptr);
+    z = strtof(ptr, &ptr);
     return true;
 }
 
 std::string Vector3::ToString() const
 {
-    return std::to_string(x) + " " + std::to_string(y) + " " + std::to_string(z);
+    return FormatString("%f %f %f", x, y, z);
 }
 
 Vector3 operator * (float lhs, const Vector3& rhs)
@@ -90,25 +102,26 @@ const Vector4 Vector4::W        {0, 0, 0, 1};
 
 bool Vector4::FromString(std::string_view str)
 {
-    size_t space1 = str.find(' ');
-    if (space1 == std::string::npos) return false;
+    std::string trimed = Trimed(str);
+    int count = CountElements(trimed, ' ');
 
-    size_t space2 = str.find(' ', space1 + 1);
-    if (space2 == std::string::npos) return false; 
+    if (count != 4)
+    {
+        PT_ASSERT_MSG(false, "Invalid string format");
+        return false;
+    }
 
-    size_t space3 = str.find(' ', space2 + 1);
-    if (space3 == std::string::npos) return false; 
-
-    x = std::stof(std::string{str.substr(0, space1)});
-    y = std::stof(std::string{str.substr(space1 + 1, space2 - space1 - 1)});
-    z = std::stof(std::string{str.substr(space2 + 1, space3 - space2 - 1)});
-    w = std::stof(std::string{str.substr(space3 + 1)});
+    char* ptr = trimed.data();
+    x = strtof(ptr, &ptr);
+    y = strtof(ptr, &ptr);
+    z = strtof(ptr, &ptr);
+    w = strtof(ptr, &ptr);
     return true;
 }
 
 std::string Vector4::ToString() const
 {
-    return std::to_string(x) + " " + std::to_string(y) + " " + std::to_string(z) + " " + std::to_string(w);
+    return FormatString("%f %f %f %f", x, y, z, w);
 }
 
 Vector4 operator * (float lhs, const Vector4& rhs)

@@ -2,6 +2,7 @@
 
 #include "Object/Ptr.hpp"
 #include "Renderer/Camera.hpp"
+#include "Math/Quaternion.hpp"
 
 union SDL_Event;
 
@@ -15,6 +16,7 @@ enum class SceneCameraMovement
     RIGHT
 };
 
+// TODO: Refactor rotation when using quaternions
 class SceneCameraController : public RefCounted
 {
 public:
@@ -27,14 +29,13 @@ public:
     void OnEvent(float delta);
 
     void SetPosition(const Vector3& pos);
-    void SetRotation(const Vector3& rot);
+    void SetRotation(const Quaternion& quat);
 
     void Move(SceneCameraMovement dir, float speed = 1.0f);    
-    void Rotate(const Vector3& move, float speed = 1.0f);
+    void Rotate(float xOffset, float yOffset, float speed = 1.0f);
 private:
     SharedPtr<Camera> m_Camera;
     Vector3 m_Position;
-    Vector3 m_Rotation;
 };
 
 } // namespace Pt

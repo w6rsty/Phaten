@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Matrix.hpp"
+#include "Quaternion.hpp"
 
 namespace Pt {
 
@@ -10,6 +11,7 @@ Matrix3 ScaleMatrix3(float scale);
 Matrix3 RotationMatrix3(float degree, const Vector3& rotation);
 Matrix3 RotationMatrix3(const Vector3& rotation);
 Matrix3 RotationMatrix3(float degreeX, float degreeY, float degreeZ);
+Matrix3 RotationMatrix3(const Quaternion& quat);
 
 Matrix3 TransformMatrix3(const Vector3& rotaion, const Vector3& scale);
 // Matrix3 TransformMatrix3(const Quaternion& rotaion, const Vector3& scale);
@@ -22,6 +24,7 @@ Matrix4 ScaleMatrix4(float scale);
 Matrix4 RotationMatrix4(float degree, const Vector3& rotation);
 Matrix4 RotationMatrix4(const Vector3& rotation);
 Matrix4 RotationMatrix4(float degreeX, float degreeY, float degreeZ);
+Matrix4 RotationMatrix4(const Quaternion& quat);
 Matrix4 TranslateMatrix4(const Vector3& translation);
 Matrix4 TranslateMatrix4(float x, float y, float z);
 

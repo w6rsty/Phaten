@@ -84,6 +84,7 @@ Matrix3 RotationMatrix3(float degreeX, float degreeY, float degreeZ)
     return RotationMatrix3(Vector3{degreeX, degreeY, degreeZ});
 }
 
+Matrix3 RotationMatrix3(const Quaternion& quat) { return quat.ToMatrix(); }
 
 Matrix4 ScaleMatrix4(const Vector3& scale)
 {
@@ -121,6 +122,8 @@ Matrix4 RotationMatrix4(float degreeX, float degreeY, float degreeZ)
 {
     return RotationMatrix4(Vector3{degreeX, degreeY, degreeZ});
 }
+
+Matrix4 RotationMatrix4(const Quaternion& quat) { return quat.ToMatrix(); }
 
 Matrix4 TranslateMatrix4(const Vector3& translation)
 {

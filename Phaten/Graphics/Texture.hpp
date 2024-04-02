@@ -39,7 +39,6 @@ public:
     void SetWrapMode(TextureWrapMode mode);
     void SetFilterMode(TextureFilterMode minMode, TextureFilterMode magMode);
 
-    bool Loaded() const { return m_Loaded; }
     int Channels() const { return m_Channels; }
     virtual IntV2 Size2D() const override { return IntV2 {m_Width, m_Height}; }
 

@@ -9,6 +9,7 @@
 #include "Math/Matrix.hpp"
 #include "Shader.hpp"
 #include "GraphicsContext.hpp"
+#include "FrameBuffer.hpp"
 
 struct SDL_Window;
 
@@ -35,6 +36,8 @@ public:
     void SetUniform(ShaderProgram* program, PresetUniform uniform, const Vector3& value);
     void SetUniform(ShaderProgram* program, PresetUniform uniform, const Vector4& value);
     void SetUniform(ShaderProgram* program, PresetUniform uniform, const Matrix4& value);
+
+    void SetFrameBuffer(FrameBuffer* frameBuffer);
 
     static void Draw(PrimitiveType type, size_t first, size_t count);
     static void DrawIndexed(PrimitiveType type, size_t first, size_t count);

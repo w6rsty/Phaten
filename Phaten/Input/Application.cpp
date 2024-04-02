@@ -7,6 +7,9 @@
 #include "Graphics/GraphicsDefs.hpp"
 #include "IO/Logger.hpp"
 #include "ImGuiPlugin.hpp"
+#include "Math/Matrix.hpp"
+#include "Math/Quaternion.hpp"
+#include "Math/Vector.hpp"
 
 namespace Pt {
 
@@ -45,11 +48,6 @@ Application::Application() :
     m_Window = CreateShared<Window>(WindowCreateInfo{"Phaten", IntV2{1280, 720}, ScreenMode::WINDOWED});
 
     m_Input = CreateScoped<Input>();
-    m_Input->SetOnExit([this]() {
-        std::lock_guard<std::mutex> lock(m_RenderStateMutex);
-        m_RenderState = false;
-        m_Running = false;
-    });
 }
 
 Application::~Application()
@@ -64,8 +62,6 @@ void Application::Run()
     OnEvent();
 
     m_RenderThread.join();
-
-    m_CameraController->Detach();
 }
 
 void Application::OnEvent()
@@ -89,6 +85,12 @@ void Application::OnEvent()
         if (m_Input->KeyDown(SDLK_d))
             m_CameraController->Move(SceneCameraMovement::RIGHT, speed);
 
+        if (m_Input->MouseButtonDown(3))
+        {
+            auto move = m_Input->MouseMove();
+            m_CameraController->Rotate(move.x, move.y);
+        }
+
         SDL_Delay(8);
     }
 }
@@ -99,11 +101,19 @@ void Application::OnRender()
 
     {
         m_Graphics = CreateScoped<Graphics>(m_Window);
-        m_Graphics->SetVSync(true);
-        m_Frequency = (double)SDL_GetPerformanceFrequency();
+        m_Input->SetOnExit([this]() {
+            m_RenderState = false;
+            m_Running = false;
+        });
+
         ImGuiInit();
-    
+        m_Input->SetPluginUpdate([this](const SDL_Event& event) {
+            ImGuiProcessEvent(event);
+        });
+
+        m_Graphics->SetVSync(true);
         m_Graphics->SetClearColor();
+        m_Frequency = (double)SDL_GetPerformanceFrequency();
 
         m_VB = CreateShared<VertexBuffer>();
         m_VB->Define(BufferUsage::STATIC, 8, {VertexLayout{
@@ -124,16 +134,6 @@ void Application::OnRender()
         
         m_Texture = CreateShared<Texture2D>();
         m_Texture->Define("Assets/Textures/face.jpg");
-        m_Texture->Bind();  
-
-        m_ColorTex = CreateShared<Texture2D>();
-        m_ColorTex->Define(1280, 720, 3, nullptr);
-        m_DepthStencilTex = CreateShared<Texture2D>();
-        m_DepthStencilTex->Define(1280, 720, 3, nullptr);
-
-        m_FrameBuffer = CreateShared<FrameBuffer>();
-        m_FrameBuffer->Define(m_ColorTex, m_DepthStencilTex);
-        FrameBuffer::Unbind();
 
         m_Camera = CreateShared<Camera>();
         m_Camera->SetPerspective(45.0f, 0.1f, 100.0f);
@@ -162,16 +162,15 @@ void Application::OnRender()
         Matrix4 mat = m_Camera->GetProjection() * m_Camera->GetView();
         m_UB->SetData(0, sizeof(Matrix4), &mat);
 
-        m_FrameBuffer->Bind();
         m_Program->Bind();
+        m_Texture->Bind();
         m_Graphics->SetUniform(m_Program, PresetUniform::U_MODEL, s_Data.model);
         m_Graphics->DrawIndexed(PrimitiveType::TRIANGLES, 0, 36);
-        FrameBuffer::Unbind();
 
         ImGuiBegin();
         ImGui::Begin("Camera");
         ImGui::Text("Position: %.2f, %.2f, %.2f", m_Camera->GetPosition().x, m_Camera->GetPosition().y, m_Camera->GetPosition().z);
-        ImGui::Text("Rotation: %.2f, %.2f, %.2f", m_Camera->GetRotation().x, m_Camera->GetRotation().y, m_Camera->GetRotation().z);
+        ImGui::Text("Rotation: %.2f, %.2f, %.2f %.2f", m_Camera->GetRotation().w, m_Camera->GetRotation().x, m_Camera->GetRotation().y, m_Camera->GetRotation().z);
         ImGui::Text("FPS: %.2f", m_FPS);
         ImGui::End();
         ImGuiEnd();

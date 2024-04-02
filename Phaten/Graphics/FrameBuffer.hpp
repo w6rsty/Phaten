@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Object/Ptr.hpp"
-#include "Graphics/Texture.hpp"
+#include "Math/IntVector.hpp"
 
 namespace Pt {
 
@@ -11,18 +11,24 @@ public:
     FrameBuffer();
     ~FrameBuffer();
 
-    void Define(Texture* colorTex, Texture* depthStencilTex);
-
-    unsigned GLHandle() const { return m_Handle; }
+    void Define(int x, int y);
 
     void Bind();
 
-    static void Bind(FrameBuffer* draw, FrameBuffer* read);
+    unsigned GLHandle() const { return m_Handle; }
+
+    unsigned ColorTexture() const { return m_ColorTex; }
+    unsigned DepthStencilTexture() const { return m_DepthStencilTex; }
+
+    static void Bind(FrameBuffer* buffer);
     static void Unbind();
 private:
     void Release();
 
     unsigned m_Handle;
+    IntV2 m_Size;
+    unsigned m_ColorTex;
+    unsigned m_DepthStencilTex;
 };
 
 } // namespace Pt

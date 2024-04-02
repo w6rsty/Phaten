@@ -78,6 +78,11 @@ void Input::Update()
             m_MouseMove.y = event.motion.yrel;
             break;
         }
+
+        if (m_PluginUpdate)
+        {
+            m_PluginUpdate(event);
+        }
     }
 }
 

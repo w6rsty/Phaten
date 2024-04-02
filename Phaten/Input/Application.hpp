@@ -3,6 +3,7 @@
 #include <thread>
 
 #include "Graphics/FrameBuffer.hpp"
+#include "Math/Vector.hpp"
 #include "Object/Ptr.hpp"
 #include "Input/Window.hpp"
 #include "Input/Input.hpp"
@@ -12,6 +13,8 @@
 #include "Graphics/UniformBuffer.hpp"
 #include "Graphics/Texture.hpp"
 #include "Scene/SceneCameraController.hpp"
+
+#include "Math/Quaternion.hpp"
 
 namespace Pt {
 
@@ -48,16 +51,12 @@ private:
     std::thread m_RenderThread;
     std::mutex m_RenderStateMutex;
 
-    double m_Frequency;
     double m_DeltaTime;
+    // FPS
+    double m_Frequency;
     uint64_t m_LastTime = 0.0f;
     int m_FrameCount = 0;
     float m_FPS = 0;
-
-    SharedPtr<Texture2D> m_ColorTex;
-    SharedPtr<Texture2D> m_DepthStencilTex;
-
-    SharedPtr<FrameBuffer> m_FrameBuffer;
 };
 
 } // namespace Ptd

@@ -6,12 +6,9 @@
 
 namespace Pt {
 
-static FrameBuffer* boundDrawBuffer = nullptr;
-static FrameBuffer* boundReadBuffer = nullptr;
-
+static FrameBuffer* boundFrameBuffer = nullptr;
 FrameBuffer::FrameBuffer()
 {
-    glGenFramebuffers(1, &m_Handle);
 }
 
 FrameBuffer::~FrameBuffer()
@@ -19,85 +16,66 @@ FrameBuffer::~FrameBuffer()
     Release();
 }
 
-void FrameBuffer::Define(Texture* colorTex, Texture* depthStencilTex)
+void FrameBuffer::Define(int x, int y)
 {
-    Bind();
+    glGenFramebuffers(1, &m_Handle);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_Handle);
 
-    IntV2 size = IntV2::ZERO;
+    m_Size = IntV2(x, y);
 
-    if (colorTex && colorTex->TexGLType() == TextureType::TEX_2D)
-    {
-        size = colorTex->Size2D();
-        glDrawBuffer(GL_COLOR_ATTACHMENT0);
-        glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, colorTex->TexGLTarget(), colorTex->GLHandle(), 0);
-    }
-    else {
-        glDrawBuffer(GL_NONE);
-        glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0, 0);
-    }
+    glGenTextures(1, &m_ColorTex);
+    glBindTexture(GL_TEXTURE_2D, m_ColorTex);
 
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, m_Size.x, m_Size.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-    if (depthStencilTex)
-    {
-        if (size != IntV2::ZERO && size != depthStencilTex->Size2D())
-        {
-            PT_LOG_WARN("Framebuffer color and depth dimensions don't match");
-        }
-        else
-        {
-            size = depthStencilTex->Size2D();
-        }
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-        glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depthStencilTex->TexGLTarget(), depthStencilTex->GLHandle(), 0);
-        glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, depthStencilTex->TexGLTarget(), depthStencilTex->GLHandle(), 0);
-    }
-    else
-    {
-        glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, 0, 0);
-        glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_TEXTURE_2D, 0, 0);
-    }
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_ColorTex, 0);
 
-    PT_LOG_INFO("Created framebuffer: width: ", size.x, ", height: ", size.y);
+    glGenTextures(1, &m_DepthStencilTex);
+    glBindTexture(GL_TEXTURE_2D, m_DepthStencilTex);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, m_Size.x, m_Size.y, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, NULL);
+
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, m_DepthStencilTex, 0);
+
+    if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        PT_LOG_ERROR("Framebuffer is not complete!");
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    PT_LOG_INFO("Created framebuffer: width: ", m_Size.x, ", height: ", m_Size.y);
 }
 
 void FrameBuffer::Bind()
 {
-    if (!m_Handle || boundDrawBuffer == this)
+    if (!m_Handle || boundFrameBuffer == this)
     {
         return;
     }
     
     glBindFramebuffer(GL_FRAMEBUFFER, m_Handle);
-    boundDrawBuffer = this;
+    glViewport(0, 0, m_Size.x, m_Size.y);
+    boundFrameBuffer = this;
 }
 
-void FrameBuffer::Bind(FrameBuffer* draw, FrameBuffer* read)
+void FrameBuffer::Bind(FrameBuffer* buffer)
 {
-    if (boundDrawBuffer != draw)
+    if (boundFrameBuffer != buffer)
     {
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, draw ? draw->GLHandle() : 0);
-        boundDrawBuffer = draw;
-    }
-
-    if (boundReadBuffer != read)
-    {
-        glBindFramebuffer(GL_READ_FRAMEBUFFER, read ? read->GLHandle() : 0);
-        boundReadBuffer = read;
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, buffer ? buffer->GLHandle() : 0);
+        boundFrameBuffer = buffer;
     }
 }
 
 void FrameBuffer::Unbind()
 {
-    if (boundDrawBuffer)
+    if (boundFrameBuffer)
     {
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-        boundDrawBuffer = nullptr;
-    }
-
-    if (boundReadBuffer)
-    {
-        glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
-        boundReadBuffer = nullptr;
+        boundFrameBuffer = nullptr;
     }
 }
 
@@ -105,7 +83,7 @@ void FrameBuffer::Release()
 {
     if (m_Handle)
     {
-        if (boundDrawBuffer == this || boundReadBuffer == this)
+        if (boundFrameBuffer == this)
         {
             FrameBuffer::Unbind();
         }

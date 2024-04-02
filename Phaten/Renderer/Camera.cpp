@@ -1,6 +1,8 @@
 #include "Camera.hpp"
 
+#include "Math/Quaternion.hpp"
 #include "Math/Space.hpp"
+#include "Math/Transform.hpp"
 #include "Math/Vector.hpp"
 
 namespace Pt {
@@ -25,7 +27,7 @@ Camera::Camera() :
     m_ProjectionOrtho(1.0f),
     m_View(1.0f),
     m_Position(Vector3::ZERO),
-    m_Rotation(Vector3{0, -90, 0}),
+    m_Rotation(Quaternion::IDENTITY),
     m_Direction(Vector3::FORWARD),
     m_Up(Vector3::UP)
 {
@@ -59,9 +61,10 @@ void Camera::SetPosition(const Vector3& pos)
     UpdateView();
 }
 
-void Camera::SetRotation(const Vector3& rot)
+void Camera::SetRotation(const Quaternion& delta)
 {
-    m_Rotation = rot;
+    m_Rotation = m_Rotation * delta;
+    m_Rotation.Normalize();
     UpdateView();
 }
 
@@ -79,12 +82,7 @@ void Camera::UpdateProjection()
 
 void Camera::UpdateView()
 {
-    Vector3 front;
-    front.x = cos(Radians(m_Rotation.y)) * cos(Radians(m_Rotation.x));
-    front.y = sin(Radians(m_Rotation.x));
-    front.z = sin(Radians(m_Rotation.y)) * cos(Radians(m_Rotation.x));
-    m_Direction = Normalize(front);
-
+    m_Direction = RotationMatrix3(m_Rotation) * Vector3::BACKWARD;
     // normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
     Vector3 right = Normalize(Cross(m_Direction, Vector3::UP));  
     // Update up
