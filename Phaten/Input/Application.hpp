@@ -2,6 +2,7 @@
 
 #include <thread>
 
+#include "Graphics/FrameBuffer.hpp"
 #include "Object/Ptr.hpp"
 #include "Input/Window.hpp"
 #include "Input/Input.hpp"
@@ -52,6 +53,11 @@ private:
     uint64_t m_LastTime = 0.0f;
     int m_FrameCount = 0;
     float m_FPS = 0;
+
+    SharedPtr<Texture2D> m_ColorTex;
+    SharedPtr<Texture2D> m_DepthStencilTex;
+
+    SharedPtr<FrameBuffer> m_FrameBuffer;
 };
 
 } // namespace Ptd

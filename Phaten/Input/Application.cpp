@@ -3,6 +3,7 @@
 #include <SDL.h>
 #include <imgui.h>
 
+#include "Graphics/FrameBuffer.hpp"
 #include "Graphics/GraphicsDefs.hpp"
 #include "IO/Logger.hpp"
 #include "ImGuiPlugin.hpp"
@@ -125,6 +126,15 @@ void Application::OnRender()
         m_Texture->Define("Assets/Textures/face.jpg");
         m_Texture->Bind();  
 
+        m_ColorTex = CreateShared<Texture2D>();
+        m_ColorTex->Define(1280, 720, 3, nullptr);
+        m_DepthStencilTex = CreateShared<Texture2D>();
+        m_DepthStencilTex->Define(1280, 720, 3, nullptr);
+
+        m_FrameBuffer = CreateShared<FrameBuffer>();
+        m_FrameBuffer->Define(m_ColorTex, m_DepthStencilTex);
+        FrameBuffer::Unbind();
+
         m_Camera = CreateShared<Camera>();
         m_Camera->SetPerspective(45.0f, 0.1f, 100.0f);
         m_Camera->SetPosition(Vector3(0.0f, 0.0f, 3.0f));
@@ -152,9 +162,11 @@ void Application::OnRender()
         Matrix4 mat = m_Camera->GetProjection() * m_Camera->GetView();
         m_UB->SetData(0, sizeof(Matrix4), &mat);
 
+        m_FrameBuffer->Bind();
         m_Program->Bind();
         m_Graphics->SetUniform(m_Program, PresetUniform::U_MODEL, s_Data.model);
         m_Graphics->DrawIndexed(PrimitiveType::TRIANGLES, 0, 36);
+        FrameBuffer::Unbind();
 
         ImGuiBegin();
         ImGui::Begin("Camera");

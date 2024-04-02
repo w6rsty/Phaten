@@ -179,4 +179,9 @@ void Texture2D::Release()
     m_Channels = 0;
 }
 
+unsigned Texture2D::TexGLTarget() const
+{
+    return GL_TEXTURE_2D;
+}
+
 } // namespace Pt

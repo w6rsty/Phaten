@@ -11,8 +11,8 @@ class IntV2
 {
 public:
     union {
-        struct { uint32_t x, y; };
-        uint32_t data[2];
+        struct { int32_t x, y; };
+        int32_t data[2];
     };
 
     IntV2()
@@ -25,13 +25,13 @@ public:
     {
     }
 
-    IntV2(uint32_t x_, uint32_t y_) :
+    IntV2(int32_t x_, int32_t y_) :
         x(x_),
         y(y_)
     {
     }
 
-    IntV2(const uint32_t* data) :
+    IntV2(const int32_t* data) :
         x(data[0]),
         y(data[1])
     {
@@ -64,14 +64,14 @@ public:
         return *this;
     }
 
-    IntV2& operator * (uint32_t rhs)
+    IntV2& operator * (int32_t rhs)
     {
         x *= rhs;
         y *= rhs;
         return *this;
     }
 
-    IntV2& operator / (uint32_t rhs)
+    IntV2& operator / (int32_t rhs)
     {
         x /= rhs;
         y /= rhs;
@@ -83,17 +83,17 @@ public:
     IntV2 operator + (const IntV2& rhs) const { return IntV2{x + rhs.x, y + rhs.y}; }
     IntV2 operator - () const { return IntV2{-x, -y}; }
     IntV2 operator - (const IntV2& rhs) const { return IntV2{x - rhs.x, y - rhs.y}; }
-    IntV2 operator * (uint32_t rhs) const { return IntV2{x * rhs, y * rhs}; }
-    IntV2 operator / (uint32_t rhs) const { return IntV2{x / rhs, y / rhs}; }
+    IntV2 operator * (int32_t rhs) const { return IntV2{x * rhs, y * rhs}; }
+    IntV2 operator / (int32_t rhs) const { return IntV2{x / rhs, y / rhs}; }
 
-    uint32_t& operator [] (uint32_t index) { return data[index]; }
-    const uint32_t& operator [] (uint32_t index) const { return data[index]; }
+    int32_t& operator [] (int32_t index) { return data[index]; }
+    const int32_t& operator [] (int32_t index) const { return data[index]; }
 
-    uint32_t& At(size_t index) { PT_ASSERT(index < 2); return data[index]; }
-    const uint32_t& At(size_t index) const { PT_ASSERT(index < 2); return data[index]; }
+    int32_t& At(size_t index) { PT_ASSERT(index < 2); return data[index]; }
+    const int32_t& At(size_t index) const { PT_ASSERT(index < 2); return data[index]; }
 
     std::string ToString() const;
-    const uint32_t* Data() const { return data; }
+    const int32_t* Data() const { return data; }
 
     static const IntV2 ZERO;
     static const IntV2 ONE;
@@ -107,9 +107,9 @@ class IntV3
 {
 public:
     union {
-        struct { uint32_t x, y, z; };
-        struct { uint32_t r, g, b; };
-        uint32_t data[3];
+        struct { int32_t x, y, z; };
+        struct { int32_t r, g, b; };
+        int32_t data[3];
     };
 
     IntV3()
@@ -123,14 +123,14 @@ public:
     {
     }
 
-    IntV3(uint32_t x_, uint32_t y_, uint32_t z_) :
+    IntV3(int32_t x_, int32_t y_, int32_t z_) :
         x(x_),
         y(y_),
         z(z_)
     {
     }
 
-    IntV3(const uint32_t* data) :
+    IntV3(const int32_t* data) :
         x(data[0]),
         y(data[1]),
         z(data[2])
@@ -158,7 +158,7 @@ public:
         return *this;
     }
 
-    IntV3& operator * (uint32_t rhs)
+    IntV3& operator * (int32_t rhs)
     {
         x *= rhs;
         y *= rhs;
@@ -166,7 +166,7 @@ public:
         return *this;
     }
 
-    IntV3& operator / (uint32_t rhs)
+    IntV3& operator / (int32_t rhs)
     {
         x /= rhs;
         y /= rhs;
@@ -179,17 +179,17 @@ public:
     IntV3 operator + (const IntV3& rhs) const { return IntV3{x + rhs.x, y + rhs.y, z + rhs.z}; }
     IntV3 operator - () const { return IntV3{-x, -y, -z}; }
     IntV3 operator - (const IntV3& rhs) const { return IntV3{x - rhs.x, y - rhs.y, z - rhs.z}; }
-    IntV3 operator * (uint32_t rhs) const { return IntV3{x * rhs, y * rhs, z * rhs}; }
-    IntV3 operator / (uint32_t rhs) const { return IntV3{x / rhs, y / rhs, z / rhs}; }
+    IntV3 operator * (int32_t rhs) const { return IntV3{x * rhs, y * rhs, z * rhs}; }
+    IntV3 operator / (int32_t rhs) const { return IntV3{x / rhs, y / rhs, z / rhs}; }
 
-    uint32_t& operator [] (size_t index) { return data[index]; }
-    const uint32_t& operator [] (size_t index) const { return data[index]; }
+    int32_t& operator [] (size_t index) { return data[index]; }
+    const int32_t& operator [] (size_t index) const { return data[index]; }
 
-    uint32_t& At(uint32_t index) { PT_ASSERT(index < 3); return data[index]; }
-    const uint32_t& At(uint32_t index) const { PT_ASSERT(index < 3); return data[index]; }
+    int32_t& At(int32_t index) { PT_ASSERT(index < 3); return data[index]; }
+    const int32_t& At(int32_t index) const { PT_ASSERT(index < 3); return data[index]; }
 
     std::string ToString() const;
-    const uint32_t* Data() const { return data; }
+    const int32_t* Data() const { return data; }
 
     static const IntV3 Zero;
     static const IntV3 One;

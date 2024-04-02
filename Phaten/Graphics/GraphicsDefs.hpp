@@ -23,6 +23,14 @@ enum class ScreenMode
     BORDERLESS_FULLSCREEN
 };
 
+enum class TextureType
+{
+    TEX_2D = 0,
+    TEX_3D,
+    TEX_CUBE,
+    MAX_TEX_TYPE
+};
+
 enum class BufferUsage
 {
     STATIC = 0,

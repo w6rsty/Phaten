@@ -3,6 +3,7 @@
 #include <string_view>
 
 #include "Object/Ptr.hpp"
+#include "Math/IntVector.hpp"
 #include "GraphicsDefs.hpp"
 
 namespace Pt {
@@ -13,7 +14,12 @@ class Texture : public RefCounted
 public:
     // TODO: Support resource manager
     virtual ~Texture() = default;
+
+    virtual IntV2 Size2D() const { return IntV2::ZERO; }
+
     virtual unsigned GLHandle() const = 0;
+    virtual TextureType TexGLType() const = 0;
+    virtual unsigned TexGLTarget() const = 0;
 };
 
 /// 2D texture
@@ -34,15 +40,16 @@ public:
     void SetFilterMode(TextureFilterMode minMode, TextureFilterMode magMode);
 
     bool Loaded() const { return m_Loaded; }
-    int Width() const { return m_Width; }
-    int Height() const { return m_Height; }
     int Channels() const { return m_Channels; }
+    virtual IntV2 Size2D() const override { return IntV2 {m_Width, m_Height}; }
 
     TextureWrapMode WrapMode() const { return m_WrapMode; }
     TextureFilterMode MinFilterMode() const { return m_MinFilterMode; }
     TextureFilterMode MagFilterMode() const { return m_MagFilterMode; }
 
     virtual unsigned GLHandle() const override { return m_Handle; }
+    virtual TextureType TexGLType() const override { return TextureType::TEX_2D; }
+    virtual unsigned TexGLTarget() const override;
 private:
     bool Create(std::string_view path);
     bool Create(const void* data);
