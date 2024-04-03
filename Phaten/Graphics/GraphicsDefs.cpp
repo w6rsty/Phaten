@@ -82,6 +82,84 @@ const std::string PrimitiveName[]
     "TRIANGLE_FAN"
 };
 
+const GLenum ImageFormatGLInternalFormat[]
+{
+    0,
+    GL_R8,
+    GL_RG8,
+    GL_RGB8,
+    GL_RGBA8,
+    GL_ALPHA,
+    GL_R16,
+    GL_RG16,
+    GL_RGBA16,
+    GL_R16F,
+    GL_RG16F,
+    GL_RGBA16F,
+    GL_R32F,
+    GL_RG32F,
+    GL_RGB32F,
+    GL_RGBA32F,
+    GL_R32UI,
+    GL_RG32UI,
+    GL_RGBA32UI,
+    GL_DEPTH_COMPONENT16,
+    GL_DEPTH_COMPONENT32,
+    GL_DEPTH24_STENCIL8,
+};
+
+const GLenum ImageFormatGLFormat[]
+{
+    0,
+    GL_RED,
+    GL_RG,
+    GL_RGB,
+    GL_RGBA,
+    GL_ALPHA,
+    GL_RED,
+    GL_RG,
+    GL_RGBA,
+    GL_RED,
+    GL_RG,
+    GL_RGBA,
+    GL_RED,
+    GL_RG,
+    GL_RGB,
+    GL_RGBA,
+    GL_RED_INTEGER,
+    GL_RG_INTEGER,
+    GL_RGBA_INTEGER,
+    GL_DEPTH_COMPONENT,
+    GL_DEPTH_COMPONENT,
+    GL_DEPTH_STENCIL,
+};
+
+const GLenum ImageFormatGLDataType[]
+{
+    0,
+    GL_UNSIGNED_BYTE,
+    GL_UNSIGNED_BYTE,
+    GL_UNSIGNED_BYTE,
+    GL_UNSIGNED_BYTE,
+    GL_UNSIGNED_BYTE,
+    GL_UNSIGNED_SHORT,
+    GL_UNSIGNED_SHORT,
+    GL_UNSIGNED_SHORT,
+    GL_FLOAT,
+    GL_FLOAT,
+    GL_FLOAT,
+    GL_FLOAT,
+    GL_FLOAT,
+    GL_FLOAT,
+    GL_FLOAT,
+    GL_UNSIGNED_INT,
+    GL_UNSIGNED_INT,
+    GL_UNSIGNED_INT,
+    GL_UNSIGNED_SHORT,
+    GL_UNSIGNED_INT,
+    GL_UNSIGNED_INT_24_8,
+};
+
 const GLenum PrimitiveGLType[]
 {
     GL_POINTS,
@@ -90,6 +168,13 @@ const GLenum PrimitiveGLType[]
     GL_TRIANGLES,
     GL_TRIANGLE_STRIP,
     GL_TRIANGLE_FAN
+};
+
+const GLenum TextureTypeGLTarget[]
+{
+    GL_TEXTURE_2D,
+    GL_TEXTURE_3D,
+    GL_TEXTURE_CUBE_MAP
 };
 
 const GLenum TextureWrapModeGLType[]

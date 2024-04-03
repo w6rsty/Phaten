@@ -2,9 +2,6 @@
 
 #include <thread>
 
-#include "Graphics/FrameBuffer.hpp"
-#include "Math/Vector.hpp"
-#include "Object/Ptr.hpp"
 #include "Input/Window.hpp"
 #include "Input/Input.hpp"
 #include "Graphics/Graphics.hpp"
@@ -12,9 +9,8 @@
 #include "Graphics/IndexBuffer.hpp"
 #include "Graphics/UniformBuffer.hpp"
 #include "Graphics/Texture.hpp"
+#include "Graphics/FrameBuffer.hpp"
 #include "Scene/SceneCameraController.hpp"
-
-#include "Math/Quaternion.hpp"
 
 namespace Pt {
 
@@ -35,13 +31,8 @@ private:
     ScopedPtr<Input> m_Input;
 
     // Temporary data for rendering.
-    SharedPtr<VertexBuffer> m_VB;
-    SharedPtr<IndexBuffer> m_IB;
-    SharedPtr<UniformBuffer> m_UB;
-    SharedPtr<ShaderProgram> m_Program;
     SharedPtr<Camera> m_Camera;
     SharedPtr<SceneCameraController> m_CameraController;
-    SharedPtr<Texture2D> m_Texture;
 
     /// Applicat state.
     bool m_Running;

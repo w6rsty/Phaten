@@ -16,6 +16,32 @@ static const size_t MAX_TEXTURE_SLOTS = 16;
 static const size_t MAX_TEXTURE_SLOTS = 32;
 #endif
 
+enum class ImageFormat
+{
+    NONE = 0,
+    R8,
+    RG8,
+    RGB8,
+    RGBA8,
+    A8,
+    R16,
+    RG16,
+    RGBA16,
+    R16F,
+    RG16F,
+    RGBA16F,
+    R32F,
+    RG32F,
+    RGB32F,
+    RGBA32F,
+    R32U,
+    RG32U,
+    RGBA32U,
+    D16,
+    D32,
+    D24S8,
+};
+
 enum class ScreenMode
 {
     WINDOWED = 0,
@@ -125,8 +151,14 @@ extern const std::string PresetUniformName[];
 extern const std::string PrimitiveName[];
 extern const GLenum PrimitiveGLType[];
 
+extern const GLenum ImageFormatGLInternalFormat[];
+extern const GLenum ImageFormatGLFormat[];
+extern const GLenum ImageFormatGLDataType[];
+
+extern const GLenum TextureTypeGLTarget[];
 extern const GLenum TextureWrapModeGLType[];
 extern const GLenum TextureFilterModeGLType[];
+
 
 template <typename T>
 constexpr size_t EnumAsIndex(T type)

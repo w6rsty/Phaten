@@ -1,162 +1,150 @@
 #include "Texture.hpp"
 
 #include <glad/glad.h>
-#include <stb_image.h>
 
+#include "Graphics/GraphicsDefs.hpp"
 #include "IO/Logger.hpp"
-#include "GraphicsDefs.hpp"
 
 namespace Pt {
 
 static const Texture* boundTextureSlot[MAX_TEXTURE_SLOTS] = { nullptr };
-static size_t boundTextureSlotIndex = 0;
 
-Texture2D::Texture2D() :
+Texture::Texture() :
     m_Handle(0),
-    m_Flip(true),
-    m_Width(0),
-    m_Height(0),
-    m_Channels(0),
-    m_WrapMode(TextureWrapMode::REPEAT),
-    m_MinFilterMode(TextureFilterMode::LINEAR),
-    m_MagFilterMode(TextureFilterMode::LINEAR)
+    m_Target(0),
+    m_Size(IntV3::ZERO),
+    m_Format(ImageFormat::NONE),
+    m_Type(TextureType::TEX_2D),
+    m_WrapModes{TextureWrapMode::REPEAT, TextureWrapMode::REPEAT, TextureWrapMode::REPEAT},
+    m_FilterMode(TextureFilterMode::LINEAR)
 {
     // Check graphics loaded
 }
 
-Texture2D::~Texture2D()
+Texture::~Texture()
 {
     Release();
 }
 
-void Texture2D::Define(std::string_view path, bool flip)
+void Texture::Define(TextureType type, const IntV2& size, ImageFormat format, const void* data)
 {
-    Release();
-
-    m_Flip = flip;
-
-    Create(path);
+    Define(type, IntV3 {size, 1}, format, data);
 }
 
-void Texture2D::Define(int width, int height, int channels, const void* data)
+void Texture::Define(TextureType type, const IntV3& size, ImageFormat format, const void* data)
 {
     Release();
 
-    m_Flip = false;
-    m_Width = width;
-    m_Height = height;
-    m_Channels = channels;
+    m_Size = size;
+    m_Type = type;
+    m_Format = format;
+    m_Target = TextureTypeGLTarget[EnumAsIndex(m_Type)];
 
     Create(data);
 }
 
-void Texture2D::Bind() const
+void Texture::SetData(const void* data)
 {
-    if (boundTextureSlotIndex >= MAX_TEXTURE_SLOTS)
+    if (!m_Handle)
     {
-        PT_LOG_WARN("Exceeded max texture slots.");
         return;
     }
 
-    for (size_t i = 0; i < MAX_TEXTURE_SLOTS; ++i)
+    ForceBind();
+
+    GLenum format = ImageFormatGLFormat[EnumAsIndex(m_Format)];
+
+    glTexSubImage2D(m_Target, 0, 0, 0, m_Size.x, m_Size.y, format, ImageFormatGLDataType[EnumAsIndex(m_Format)], data);
+}
+
+void Texture::Bind(size_t index) const
+{
+    if (!m_Handle)
     {
-        if (boundTextureSlot[i] == this)
-        {
-            return;
-        }
+        return;
     }
 
-    glActiveTexture(GL_TEXTURE0 + boundTextureSlotIndex);
-    glBindTexture(GL_TEXTURE_2D, m_Handle);
-
-    boundTextureSlot[boundTextureSlotIndex] = this;
-    ++boundTextureSlotIndex;
-}
-
-void Texture2D::SetWrapMode(TextureWrapMode mode)
-{
-    Bind();
-
-    m_WrapMode = mode;
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, TextureWrapModeGLType[EnumAsIndex(m_WrapMode)]);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, TextureWrapModeGLType[EnumAsIndex(m_WrapMode)]);
-}
-
-void Texture2D::SetFilterMode(TextureFilterMode minMode, TextureFilterMode magMode)
-{
-    Bind();
-
-    m_MinFilterMode = minMode;
-    m_MagFilterMode = magMode;
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, TextureFilterModeGLType[EnumAsIndex(m_MinFilterMode)]);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, TextureFilterModeGLType[EnumAsIndex(m_MagFilterMode)]);
-}
-
-bool Texture2D::Create(std::string_view path)
-{
-    stbi_set_flip_vertically_on_load(m_Flip);
-
-    unsigned char* data = stbi_load(path.data(), &m_Width, &m_Height, &m_Channels, 0);
-    if (!data)
+    if (index >= MAX_TEXTURE_SLOTS)
     {
-        PT_LOG_WARN("Failed to load texture: ", path);
-        return false;
+        PT_LOG_WARN("Exceeded max texture slots. (", MAX_TEXTURE_SLOTS, ") get: ", index);
+        return;
     }
 
+    if (boundTextureSlot[index] == this)
+    {
+        return;
+    }
+
+    glActiveTexture(GL_TEXTURE0 + index);
+    glBindTexture(m_Target, m_Handle);
+
+    boundTextureSlot[index] = this;
+}
+
+void Texture::SetWrapMode(size_t index, TextureWrapMode mode)
+{
+    if (!m_Handle)
+    {
+        return;
+    }
+
+    ForceBind();
+
+    m_WrapModes[index] = mode;
+
+    glTexParameteri(m_Target, GL_TEXTURE_WRAP_S, TextureWrapModeGLType[EnumAsIndex(m_WrapModes[0])]);
+    glTexParameteri(m_Target, GL_TEXTURE_WRAP_T, TextureWrapModeGLType[EnumAsIndex(m_WrapModes[1])]);
+    glTexParameteri(m_Target, GL_TEXTURE_WRAP_R, TextureWrapModeGLType[EnumAsIndex(m_WrapModes[2])]);
+}
+
+void Texture::SetFilterMode(TextureFilterMode mode)
+{
+    if (!m_Handle)
+    {
+        return;
+    }
+
+    ForceBind();
+
+    m_FilterMode = mode;
+
+    glTexParameteri(m_Target, GL_TEXTURE_MAG_FILTER, TextureFilterModeGLType[EnumAsIndex(m_FilterMode)]);
+}
+
+void Texture::ForceBind() const
+{
+    boundTextureSlot[0] = nullptr;
+    Bind(0);
+}
+
+bool Texture::Create(const void* data)
+{
     glGenTextures(1, &m_Handle);
-    glBindTexture(GL_TEXTURE_2D, m_Handle);
+    glBindTexture(m_Target, m_Handle);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, TextureWrapModeGLType[EnumAsIndex(m_WrapMode)]);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, TextureWrapModeGLType[EnumAsIndex(m_WrapMode)]);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, TextureFilterModeGLType[EnumAsIndex(m_MinFilterMode)]);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, TextureFilterModeGLType[EnumAsIndex(m_MagFilterMode)]);
+    glTexParameteri(m_Target, GL_TEXTURE_WRAP_S, TextureWrapModeGLType[EnumAsIndex(m_WrapModes[0])]);
+    glTexParameteri(m_Target, GL_TEXTURE_WRAP_T, TextureWrapModeGLType[EnumAsIndex(m_WrapModes[1])]);
+    glTexParameteri(m_Target, GL_TEXTURE_WRAP_R, TextureWrapModeGLType[EnumAsIndex(m_WrapModes[2])]);
+    glTexParameteri(m_Target, GL_TEXTURE_MIN_FILTER, TextureFilterModeGLType[EnumAsIndex(m_FilterMode)]);
+    glTexParameteri(m_Target, GL_TEXTURE_MAG_FILTER, TextureFilterModeGLType[EnumAsIndex(m_FilterMode)]);
 
-    GLenum format = GL_RGB;
-    if (m_Channels == 4)
-    {
-        format = GL_RGBA;
-    }
+    GLenum internalFormat = ImageFormatGLInternalFormat[EnumAsIndex(m_Format)];
+    GLenum format = ImageFormatGLFormat[EnumAsIndex(m_Format)];
 
-    glTexImage2D(GL_TEXTURE_2D, 0, format, m_Width, m_Height, 0, format, GL_UNSIGNED_BYTE, data);
+    glTexImage2D(m_Target, 0, internalFormat, m_Size.x, m_Size.y, 0, format, ImageFormatGLDataType[EnumAsIndex(m_Format)], data);
 
-    stbi_image_free(data);
-
-    PT_LOG_INFO("Created texture. width: ", m_Width, ", height: ", m_Height, ", channels: ", m_Channels);
+    PT_LOG_INFO("Created texture: ", m_Size.x, "x", m_Size.y, "x", m_Size.z);
 
     return true;
 }
 
-bool Texture2D::Create(const void* data)
-{
-    glGenTextures(1, &m_Handle);
-    glBindTexture(GL_TEXTURE_2D, m_Handle);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, TextureWrapModeGLType[EnumAsIndex(m_WrapMode)]);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, TextureWrapModeGLType[EnumAsIndex(m_WrapMode)]);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, TextureFilterModeGLType[EnumAsIndex(m_MinFilterMode)]);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, TextureFilterModeGLType[EnumAsIndex(m_MagFilterMode)]);
-
-    GLenum format = GL_RGB;
-    if (m_Channels == 4)
-    {
-        format = GL_RGBA;
-    }
-
-    glTexImage2D(GL_TEXTURE_2D, 0, format, m_Width, m_Height, 0, format, GL_UNSIGNED_BYTE, data);
-
-    PT_LOG_INFO("Created texture. width: ", m_Width, ", height: ", m_Height, ", channels: ", m_Channels);
-
-    return true;
-}
-
-void Texture2D::Release()
+void Texture::Release()
 {
     if (m_Handle)
     {
         glDeleteTextures(1, &m_Handle);
         m_Handle = 0;
+        
         for (size_t i = 0; i < MAX_TEXTURE_SLOTS; ++i)
         {
             if (boundTextureSlot[i] == this)
@@ -166,15 +154,13 @@ void Texture2D::Release()
         }
     }
 
-    m_Loaded = false;
-    m_Width = 0;
-    m_Height = 0;
-    m_Channels = 0;
-}
+    m_Target = 0;
+    m_Size = IntV3::ZERO;
 
-unsigned Texture2D::TexGLTarget() const
-{
-    return GL_TEXTURE_2D;
+    m_Format = ImageFormat::NONE;
+    m_Type = TextureType::TEX_2D;
+    m_WrapModes[0] = m_WrapModes[1] = m_WrapModes[2] = TextureWrapMode::REPEAT;
+    m_FilterMode = TextureFilterMode::LINEAR;
 }
 
 } // namespace Pt

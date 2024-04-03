@@ -142,6 +142,13 @@ public:
         FromString(str);
     }
 
+    IntV3(const IntV2& v2, int32_t z_) :
+        x(v2.x),
+        y(v2.y),
+        z(z_)
+    {
+    }
+
     IntV3& operator += (const IntV3& rhs)
     {
         x += rhs.x;
@@ -191,8 +198,8 @@ public:
     std::string ToString() const;
     const int32_t* Data() const { return data; }
 
-    static const IntV3 Zero;
-    static const IntV3 One;
+    static const IntV3 ZERO;
+    static const IntV3 ONE;
     static const IntV3 X;
     static const IntV3 Y;
     static const IntV3 Z;

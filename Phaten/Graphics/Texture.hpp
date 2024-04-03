@@ -8,63 +8,54 @@
 
 namespace Pt {
 
-/// Base class for all textures
+// TODO: Support resource manager
+/// Texture
 class Texture : public RefCounted
 {
 public:
-    // TODO: Support resource manager
-    virtual ~Texture() = default;
+    Texture();
+    ~Texture();
 
-    virtual IntV2 Size2D() const { return IntV2::ZERO; }
-
-    virtual unsigned GLHandle() const = 0;
-    virtual TextureType TexGLType() const = 0;
-    virtual unsigned TexGLTarget() const = 0;
-};
-
-/// 2D texture
-class Texture2D : public Texture
-{
-public:
-    Texture2D();
-    ~Texture2D();
-
-    // TODO: Support resource manager
-    /// Load texture from file
-    void Define(std::string_view path, bool flip = true);
     /// Create texture
-    void Define(int width, int height, int channels, const void* data);
-    void Bind() const;
+    void Define(TextureType type, const IntV2& size, ImageFormat format, const void* data);
+    void Define(TextureType type, const IntV3& size, ImageFormat format, const void* data);
+    void SetData(const void* data);
+    /// Auto bind texture
+    void Bind(size_t index) const;
 
-    void SetWrapMode(TextureWrapMode mode);
-    void SetFilterMode(TextureFilterMode minMode, TextureFilterMode magMode);
+    void SetWrapMode(size_t index, TextureWrapMode mode);
+    void SetFilterMode(TextureFilterMode mode);
 
-    int Channels() const { return m_Channels; }
-    virtual IntV2 Size2D() const override { return IntV2 {m_Width, m_Height}; }
+    /// Get texture2d size
+    IntV2 Size2D() const { return IntV2 {m_Size.x, m_Size.y}; }
+    /// Get texture wrap mode
+    TextureWrapMode WrapMode(size_t index) const { return m_WrapModes[index]; }
+    /// Get texture filter mode
+    TextureFilterMode FilterMode() const { return m_FilterMode; }
 
-    TextureWrapMode WrapMode() const { return m_WrapMode; }
-    TextureFilterMode MinFilterMode() const { return m_MinFilterMode; }
-    TextureFilterMode MagFilterMode() const { return m_MagFilterMode; }
-
-    virtual unsigned GLHandle() const override { return m_Handle; }
-    virtual TextureType TexGLType() const override { return TextureType::TEX_2D; }
-    virtual unsigned TexGLTarget() const override;
+    /// Get texture GL handle
+    unsigned GLHandle() const { return m_Handle; }
+    /// Get texture GL type
+    TextureType GLType() const { return m_Type; }
+    /// Get texture GL target
+    unsigned GLTarget() const { return m_Target; }
 private:
-    bool Create(std::string_view path);
+    void ForceBind() const;
+
     bool Create(const void* data);
     void Release();
 
     unsigned m_Handle;
-    bool m_Flip;
-    int m_Width;
-    int m_Height;
-    int m_Channels;
+    /// Texture GL target(from type)
+    unsigned m_Target;
+    IntV3 m_Size;
 
-    bool m_Loaded;
-
-    TextureWrapMode m_WrapMode;
-    TextureFilterMode m_MinFilterMode;
-    TextureFilterMode m_MagFilterMode;
+    /// Internal storage format
+    ImageFormat m_Format;
+    // Texture type
+    TextureType m_Type;
+    TextureWrapMode m_WrapModes[3];
+    TextureFilterMode m_FilterMode;
 };
 
 } // namespace Pt

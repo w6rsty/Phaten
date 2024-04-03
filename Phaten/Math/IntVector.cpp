@@ -26,8 +26,8 @@ std::string IntV2::ToString() const
     return std::to_string(x) + " " + std::to_string(y);
 }
 
-const IntV3 IntV3::Zero = IntV3{0, 0, 0};
-const IntV3 IntV3::One = IntV3{1, 1, 1};
+const IntV3 IntV3::ZERO = IntV3{0, 0, 0};
+const IntV3 IntV3::ONE = IntV3{1, 1, 1};
 const IntV3 IntV3::X = IntV3{1, 0, 0};
 const IntV3 IntV3::Y = IntV3{0, 1, 0};
 const IntV3 IntV3::Z = IntV3{0, 0, 1};
