@@ -3,10 +3,14 @@
 #include <SDL.h>
 #include <imgui.h>
 
-#include "IO/Logger.hpp"
-#include "Graphics/FrameBuffer.hpp"
-#include "Graphics/GraphicsDefs.hpp"
 #include "ImGuiPlugin.hpp"
+#include "IO/Logger.hpp"
+#include "Graphics/GraphicsDefs.hpp"
+#include "Graphics/FrameBuffer.hpp"
+#include "Graphics/VertexBuffer.hpp"
+#include "Graphics/IndexBuffer.hpp"
+#include "Graphics/UniformBuffer.hpp"
+#include "Graphics/Texture.hpp"
 #include "Math/Matrix.hpp"
 #include "Math/Quaternion.hpp"
 #include "Resource/Image.hpp"
@@ -15,7 +19,7 @@ namespace Pt {
 
 struct GraphicsData
 {
-    static constexpr float vertices[] = {
+    static constexpr float cubeVertices[] = {
         -0.5f, -0.5f,  0.5f, 0.0f, 0.0f, // 0
          0.5f, -0.5f,  0.5f, 1.0f, 0.0f, // 1
          0.5f,  0.5f,  0.5f, 1.0f, 1.0f, // 2
@@ -27,13 +31,20 @@ struct GraphicsData
     };
 
     // cube indices
-    static constexpr unsigned int indices[] = {
+    static constexpr unsigned int cubeIndices[] = {
         0, 1, 2, 2, 3, 0,
         4, 5, 6, 6, 7, 4,
         1, 5, 6, 6, 2, 1,
         0, 4, 7, 7, 3, 0,
         0, 4, 5, 5, 1, 0,
         3, 7, 6, 6, 2, 3
+    };
+
+    static constexpr float quadVertices[] = {
+        -1.0f, -1.0f,  0.0f, 0.0f, 0.0f,
+         1.0f, -1.0f,  0.0f, 1.0f, 0.0f,
+         1.0f,  1.0f,  0.0f, 1.0f, 1.0f,
+        -1.0f,  1.0f,  0.0f, 0.0f, 1.0f
     };
 
     Matrix4 model {1.0f};
@@ -66,7 +77,7 @@ void Application::Run()
 
 void Application::OnEvent()
 {
-    PT_TAG_INFO("Thread", "Launch OnEvent() on thread: ", std::this_thread::get_id());
+    PT_TAG_DEBUG("Thread", "Launch OnEvent() on thread: ", std::this_thread::get_id());
 
     while (m_Running)
     {
@@ -97,7 +108,7 @@ void Application::OnEvent()
 
 void Application::OnRender()
 {
-    PT_TAG_INFO("Thread", "Launch OnRender() on thread: ", std::this_thread::get_id());
+    PT_TAG_DEBUG("Thread", "Launch OnRender() on thread: ", std::this_thread::get_id());
 
     
     m_Graphics = CreateScoped<Graphics>(m_Window);
@@ -119,24 +130,21 @@ void Application::OnRender()
     vbo->Define(BufferUsage::STATIC, 8, {VertexLayout{
         {VertexElementType::FLOAT3, VertexElementSemantic::POSITION},
         {VertexElementType::FLOAT2, VertexElementSemantic::TEXCOORD}
-    }}, s_Data.vertices);
-    vbo->Bind(vbo->Attributes());
+    }}, s_Data.cubeVertices);
 
     auto ibo = CreateShared<IndexBuffer>();
-    ibo->Define(BufferUsage::STATIC, 36, s_Data.indices);
-    ibo->Bind();
+    ibo->Define(BufferUsage::STATIC, 36, s_Data.cubeIndices);
 
     auto ubo = CreateShared<UniformBuffer>();
     ubo->Define(BufferUsage::DYNAMIC, sizeof(Matrix4));
 
     auto fbo = CreateShared<FrameBuffer>();
     auto colorAttachment = CreateShared<Texture>();
-    colorAttachment->Define(TextureType::TEX_2D, IntV2{1280, 720}, ImageFormat::RGB8, nullptr);
+    colorAttachment->Define(TextureType::TEX_2D, IntV2{1280 * 2, 720 * 2}, ImageFormat::RGB8, nullptr);
     auto depthAttachment = CreateShared<Texture>();
-    depthAttachment->Define(TextureType::TEX_2D, IntV2{1280, 720}, ImageFormat::D24S8, nullptr);
+    depthAttachment->Define(TextureType::TEX_2D, IntV2{1280 * 2, 720 * 2}, ImageFormat::D24S8, nullptr);
     fbo->Define(colorAttachment, depthAttachment);
 
-    m_Graphics->LoadShader("Basic");
     auto program = m_Graphics->CreateProgram("Basic", "", "");
 
     auto image = CreateScoped<Image>();
@@ -144,6 +152,19 @@ void Application::OnRender()
 
     auto tex = CreateShared<Texture>();
     tex->Define(TextureType::TEX_2D, image->Size(), image->Format(), image->Data());
+    tex->SetFilterMode(TextureFilterMode::NEAREST);
+
+    /// ========================================================================
+    auto svbo = CreateShared<VertexBuffer>();
+    svbo->Define(BufferUsage::STATIC, 4, {VertexLayout{
+        {VertexElementType::FLOAT3, VertexElementSemantic::POSITION},
+        {VertexElementType::FLOAT2, VertexElementSemantic::TEXCOORD}
+    }}, s_Data.quadVertices);
+
+    auto sibo = CreateShared<IndexBuffer>();
+    sibo->Define(BufferUsage::STATIC, 6, s_Data.cubeIndices);
+
+    auto sprogram = m_Graphics->CreateProgram("Debug", "", "");
 
     m_Camera = CreateShared<Camera>();
     m_Camera->SetPerspective(45.0f, 0.1f, 100.0f);
@@ -156,6 +177,9 @@ void Application::OnRender()
         std::lock_guard<std::mutex> lock(m_RenderStateMutex);
         m_RenderState = true;
     }
+    
+    // convolution threshold
+    float threshold = 0.5f;
 
     SDL_GL_MakeCurrent(SDL_GL_GetCurrentWindow(), SDL_GL_GetCurrentContext());
     while (m_RenderState & m_Running)
@@ -165,38 +189,40 @@ void Application::OnRender()
         m_LastTime = currentTime;
         m_FPS = 1.0 / m_DeltaTime;
 
-        m_Graphics->SetFrameBuffer(fbo);
-        m_Graphics->SetClearColor({0.3f, 0.3f, 0.3f, 1.0f});
-        m_Graphics->Clear();
-
         ubo->Bind(0);
         Matrix4 mat = m_Camera->GetProjection() * m_Camera->GetView();
         ubo->SetData(0, sizeof(Matrix4), &mat);
-
-        program->Bind();
-        tex->Bind(0);
-        m_Graphics->SetUniform(program, PresetUniform::U_MODEL, s_Data.model);
-        m_Graphics->DrawIndexed(PrimitiveType::TRIANGLES, 0, 36);
-
-        m_Graphics->SetFrameBuffer(nullptr);
-        m_Graphics->SetClearColor();
+        /// ====================================================================
+        glEnable(GL_DEPTH_TEST);
+        m_Graphics->SetFrameBuffer(fbo);
         m_Graphics->Clear();
 
-        ubo->Bind(0);
-        ubo->SetData(0, sizeof(Matrix4), &mat);
-
+        vbo->Bind(vbo->Attributes());
+        ibo->Bind();
+        tex->Bind(0);
         program->Bind();
-        
-        colorAttachment->Bind(0);
         m_Graphics->SetUniform(program, PresetUniform::U_MODEL, s_Data.model);
         m_Graphics->DrawIndexed(PrimitiveType::TRIANGLES, 0, 36);
+
+        /// ====================================================================
+        glDisable(GL_DEPTH_TEST);
+        m_Graphics->SetFrameBuffer(nullptr);
+        m_Graphics->Clear();
+
+        svbo->Bind(svbo->Attributes());
+        sibo->Bind();
+        colorAttachment->Bind(1);
+        sprogram->Bind();
+        m_Graphics->SetUniform(sprogram, PresetUniform::U_DRAG_FLOAT, threshold);
+        m_Graphics->DrawIndexed(PrimitiveType::TRIANGLES, 0, 6);
 
         ImGuiBegin();
         ImGui::Begin("Camera");
-        ImGui::Text("Position: %.2f, %.2f, %.2f", m_Camera->GetPosition().x, m_Camera->GetPosition().y, m_Camera->GetPosition().z);
-        ImGui::Text("Rotation: %.2f, %.2f, %.2f %.2f", m_Camera->GetRotation().w, m_Camera->GetRotation().x, m_Camera->GetRotation().y, m_Camera->GetRotation().z);
+        ImGui::Text("Position: %.2f, %.2f, %.2f",
+            m_Camera->GetPosition().x, m_Camera->GetPosition().y, m_Camera->GetPosition().z);
         ImGui::Text("FPS: %.2f", m_FPS);
 
+        ImGui::SliderFloat("Threshold", &threshold, 0.1f, 1.0f);
         ImGui::Image(reinterpret_cast<void*>(colorAttachment->GLHandle()), ImVec2(320, 180), ImVec2(0, 1), ImVec2(1, 0));
         ImGui::End();
         ImGuiEnd();

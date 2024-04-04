@@ -4,6 +4,7 @@
 #include "Math/Space.hpp"
 #include "Math/Transform.hpp"
 #include "Math/Vector.hpp"
+#include <dlfcn.h>
 
 namespace Pt {
 
@@ -61,11 +62,22 @@ void Camera::SetPosition(const Vector3& pos)
     UpdateView();
 }
 
-void Camera::SetRotation(const Quaternion& delta)
+void Camera::UpdatePosition(const Vector3& delta)
 {
-    m_Rotation = m_Rotation * delta;
-    m_Rotation.Normalize();
+    m_Position += delta;
     UpdateView();
+}
+
+void Camera::SetRotation(const Quaternion& quat)
+{
+    m_Rotation = quat;
+    UpdateView();
+}
+
+void Camera::UpdateRotation(const Quaternion& delta)
+{
+    m_Rotation = delta * m_Rotation;
+    UpdateView();   
 }
 
 void Camera::UpdateProjection()
@@ -82,6 +94,7 @@ void Camera::UpdateProjection()
 
 void Camera::UpdateView()
 {
+    // FIXME: Works but not good
     m_Direction = RotationMatrix3(m_Rotation) * Vector3::BACKWARD;
     // normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
     Vector3 right = Normalize(Cross(m_Direction, Vector3::UP));  

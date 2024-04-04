@@ -29,11 +29,11 @@ static const std::string_view LevelToString(Level level)
     switch (level)
     {
         case Level::Trace:  return "[Trace]";
-        case Level::Debug:  return "[Debug]";
+        case Level::Debug:  return "\x1b[33m[Debug]\x1b[0m";
         case Level::Info:   return "[Info]";
-        case Level::Warn:   return "[Warn]";
-        case Level::Error:  return "[Error]";
-        case Level::Fatal:  return "[Fatal]";
+        case Level::Warn:   return "\x1b[31m[Warn]\x1b[0m";
+        case Level::Error:  return "\x1b[31m[Error]\x1b[0m";
+        case Level::Fatal:  return "\x1b[31m[Fatal]\x1b[0m";
         case Level::None:   return "[]";
     }
 }
@@ -102,8 +102,10 @@ private:
         // filter out low level logs
         if (level < level_) return;
 
-        stream_ << LevelToString(level) << " " << fileName << ":" << line << ":" << funcName << "\n";
-        stream_ << ">> "; 
+        stream_ << LevelToString(level) << " ";
+#ifndef PT_LOGGING_COMPACT
+        stream_ << fileName << ":" << line << ":" << funcName << "\n" << ">> ";
+#endif
         doLogImpl(std::forward<Args>(args)...);
         stream_ << "\n";
     }

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Math/Vector.hpp"
 #include "Object/Ptr.hpp"
 #include "Math/Matrix.hpp"
 #include "Math/Quaternion.hpp"
@@ -36,13 +37,25 @@ public:
     float GetNearOrtho() const { return m_NearOrtho; }
     float GetFarOrtho() const { return m_FarOrtho; }
 
+    /// Get the position.
     const Vector3& GetPosition() const { return m_Position; }
+    /// Get the direction.
     const Vector3& GetDirection() const { return m_Direction; }
+    /// Get the rotation quaternion(Not direciton)
     const Quaternion& GetRotation() const { return m_Rotation; }
+    /// Get the rotation in euler angles(Not direction).
     const Vector3 GetRotationEuler() const { return m_Rotation.EulerAngles(); }
+    /// Get the up.
+    const Vector3& GetUp() const { return m_Up; }
 
+    /// Reset the camera position.
     void SetPosition(const Vector3& pos);
-    void SetRotation(const Quaternion& delta);
+    /// Update the camera position by delta. Or say, move.
+    void UpdatePosition(const Vector3& delta);
+    /// Reset the camera rotation.
+    void SetRotation(const Quaternion& quat);
+    /// Update the camera rotation by delta.
+    void UpdateRotation(const Quaternion& delta);
 
     const Matrix4& GetProjection() const;
     const Matrix4& GetView() const;

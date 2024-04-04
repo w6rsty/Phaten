@@ -69,6 +69,7 @@ const std::string PresetUniformName[]
     "uTime",
     "uProjectionView",
     "uModel",
+    "uDragFloat"
     ""
 };
 

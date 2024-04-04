@@ -166,7 +166,7 @@ void ShaderProgram::Create(
         }
     }
 #ifdef PT_SHADER_DEBUG
-        PT_LOG_DEBUG("Active attributes:\n", ShowAttributes(m_Attributes));
+        PT_TAG_DEBUG("ShaderProgram", "Active attributes:\n", ShowAttributes(m_Attributes));
 #endif
 
     // Get used uniforms ============================================
@@ -178,7 +178,7 @@ void ShaderProgram::Create(
     glGetProgramiv(m_Handle, GL_ACTIVE_UNIFORMS, &numUniforms);
 
 #ifdef PT_SHADER_DEBUG
-        PT_LOG_DEBUG("Active uniform count: ", numUniforms);
+        PT_TAG_DEBUG("ShaderProgram", "Active uniform count: ", numUniforms);
 #endif
     // Reset preset uniforms
     for (int& presetUniform : m_PresetUniforms)
@@ -199,6 +199,9 @@ void ShaderProgram::Create(
         );
 
         std::string uniformName(nameBuffer, nameLength);
+#ifdef PT_SHADER_DEBUG
+        std::cout << uniformName << std::endl;
+#endif
         // Remove [0] if uniform is an array.(not neccessery but recommend doing this)
         ReplaceIn(uniformName, "[0]", ""); 
         int location = glGetUniformLocation(m_Handle, uniformName.c_str());

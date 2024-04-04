@@ -26,9 +26,19 @@ void FrameBuffer::Define(Texture* colorTex, Texture* depthStencilTex)
 
     m_Size = colorTex->Size2D();
 
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, colorTex->GLTarget(), colorTex->GLHandle(), 0);
+    glFramebufferTexture2D(
+        GL_FRAMEBUFFER,
+        GL_COLOR_ATTACHMENT0,
+        colorTex->GLTarget(),
+        colorTex->GLHandle(),
+        0);
 
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, depthStencilTex->GLTarget(), depthStencilTex->GLHandle(), 0);
+    glFramebufferTexture2D(
+        GL_FRAMEBUFFER,
+        GL_DEPTH_STENCIL_ATTACHMENT,
+        depthStencilTex->GLTarget(),
+        depthStencilTex->GLHandle(),
+        0);
 
     if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         PT_LOG_ERROR("Framebuffer is not complete!");
@@ -45,7 +55,7 @@ void FrameBuffer::Bind()
     }
     
     glBindFramebuffer(GL_FRAMEBUFFER, m_Handle);
-    glViewport(0, 0, m_Size.x, m_Size.y);
+    // glViewport(0, 0, m_Size.x, m_Size.y);
     boundFrameBuffer = this;
 }
 

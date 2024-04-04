@@ -52,13 +52,15 @@ void SceneCameraController::Move(SceneCameraMovement dir, float speed)
         break;
     }
 
+    // Do not use UpdatePosition() here. This is a player camera.
+    // Not move along the axis.
     m_Camera->SetPosition(m_Position);
 }
 
 void SceneCameraController::Rotate(float xOffset, float yOffset, float speed)
 {    
     speed *= 0.003f;
-    m_Camera->SetRotation({yOffset * speed, xOffset * speed, 0.0});
+    m_Camera->UpdateRotation({yOffset * speed, xOffset * speed, 0.0});
 }
 
 } // namespace Pt

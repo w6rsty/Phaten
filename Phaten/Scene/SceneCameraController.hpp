@@ -16,7 +16,10 @@ enum class SceneCameraMovement
     RIGHT
 };
 
-// TODO: Refactor rotation when using quaternions
+/// Controller for scene camera.
+/// Do not provide any access to camera info.
+/// Provide Attach and Detach so it by .
+// TODO: Add a base class for camera controller.
 class SceneCameraController : public RefCounted
 {
 public:

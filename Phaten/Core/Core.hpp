@@ -7,6 +7,7 @@ namespace Pt
 
 #ifdef PT_DEBUG
     #define PT_ENABLE_LOGGING
+    #define PT_LOGGING_COMPACT
     #define PT_ENABLE_ASSERTION
 
     #define PT_SHADER_DEBUG

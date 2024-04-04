@@ -3,13 +3,8 @@
 #include <thread>
 
 #include "Input/Window.hpp"
-#include "Input/Input.hpp"
 #include "Graphics/Graphics.hpp"
-#include "Graphics/VertexBuffer.hpp"
-#include "Graphics/IndexBuffer.hpp"
-#include "Graphics/UniformBuffer.hpp"
-#include "Graphics/Texture.hpp"
-#include "Graphics/FrameBuffer.hpp"
+#include "Input/Input.hpp"
 #include "Scene/SceneCameraController.hpp"
 
 namespace Pt {

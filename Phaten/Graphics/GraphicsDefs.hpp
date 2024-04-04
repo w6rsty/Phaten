@@ -103,6 +103,7 @@ enum class PresetUniform : size_t
     U_TIME,
     U_PROJECTION_VIEW,
     U_MODEL,
+    U_DRAG_FLOAT,
     MAX_PRESET_UNIFORMS
 };
 

@@ -26,6 +26,6 @@ void vert()
 
 void frag()
 {
-    vec3 texColor = texture(uTexture, vTexCoord).rgb;
+    vec3 texColor = texture(uTexture0, vTexCoord).rgb;
     FragColor = vec4(texColor, 1.0);
 }

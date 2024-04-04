@@ -54,7 +54,8 @@ void Texture::SetData(const void* data)
 
     GLenum format = ImageFormatGLFormat[EnumAsIndex(m_Format)];
 
-    glTexSubImage2D(m_Target, 0, 0, 0, m_Size.x, m_Size.y, format, ImageFormatGLDataType[EnumAsIndex(m_Format)], data);
+    glTexSubImage2D(m_Target, 0, 0, 0, m_Size.x, m_Size.y, format,
+        ImageFormatGLDataType[EnumAsIndex(m_Format)], data);
 }
 
 void Texture::Bind(size_t index) const
@@ -131,7 +132,8 @@ bool Texture::Create(const void* data)
     GLenum internalFormat = ImageFormatGLInternalFormat[EnumAsIndex(m_Format)];
     GLenum format = ImageFormatGLFormat[EnumAsIndex(m_Format)];
 
-    glTexImage2D(m_Target, 0, internalFormat, m_Size.x, m_Size.y, 0, format, ImageFormatGLDataType[EnumAsIndex(m_Format)], data);
+    glTexImage2D(m_Target, 0, internalFormat, m_Size.x, m_Size.y, 0, format,
+        ImageFormatGLDataType[EnumAsIndex(m_Format)], data);
 
     PT_LOG_INFO("Created texture: ", m_Size.x, "x", m_Size.y, "x", m_Size.z);
 
