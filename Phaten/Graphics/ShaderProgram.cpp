@@ -200,7 +200,7 @@ void ShaderProgram::Create(
 
         std::string uniformName(nameBuffer, nameLength);
 #ifdef PT_SHADER_DEBUG
-        std::cout << uniformName << std::endl;
+        std::cout << "- " << uniformName << std::endl;
 #endif
         // Remove [0] if uniform is an array.(not neccessery but recommend doing this)
         ReplaceIn(uniformName, "[0]", ""); 

@@ -6,6 +6,27 @@
 
 namespace Pt {
 
+const unsigned BufferBitGLType[]
+{
+    GL_COLOR_BUFFER_BIT,
+    GL_DEPTH_BUFFER_BIT,
+    GL_STENCIL_BUFFER_BIT
+};
+
+unsigned BufferBitsToGLBits(unsigned bits)
+{
+    unsigned result = 0;
+    for (int i = 0; i < static_cast<int>(BufferBitType::MAX_BUFFER_BIT); ++i)
+    {
+        if (bits & (1 << i))
+        {
+            result |= BufferBitGLType[i];
+        }
+    }
+    return result;
+}
+
+
 const unsigned VertexElementGLCount[]
 {
     1,

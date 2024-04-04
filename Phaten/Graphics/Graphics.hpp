@@ -39,6 +39,8 @@ public:
 
     void SetFrameBuffer(FrameBuffer* frameBuffer);
 
+    bool IsVSync() const { return m_VSync; }
+
     static void Draw(PrimitiveType type, size_t first, size_t count);
     static void DrawIndexed(PrimitiveType type, size_t first, size_t count);
 
@@ -47,7 +49,7 @@ public:
     WeakPtr<Window> GetWindow() const { return m_Window; }
 
     void Present();
-    static void Clear();
+    static void Clear(unsigned bits = 1);
 private:
     bool m_VSync;
 

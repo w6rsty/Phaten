@@ -56,7 +56,8 @@ Application::Application() :
     m_Running(false),
     m_RenderState(false)
 {
-    m_Window = CreateShared<Window>(WindowCreateInfo{"Phaten", IntV2{1280, 720}, ScreenMode::WINDOWED});
+    m_Window = CreateShared<Window>(
+        WindowCreateInfo{"Phaten", IntV2{1280, 720}, ScreenMode::WINDOWED});
 
     m_Input = CreateScoped<Input>();
 }
@@ -110,7 +111,6 @@ void Application::OnRender()
 {
     PT_TAG_DEBUG("Thread", "Launch OnRender() on thread: ", std::this_thread::get_id());
 
-    
     m_Graphics = CreateScoped<Graphics>(m_Window);
     m_Input->SetOnExit([this]() {
         m_RenderState = false;
@@ -122,8 +122,6 @@ void Application::OnRender()
         ImGuiProcessEvent(event);
     });
 
-    m_Graphics->SetVSync(true);
-    m_Graphics->SetClearColor();
     m_Frequency = (double)SDL_GetPerformanceFrequency();
 
     auto vbo = CreateShared<VertexBuffer>();
@@ -141,6 +139,7 @@ void Application::OnRender()
     auto fbo = CreateShared<FrameBuffer>();
     auto colorAttachment = CreateShared<Texture>();
     colorAttachment->Define(TextureType::TEX_2D, IntV2{1280 * 2, 720 * 2}, ImageFormat::RGB8, nullptr);
+    colorAttachment->SetWrapMode(0, TextureWrapMode::CLAMP_TO_EDGE);
     auto depthAttachment = CreateShared<Texture>();
     depthAttachment->Define(TextureType::TEX_2D, IntV2{1280 * 2, 720 * 2}, ImageFormat::D24S8, nullptr);
     fbo->Define(colorAttachment, depthAttachment);
@@ -164,7 +163,9 @@ void Application::OnRender()
     auto sibo = CreateShared<IndexBuffer>();
     sibo->Define(BufferUsage::STATIC, 6, s_Data.cubeIndices);
 
-    auto sprogram = m_Graphics->CreateProgram("Debug", "", "");
+    auto debugProgram = m_Graphics->CreateProgram("Post", "", "");
+    auto debugProgramKernel = m_Graphics->CreateProgram("Post", "", "KERNEL");
+    bool enableKernel = false;
 
     m_Camera = CreateShared<Camera>();
     m_Camera->SetPerspective(45.0f, 0.1f, 100.0f);
@@ -177,9 +178,6 @@ void Application::OnRender()
         std::lock_guard<std::mutex> lock(m_RenderStateMutex);
         m_RenderState = true;
     }
-    
-    // convolution threshold
-    float threshold = 0.5f;
 
     SDL_GL_MakeCurrent(SDL_GL_GetCurrentWindow(), SDL_GL_GetCurrentContext());
     while (m_RenderState & m_Running)
@@ -193,9 +191,8 @@ void Application::OnRender()
         Matrix4 mat = m_Camera->GetProjection() * m_Camera->GetView();
         ubo->SetData(0, sizeof(Matrix4), &mat);
         /// ====================================================================
-        glEnable(GL_DEPTH_TEST);
         m_Graphics->SetFrameBuffer(fbo);
-        m_Graphics->Clear();
+        m_Graphics->Clear(BufferBitType::COLOR | BufferBitType::DEPTH);
 
         vbo->Bind(vbo->Attributes());
         ibo->Bind();
@@ -205,25 +202,35 @@ void Application::OnRender()
         m_Graphics->DrawIndexed(PrimitiveType::TRIANGLES, 0, 36);
 
         /// ====================================================================
-        glDisable(GL_DEPTH_TEST);
         m_Graphics->SetFrameBuffer(nullptr);
-        m_Graphics->Clear();
+        m_Graphics->Clear(BufferBitType::COLOR | BufferBitType::DEPTH);
+
+        auto postProgram = enableKernel ? debugProgramKernel : debugProgram;
 
         svbo->Bind(svbo->Attributes());
         sibo->Bind();
         colorAttachment->Bind(1);
-        sprogram->Bind();
-        m_Graphics->SetUniform(sprogram, PresetUniform::U_DRAG_FLOAT, threshold);
+        postProgram->Bind();
         m_Graphics->DrawIndexed(PrimitiveType::TRIANGLES, 0, 6);
+        /// ====================================================================
 
         ImGuiBegin();
-        ImGui::Begin("Camera");
+        ImGui::Begin("Settings");
+        bool vsync = m_Graphics->IsVSync();
+        if (ImGui::Checkbox("VSync", &vsync))
+        {
+            m_Graphics->SetVSync(vsync);
+        }
+        ImGui::Separator();
         ImGui::Text("Position: %.2f, %.2f, %.2f",
             m_Camera->GetPosition().x, m_Camera->GetPosition().y, m_Camera->GetPosition().z);
         ImGui::Text("FPS: %.2f", m_FPS);
-
-        ImGui::SliderFloat("Threshold", &threshold, 0.1f, 1.0f);
-        ImGui::Image(reinterpret_cast<void*>(colorAttachment->GLHandle()), ImVec2(320, 180), ImVec2(0, 1), ImVec2(1, 0));
+        ImGui::Separator();
+        // switch kernel
+        ImGui::Checkbox("Enable Kernel", &enableKernel);
+        ImGui::Separator();
+        ImGui::Image(reinterpret_cast<void*>(colorAttachment->GLHandle()),
+            ImVec2(320, 180), ImVec2(0, 1), ImVec2(1, 0));
         ImGui::End();
         ImGuiEnd();
 

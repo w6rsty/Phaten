@@ -9,13 +9,20 @@ out vec2 vTexCoord;
 
 #else
 
-#include "Phaten/Shaders/DebugCommon.glsl"
+#include "Phaten/Shaders/Common.glsl"
 
 layout (location = 0) out vec4 FragColor;
 in vec3 vPos;
 in vec2 vTexCoord;
 
 const float offset = 1.0 / 300.0;
+
+// Gaussian blur
+const float kernel[9] = float[](
+    1.0 / 16.0, 2.0 / 16.0, 1.0/ 16.0,
+    2.0 / 16.0, 4.0 / 16.0, 2.0/ 16.0,
+    1.0 / 16.0, 2.0 / 16.0, 1.0/ 16.0
+);
 
 #endif
 
@@ -28,6 +35,8 @@ void vert()
 
 void frag()
 {
+
+#if defined(KERNEL)
     vec2 offsets[9] = vec2[](
         vec2(-offset, offset), // top-left
         vec2(0.0f, offset), // top-center
@@ -40,14 +49,6 @@ void frag()
         vec2(offset, -offset) // bottom-right
     );
 
-    // Laplacian
-    float kernel[9] = float[](
-        0.0,  1.0,  0.0,
-        1.0, -4.0,  1.0,
-        0.0,  1.0,  0.0
-    );
- 
-
     vec3 sampleTex[9];
     for (int i = 0; i < 9; i++)
     {
@@ -59,6 +60,8 @@ void frag()
     {
         col += sampleTex[i] * kernel[i];
     }
-    
+#else
+    vec3 col = texture(uTexture1, vTexCoord).rgb;
+#endif
     FragColor = vec4(col, 1.0);
 }

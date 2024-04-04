@@ -2,6 +2,7 @@
 
 #include <glad/glad.h>
 
+#include "Graphics/GraphicsDefs.hpp"
 #include "IO/Assert.hpp"
 #include "ShaderProgram.hpp"
 
@@ -20,6 +21,7 @@ Graphics::Graphics(const SharedPtr<Window>& window) :
     glGenVertexArrays(1, &defaultVAO);
     glBindVertexArray(defaultVAO);
 
+    SetVSync(m_VSync);
     // Initialization Done ====================================================
     glEnable(GL_DEPTH_TEST);
 }
@@ -164,10 +166,9 @@ void Graphics::Present()
     m_Window->Swap();
 }
 
-void Graphics::Clear()
+void Graphics::Clear(unsigned bits)
 {
-    /// TODO: use bitmask to select which buffer to clear.
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(BufferBitsToGLBits(bits));
 }
 
 } // namespace Pt

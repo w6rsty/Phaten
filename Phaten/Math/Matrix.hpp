@@ -633,7 +633,6 @@ public:
                              data[1][2] * (data[2][0] * data[3][1] - data[2][1] * data[3][0]));
     }
     
-    // TODO: Implement Inverse() function
     Matrix4 Inverse() const
     {
         float Coef00 = this->data[2][2] * this->data[3][3] - this->data[3][2] * this->data[2][3];

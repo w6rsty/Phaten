@@ -10,11 +10,20 @@ namespace Pt {
 static const std::string PT_GL_VERSION = "410 core";
 static const size_t MAX_UNIFORM_BUFFER_SLOTS = 16;
 
+// FIXME: Use query to get the max texture slots.
 #ifdef __APPLE__
 static const size_t MAX_TEXTURE_SLOTS = 16;
 #else
 static const size_t MAX_TEXTURE_SLOTS = 32;
 #endif
+
+enum BufferBitType : unsigned
+{
+    COLOR = 1 << 0,
+    DEPTH = 1 << 1,
+    STENCIL = 1 << 2,
+    MAX_BUFFER_BIT = 1 << 3
+};
 
 enum class ImageFormat
 {
@@ -139,6 +148,9 @@ enum class TextureFilterMode
     LINEAR,
     MAX_FILTER_MODE
 };
+
+extern const unsigned BufferBitGLType[];
+unsigned BufferBitsToGLBits(unsigned bits);
 
 extern const unsigned VertexElementGLCount[];
 extern const unsigned VertexElementGLType[];
