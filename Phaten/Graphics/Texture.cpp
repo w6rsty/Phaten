@@ -7,6 +7,15 @@
 
 namespace Pt {
 
+static size_t ImageFormatToPixelByte[] =
+{
+    0,
+    1,
+    2,
+    3,
+    4
+};
+
 static const Texture* boundTextureSlot[MAX_TEXTURE_SLOTS] = { nullptr };
 
 Texture::Texture() :
@@ -132,12 +141,34 @@ bool Texture::Create(const void* data)
     GLenum internalFormat = ImageFormatGLInternalFormat[EnumAsIndex(m_Format)];
     GLenum format = ImageFormatGLFormat[EnumAsIndex(m_Format)];
 
-    glTexImage2D(m_Target, 0, internalFormat, m_Size.x, m_Size.y, 0, format,
-        ImageFormatGLDataType[EnumAsIndex(m_Format)], data);
+    if (m_Type == TextureType::TEX_2D)
+    {
+        glTexImage2D(m_Target, 0, internalFormat, m_Size.x, m_Size.y, 0, format,
+            ImageFormatGLDataType[EnumAsIndex(m_Format)], data);
 
-    PT_LOG_INFO("Created texture: ", m_Size.x, "x", m_Size.y, "x", m_Size.z);
+        PT_LOG_INFO("Created texture: ", m_Size.x, "x", m_Size.y);
+        return true;
+    }
+    else if (m_Type == TextureType::TEX_3D)
+    {
+        glTexImage3D(m_Target, 0, internalFormat, m_Size.x, m_Size.y, m_Size.z, 0, format,
+            ImageFormatGLDataType[EnumAsIndex(m_Format)], data);
 
-    return true;
+        PT_LOG_INFO("Created texture: ", m_Size.x, "x", m_Size.y, "x", m_Size.z);
+        return true;
+    }
+    else // cubemap
+    {
+        for (size_t i = 0; i < 6; ++i)
+        {
+            size_t offset = m_Size.x * m_Size.y * ImageFormatToPixelByte[EnumAsIndex(m_Format)] * i;
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, internalFormat, m_Size.x, m_Size.y, 0, format,
+                ImageFormatGLDataType[EnumAsIndex(m_Format)], reinterpret_cast<void*>((unsigned char*)data + offset));
+        }
+
+        PT_LOG_INFO("Created cubemap texture: ", m_Size.x, "x", m_Size.y);
+        return true;
+    }
 }
 
 void Texture::Release()

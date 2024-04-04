@@ -15,7 +15,7 @@ layout (location = 0) out vec4 FragColor;
 in vec3 vPos;
 in vec2 vTexCoord;
 
-const float offset = 1.0 / 300.0;
+const float offset = 1.0 / 200.0;
 
 // Gaussian blur
 const float kernel[9] = float[](
@@ -28,9 +28,9 @@ const float kernel[9] = float[](
 
 void vert()
 {
-    gl_Position = vec4(aPosition.x, aPosition.y, 0.0, 1.0);
     vPos = aPosition;
     vTexCoord = aTexCoord;
+    gl_Position = vec4(aPosition.x, aPosition.y, 0.0, 1.0);
 }
 
 void frag()

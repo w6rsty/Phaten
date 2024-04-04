@@ -110,9 +110,12 @@ enum class VertexAttributeType : size_t
 enum class PresetUniform : size_t
 {
     U_TIME,
-    U_PROJECTION_VIEW,
+    U_PROJECTION,
+    U_VIEW,
     U_MODEL,
     U_DRAG_FLOAT,
+    U_CAMERA_POSITION,
+    U_SKYBOX,
     MAX_PRESET_UNIFORMS
 };
 

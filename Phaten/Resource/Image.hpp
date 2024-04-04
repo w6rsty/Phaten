@@ -12,21 +12,33 @@ class Image
 {
 public:
     Image();
-    ~Image();
+    virtual ~Image();
 
-    void Load(std::string_view path);
+    virtual void Load(std::string_view path);
 
-    const IntV2& Size() const { return m_Size; }
+    virtual const IntV2& Size() const { return m_Size; }
     ImageFormat Format() const { return m_Format; }
     unsigned char PixelBytes() const { return m_PixelBytes; }
     const unsigned char* Data() const { return m_Data; }
-private:
-    void Release();
+    const size_t Bytes() const { return m_Size.x * m_Size.y * m_PixelBytes; }
+protected:
+    virtual void Release();
 
     IntV2 m_Size;
     ImageFormat m_Format;
     unsigned char m_PixelBytes;
     unsigned char* m_Data;
+};
+
+class CubeMapImage : public Image
+{
+public:
+    CubeMapImage();
+    virtual ~CubeMapImage() override;
+
+    virtual void Load(std::string_view path) override;
+private:
+    virtual void Release() override;
 };
 
 } // namespace Pt

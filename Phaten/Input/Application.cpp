@@ -5,49 +5,28 @@
 
 #include "ImGuiPlugin.hpp"
 #include "IO/Logger.hpp"
+
 #include "Graphics/GraphicsDefs.hpp"
 #include "Graphics/FrameBuffer.hpp"
 #include "Graphics/VertexBuffer.hpp"
 #include "Graphics/IndexBuffer.hpp"
 #include "Graphics/UniformBuffer.hpp"
 #include "Graphics/Texture.hpp"
+
 #include "Math/Matrix.hpp"
 #include "Math/Quaternion.hpp"
+
+#include "Math/Transform.hpp"
+#include "Object/Ptr.hpp"
 #include "Resource/Image.hpp"
+#include "Resource/Mesh/BasicMesh.hpp"
+#include "SDL_opengl.h"
 
 namespace Pt {
 
 struct GraphicsData
 {
-    static constexpr float cubeVertices[] = {
-        -0.5f, -0.5f,  0.5f, 0.0f, 0.0f, // 0
-         0.5f, -0.5f,  0.5f, 1.0f, 0.0f, // 1
-         0.5f,  0.5f,  0.5f, 1.0f, 1.0f, // 2
-        -0.5f,  0.5f,  0.5f, 0.0f, 1.0f, // 3
-        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, // 4
-         0.5f, -0.5f, -0.5f, 1.0f, 0.0f, // 5
-         0.5f,  0.5f, -0.5f, 1.0f, 1.0f, // 6
-        -0.5f,  0.5f, -0.5f, 0.0f, 1.0f, // 7
-    };
-
-    // cube indices
-    static constexpr unsigned int cubeIndices[] = {
-        0, 1, 2, 2, 3, 0,
-        4, 5, 6, 6, 7, 4,
-        1, 5, 6, 6, 2, 1,
-        0, 4, 7, 7, 3, 0,
-        0, 4, 5, 5, 1, 0,
-        3, 7, 6, 6, 2, 3
-    };
-
-    static constexpr float quadVertices[] = {
-        -1.0f, -1.0f,  0.0f, 0.0f, 0.0f,
-         1.0f, -1.0f,  0.0f, 1.0f, 0.0f,
-         1.0f,  1.0f,  0.0f, 1.0f, 1.0f,
-        -1.0f,  1.0f,  0.0f, 0.0f, 1.0f
-    };
-
-    Matrix4 model {1.0f};
+    Matrix4 model = ScaleMatrix4(0.2f);
 };
 
 static GraphicsData s_Data;
@@ -84,7 +63,7 @@ void Application::OnEvent()
     {
         m_Input->Update();
 
-        float speed =m_DeltaTime;
+        float speed = m_DeltaTime;
         if (m_Input->KeyDown(SDLK_LSHIFT))
             speed *= 2.0f;
 
@@ -103,7 +82,10 @@ void Application::OnEvent()
             m_CameraController->Rotate(move.x, move.y);
         }
 
-        SDL_Delay(8);
+        unsigned eventSync = m_DeltaTime * 1000;
+        unsigned sleep = eventSync < 5000 ? eventSync : 8;
+        sleep = (sleep + (sleep >> 1)) >> 1;
+        SDL_Delay(sleep);
     }
 }
 
@@ -125,51 +107,43 @@ void Application::OnRender()
     m_Frequency = (double)SDL_GetPerformanceFrequency();
 
     auto vbo = CreateShared<VertexBuffer>();
-    vbo->Define(BufferUsage::STATIC, 8, {VertexLayout{
+    vbo->Define(BufferUsage::STATIC, Cube::VertexCount, {VertexLayout{
         {VertexElementType::FLOAT3, VertexElementSemantic::POSITION},
+        {VertexElementType::FLOAT3, VertexElementSemantic::NORMAL},
         {VertexElementType::FLOAT2, VertexElementSemantic::TEXCOORD}
-    }}, s_Data.cubeVertices);
+    }}, Cube::Vertices);
 
     auto ibo = CreateShared<IndexBuffer>();
-    ibo->Define(BufferUsage::STATIC, 36, s_Data.cubeIndices);
+    ibo->Define(BufferUsage::STATIC, Cube::IndexCount, Cube::Indices);
 
     auto ubo = CreateShared<UniformBuffer>();
-    ubo->Define(BufferUsage::DYNAMIC, sizeof(Matrix4));
-
-    auto fbo = CreateShared<FrameBuffer>();
-    auto colorAttachment = CreateShared<Texture>();
-    colorAttachment->Define(TextureType::TEX_2D, IntV2{1280 * 2, 720 * 2}, ImageFormat::RGB8, nullptr);
-    colorAttachment->SetWrapMode(0, TextureWrapMode::CLAMP_TO_EDGE);
-    auto depthAttachment = CreateShared<Texture>();
-    depthAttachment->Define(TextureType::TEX_2D, IntV2{1280 * 2, 720 * 2}, ImageFormat::D24S8, nullptr);
-    fbo->Define(colorAttachment, depthAttachment);
+    ubo->Define(BufferUsage::DYNAMIC, sizeof(Matrix4) * 2);
 
     auto program = m_Graphics->CreateProgram("Basic", "", "");
+    auto envProgram = m_Graphics->CreateProgram("Skybox", "", "");
 
-    auto image = CreateScoped<Image>();
-    image->Load("Assets/Textures/face.jpg");
+    auto face = CreateScoped<Image>();
+    face->Load("Assets/Textures/diamond_ore.png");
 
-    auto tex = CreateShared<Texture>();
-    tex->Define(TextureType::TEX_2D, image->Size(), image->Format(), image->Data());
-    tex->SetFilterMode(TextureFilterMode::NEAREST);
+    auto faceTex = CreateShared<Texture>();
+    faceTex->Define(TextureType::TEX_2D, face->Size(), face->Format(), face->Data());
+    faceTex->SetWrapMode(0, TextureWrapMode::REPEAT);
+    faceTex->SetWrapMode(1, TextureWrapMode::REPEAT);
+    faceTex->SetFilterMode(TextureFilterMode::LINEAR);  
 
-    /// ========================================================================
-    auto svbo = CreateShared<VertexBuffer>();
-    svbo->Define(BufferUsage::STATIC, 4, {VertexLayout{
-        {VertexElementType::FLOAT3, VertexElementSemantic::POSITION},
-        {VertexElementType::FLOAT2, VertexElementSemantic::TEXCOORD}
-    }}, s_Data.quadVertices);
+    auto environmentMap = CreateScoped<CubeMapImage>();
+    environmentMap->Load("Assets/Environment/square_cubemap_512.png");
 
-    auto sibo = CreateShared<IndexBuffer>();
-    sibo->Define(BufferUsage::STATIC, 6, s_Data.cubeIndices);
-
-    auto debugProgram = m_Graphics->CreateProgram("Post", "", "");
-    auto debugProgramKernel = m_Graphics->CreateProgram("Post", "", "KERNEL");
-    bool enableKernel = false;
+    auto envTex = CreateShared<Texture>();
+    envTex->Define(TextureType::TEX_CUBE, environmentMap->Size(), environmentMap->Format(), environmentMap->Data());
+    envTex->SetWrapMode(0, TextureWrapMode::CLAMP_TO_EDGE);
+    envTex->SetWrapMode(1, TextureWrapMode::CLAMP_TO_EDGE);
+    envTex->SetWrapMode(2, TextureWrapMode::CLAMP_TO_EDGE);
+    envTex->SetFilterMode(TextureFilterMode::LINEAR);
 
     m_Camera = CreateShared<Camera>();
-    m_Camera->SetPerspective(45.0f, 0.1f, 100.0f);
-    m_Camera->SetPosition(Vector3(0.0f, 0.0f, 3.0f));
+    m_Camera->SetPerspective(60.0f, 0.1f, 100.0f);
+    m_Camera->SetPosition({0.0f, 0.0f, 3.0f});
 
     m_CameraController = CreateShared<SceneCameraController>();
     m_CameraController->Attach(m_Camera);
@@ -188,49 +162,37 @@ void Application::OnRender()
         m_FPS = 1.0 / m_DeltaTime;
 
         ubo->Bind(0);
-        Matrix4 mat = m_Camera->GetProjection() * m_Camera->GetView();
-        ubo->SetData(0, sizeof(Matrix4), &mat);
+        ubo->SetData(0, sizeof(Matrix4), m_Camera->GetProjection().Data());
+        ubo->SetData(sizeof(Matrix4), sizeof(Matrix4), m_Camera->GetView().Data());
         /// ====================================================================
-        m_Graphics->SetFrameBuffer(fbo);
         m_Graphics->Clear(BufferBitType::COLOR | BufferBitType::DEPTH);
 
+        glDepthMask(GL_FALSE);
         vbo->Bind(vbo->Attributes());
         ibo->Bind();
-        tex->Bind(0);
+        envTex->Bind(0);
+        envProgram->Bind();
+        m_Graphics->DrawIndexed(PrimitiveType::TRIANGLES, 0, Cube::IndexCount);
+        glDepthMask(GL_TRUE);
+        /// ====================================================================
+        vbo->Bind(vbo->Attributes());
+        ibo->Bind();
+        faceTex->Bind(0);
         program->Bind();
         m_Graphics->SetUniform(program, PresetUniform::U_MODEL, s_Data.model);
-        m_Graphics->DrawIndexed(PrimitiveType::TRIANGLES, 0, 36);
-
+        m_Graphics->DrawIndexed(PrimitiveType::TRIANGLES, 0, Cube::IndexCount);
         /// ====================================================================
-        m_Graphics->SetFrameBuffer(nullptr);
-        m_Graphics->Clear(BufferBitType::COLOR | BufferBitType::DEPTH);
-
-        auto postProgram = enableKernel ? debugProgramKernel : debugProgram;
-
-        svbo->Bind(svbo->Attributes());
-        sibo->Bind();
-        colorAttachment->Bind(1);
-        postProgram->Bind();
-        m_Graphics->DrawIndexed(PrimitiveType::TRIANGLES, 0, 6);
-        /// ====================================================================
-
         ImGuiBegin();
         ImGui::Begin("Settings");
         bool vsync = m_Graphics->IsVSync();
         if (ImGui::Checkbox("VSync", &vsync))
         {
             m_Graphics->SetVSync(vsync);
-        }
+        } 
         ImGui::Separator();
         ImGui::Text("Position: %.2f, %.2f, %.2f",
             m_Camera->GetPosition().x, m_Camera->GetPosition().y, m_Camera->GetPosition().z);
         ImGui::Text("FPS: %.2f", m_FPS);
-        ImGui::Separator();
-        // switch kernel
-        ImGui::Checkbox("Enable Kernel", &enableKernel);
-        ImGui::Separator();
-        ImGui::Image(reinterpret_cast<void*>(colorAttachment->GLHandle()),
-            ImVec2(320, 180), ImVec2(0, 1), ImVec2(1, 0));
         ImGui::End();
         ImGuiEnd();
 

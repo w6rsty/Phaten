@@ -88,9 +88,12 @@ const std::string VertexElementSemanticName[]
 const std::string PresetUniformName[]
 {
     "uTime",
-    "uProjectionView",
+    "uProjection",
+    "uView",
     "uModel",
-    "uDragFloat"
+    "uDragFloat",
+    "uCameraPosition",
+    "uSkybox",
     ""
 };
 
