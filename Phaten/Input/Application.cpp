@@ -13,14 +13,11 @@
 #include "Graphics/UniformBuffer.hpp"
 #include "Graphics/Texture.hpp"
 
-#include "Math/Matrix.hpp"
+#include "Math/Transform.hpp"
 #include "Math/Quaternion.hpp"
 
-#include "Math/Transform.hpp"
-#include "Object/Ptr.hpp"
 #include "Resource/Image.hpp"
 #include "Resource/Mesh/BasicMesh.hpp"
-#include "SDL_opengl.h"
 
 namespace Pt {
 
