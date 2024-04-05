@@ -7,26 +7,16 @@
 #include "IO/Logger.hpp"
 
 #include "Graphics/GraphicsDefs.hpp"
-#include "Graphics/FrameBuffer.hpp"
-#include "Graphics/VertexBuffer.hpp"
-#include "Graphics/IndexBuffer.hpp"
 #include "Graphics/UniformBuffer.hpp"
 #include "Graphics/Texture.hpp"
+#include "Object/Ptr.hpp"
+#include "Renderer/StaticGeometry.hpp"
+#include "Resource/Image.hpp"
 
 #include "Math/Transform.hpp"
 #include "Math/Quaternion.hpp"
 
-#include "Resource/Image.hpp"
-#include "Resource/Mesh/BasicMesh.hpp"
-
 namespace Pt {
-
-struct GraphicsData
-{
-    Matrix4 model = ScaleMatrix4(0.2f);
-};
-
-static GraphicsData s_Data;
 
 Application::Application() :
     m_Running(false),
@@ -91,9 +81,10 @@ void Application::OnRender()
     PT_TAG_DEBUG("Thread", "Launch OnRender() on thread: ", std::this_thread::get_id());
 
     m_Graphics = CreateScoped<Graphics>(m_Window);
+
     m_Input->SetOnExit([this]() {
-        m_RenderState = false;
-        m_Running = false;
+    m_RenderState = false;
+    m_Running = false;
     });
 
     ImGuiInit();
@@ -103,44 +94,20 @@ void Application::OnRender()
 
     m_Frequency = (double)SDL_GetPerformanceFrequency();
 
-    auto vbo = CreateShared<VertexBuffer>();
-    vbo->Define(BufferUsage::STATIC, Cube::VertexCount, {VertexLayout{
-        {VertexElementType::FLOAT3, VertexElementSemantic::POSITION},
-        {VertexElementType::FLOAT3, VertexElementSemantic::NORMAL},
-        {VertexElementType::FLOAT2, VertexElementSemantic::TEXCOORD}
-    }}, Cube::Vertices);
-
-    auto ibo = CreateShared<IndexBuffer>();
-    ibo->Define(BufferUsage::STATIC, Cube::IndexCount, Cube::Indices);
-
     auto ubo = CreateShared<UniformBuffer>();
-    ubo->Define(BufferUsage::DYNAMIC, sizeof(Matrix4) * 2);
+    ubo->Define(BufferUsage::DYNAMIC, 
+        sizeof(Matrix4) * 2     // Projection + View
+        + sizeof(Vector3)       // Camera Position
+        + sizeof(float) * 4);   // Coefficients for debuging
 
     auto program = m_Graphics->CreateProgram("Basic", "", "");
-    auto envProgram = m_Graphics->CreateProgram("Skybox", "", "");
 
-    auto face = CreateScoped<Image>();
-    face->Load("Assets/Textures/diamond_ore.png");
-
-    auto faceTex = CreateShared<Texture>();
-    faceTex->Define(TextureType::TEX_2D, face->Size(), face->Format(), face->Data());
-    faceTex->SetWrapMode(0, TextureWrapMode::REPEAT);
-    faceTex->SetWrapMode(1, TextureWrapMode::REPEAT);
-    faceTex->SetFilterMode(TextureFilterMode::LINEAR);  
-
-    auto environmentMap = CreateScoped<CubeMapImage>();
-    environmentMap->Load("Assets/Environment/square_cubemap_512.png");
-
-    auto envTex = CreateShared<Texture>();
-    envTex->Define(TextureType::TEX_CUBE, environmentMap->Size(), environmentMap->Format(), environmentMap->Data());
-    envTex->SetWrapMode(0, TextureWrapMode::CLAMP_TO_EDGE);
-    envTex->SetWrapMode(1, TextureWrapMode::CLAMP_TO_EDGE);
-    envTex->SetWrapMode(2, TextureWrapMode::CLAMP_TO_EDGE);
-    envTex->SetFilterMode(TextureFilterMode::LINEAR);
+    auto plane = Plane(program, ScaleMatrix4({10.0f, 1.0f, 10.0f}));
+    auto cube = Cube(program, TranslateMatrix4({0.0f, 0.5f, 0.0f}));
 
     m_Camera = CreateShared<Camera>();
     m_Camera->SetPerspective(60.0f, 0.1f, 100.0f);
-    m_Camera->SetPosition({0.0f, 0.0f, 3.0f});
+    m_Camera->SetPosition({0.0f, 0.5f, 3.0f});
 
     m_CameraController = CreateShared<SceneCameraController>();
     m_CameraController->Attach(m_Camera);
@@ -149,6 +116,9 @@ void Application::OnRender()
         std::lock_guard<std::mutex> lock(m_RenderStateMutex);
         m_RenderState = true;
     }
+
+    ubo->Bind(0);
+    ubo->SetData(0, sizeof(Matrix4), m_Camera->GetProjection().Data());
 
     SDL_GL_MakeCurrent(SDL_GL_GetCurrentWindow(), SDL_GL_GetCurrentContext());
     while (m_RenderState & m_Running)
@@ -159,25 +129,12 @@ void Application::OnRender()
         m_FPS = 1.0 / m_DeltaTime;
 
         ubo->Bind(0);
-        ubo->SetData(0, sizeof(Matrix4), m_Camera->GetProjection().Data());
         ubo->SetData(sizeof(Matrix4), sizeof(Matrix4), m_Camera->GetView().Data());
         /// ====================================================================
         m_Graphics->Clear(BufferBitType::COLOR | BufferBitType::DEPTH);
 
-        glDepthMask(GL_FALSE);
-        vbo->Bind(vbo->Attributes());
-        ibo->Bind();
-        envTex->Bind(0);
-        envProgram->Bind();
-        m_Graphics->DrawIndexed(PrimitiveType::TRIANGLES, 0, Cube::IndexCount);
-        glDepthMask(GL_TRUE);
-        /// ====================================================================
-        vbo->Bind(vbo->Attributes());
-        ibo->Bind();
-        faceTex->Bind(0);
-        program->Bind();
-        m_Graphics->SetUniform(program, PresetUniform::U_MODEL, s_Data.model);
-        m_Graphics->DrawIndexed(PrimitiveType::TRIANGLES, 0, Cube::IndexCount);
+        plane.Draw(m_Graphics);
+        cube.Draw(m_Graphics);
         /// ====================================================================
         ImGuiBegin();
         ImGui::Begin("Settings");
@@ -190,6 +147,7 @@ void Application::OnRender()
         ImGui::Text("Position: %.2f, %.2f, %.2f",
             m_Camera->GetPosition().x, m_Camera->GetPosition().y, m_Camera->GetPosition().z);
         ImGui::Text("FPS: %.2f", m_FPS);
+        ImGui::Separator();
         ImGui::End();
         ImGuiEnd();
 

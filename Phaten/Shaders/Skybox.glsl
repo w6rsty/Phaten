@@ -22,11 +22,13 @@ void vert()
 {
     vPosition = aPosition;
     vNormal = aNormal;
-    gl_Position = uProjection * mat4(mat3(uView)) * vec4(aPosition, 1.0);
+    gl_Position = (uProjection * mat4(mat3(uView)) * vec4(aPosition, 1.0)).xyww;
 }
 
 void frag()
 {
+    float exposure = uDragFloat;
     vec3 env = texture(uSkybox, vPosition).rgb;
+    env = env * pow(2.0, exposure);
     FragColor = vec4(env, 1.0);
 }

@@ -1,10 +1,34 @@
 #pragma once
 
+#include <cstddef>
+
 namespace Pt {
 
-struct Cube
+struct PlaneMesh
 {
-    static const int VertexCount = 24;
+    static const size_t VertexCount = 4;
+
+    /// Position, Normal, TexCoord
+    static constexpr float Vertices[] = {
+        // Position            // Normal             // TexCoord
+        -1.0f,  0.0f, -1.0f,   0.0f,  1.0f,  0.0f,   0.0f, 0.0f,
+         1.0f,  0.0f, -1.0f,   0.0f,  1.0f,  0.0f,   1.0f, 0.0f,
+         1.0f,  0.0f,  1.0f,   0.0f,  1.0f,  0.0f,   1.0f, 1.0f,
+        -1.0f,  0.0f,  1.0f,   0.0f,  1.0f,  0.0f,   0.0f, 1.0f
+    };
+
+    static constexpr size_t IndexCount = 6;
+
+    static constexpr unsigned int Indices[] = {
+        0, 1, 2, 2, 3, 0
+    };
+
+    PlaneMesh() = delete;
+};
+
+struct CubeMesh
+{
+    static const size_t VertexCount = 24;
 
     /// Position, Normal, TexCoord
     static constexpr float Vertices[] = {
@@ -40,7 +64,7 @@ struct Cube
         -1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f, 0.0f, 1.0f,
     };
 
-    static constexpr unsigned IndexCount = 36;
+    static constexpr size_t IndexCount = 36;
 
     static constexpr unsigned int Indices[] = {
         0, 1, 2, 2, 3, 0,
@@ -51,7 +75,7 @@ struct Cube
         20, 21, 22, 22, 23, 20
     };
 
-    Cube() = delete;
+    CubeMesh() = delete;
 };
 
 } // namespace Pt

@@ -24,6 +24,7 @@ Graphics::Graphics(const SharedPtr<Window>& window) :
     SetVSync(m_VSync);
     // Initialization Done ====================================================
     glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LEQUAL);
 }
 
 Graphics::~Graphics()
