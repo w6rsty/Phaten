@@ -75,7 +75,7 @@ bool VertexBuffer::SetData(size_t startIdx, size_t numbVertices, const void *dat
     {
         if (discard)
         {
-            glBufferData( GL_ARRAY_BUFFER, totalVertexSize, nullptr, usage);
+            glBufferData(GL_ARRAY_BUFFER, totalVertexSize, nullptr, usage);
         }
 
         glBufferSubData(

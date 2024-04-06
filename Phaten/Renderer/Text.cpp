@@ -58,7 +58,7 @@ void TextRenderer::Render(Graphics *graphics, std::string_view text, const IntV2
     }
 
     m_Program->Bind();
-    m_FontSheet->Bind(0);
+    m_FontSheetTex->Bind(0);
 
     m_TextPlane.Draw(graphics, text.size() * 6);
 }
@@ -68,9 +68,9 @@ void TextRenderer::Initialize()
     auto image = CreateShared<Image>();
     image->Load(fontSheetPath);
 
-    m_FontSheet = CreateShared<Texture>();
-    m_FontSheet->Define(TextureType::TEX_2D, image);
-    m_FontSheet->SetFilterMode(TextureFilterMode::NEAREST);
+    m_FontSheetTex = CreateShared<Texture>();
+    m_FontSheetTex->Define(TextureType::TEX_2D, image);
+    m_FontSheetTex->SetFilterMode(TextureFilterMode::NEAREST);
 
     m_Vertices = new Vector3[MAX_TEXT_SIZE * 4];
 
@@ -87,7 +87,7 @@ void TextRenderer::Initialize()
 
         offset += 4;
     }
-    m_TextPlane.m_IndexBuffer->SetData(0, 256 * 4, indices);
+    m_TextPlane.m_IndexBuffer->SetData(0, 256 * 6, indices);
     delete[] indices;
 }
 

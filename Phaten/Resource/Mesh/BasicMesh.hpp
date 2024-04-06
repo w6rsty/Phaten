@@ -19,7 +19,7 @@ namespace PlaneMesh
 
     static constexpr size_t IndexCount = 6;
 
-    static constexpr unsigned int Indices[] = {
+    static constexpr unsigned Indices[] = {
         0, 1, 2, 2, 3, 0
     };
 };
@@ -64,7 +64,7 @@ namespace CubeMesh
 
     static constexpr size_t IndexCount = 36;
 
-    static constexpr unsigned int Indices[] = {
+    static constexpr unsigned Indices[] = {
         0, 1, 2, 2, 3, 0,
         4, 5, 6, 6, 7, 4,
         8, 9, 10, 10, 11, 8,

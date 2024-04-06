@@ -16,6 +16,7 @@
 #include "Renderer/Text.hpp"
 
 #include "Math/Transform.hpp"
+#include "Resource/Mesh/BasicMesh.hpp"
 
 namespace Pt {
 
@@ -103,9 +104,7 @@ void Application::OnRender()
 
     auto program = m_Graphics->CreateProgram("Basic", "", "");
 
-    m_TextRenderer = CreateShared<TextRenderer>(
-        m_Graphics->CreateProgram("Text", "", "")
-    );
+    m_TextRenderer = CreateShared<TextRenderer>(m_Graphics->CreateProgram("Text", "", ""));
 
     auto cube = Cube(program);
 
@@ -137,23 +136,23 @@ void Application::OnRender()
         /// ====================================================================
         m_Graphics->Clear(BufferBitType::COLOR | BufferBitType::DEPTH);
 
-        // cube.Draw(m_Graphics);
+        cube.Draw(m_Graphics);
         m_TextRenderer->Render(m_Graphics, "Rust", {100, 100});
         /// ====================================================================
-        ImGuiBegin();
-        ImGui::Begin("Settings");
-        bool vsync = m_Graphics->IsVSync();
-        if (ImGui::Checkbox("VSync", &vsync))
-        {
-            m_Graphics->SetVSync(vsync);
-        } 
-        ImGui::Separator();
-        ImGui::Text("Position: %.2f, %.2f, %.2f",
-            m_Camera->GetPosition().x, m_Camera->GetPosition().y, m_Camera->GetPosition().z);
-        ImGui::Text("FPS: %.2f", m_FPS);
-        ImGui::Separator();
-        ImGui::End();
-        ImGuiEnd();
+        // ImGuiBegin();
+        // ImGui::Begin("Settings");
+        // bool vsync = m_Graphics->IsVSync();
+        // if (ImGui::Checkbox("VSync", &vsync))
+        // {
+        //     m_Graphics->SetVSync(vsync);
+        // } 
+        // ImGui::Separator();
+        // ImGui::Text("Position: %.2f, %.2f, %.2f",
+        //     m_Camera->GetPosition().x, m_Camera->GetPosition().y, m_Camera->GetPosition().z);
+        // ImGui::Text("FPS: %.2f", m_FPS);
+        // ImGui::Separator();
+        // ImGui::End();
+        // ImGuiEnd();
 
         // Call window to swap buffers.
         m_Graphics->Present();

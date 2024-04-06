@@ -45,7 +45,7 @@ public:
 
         graphics->DrawIndexed(PrimitiveType::TRIANGLES, 0, m_IndexBuffer->NumIndices());
     }
-private:
+
     SharedPtr<VertexBuffer> m_VertexBuffer;
     SharedPtr<IndexBuffer> m_IndexBuffer;
     SharedPtr<ShaderProgram> m_Program;
@@ -60,7 +60,7 @@ public:
     TextPlane() 
     {
         m_VertexBuffer = CreateShared<VertexBuffer>();
-        m_VertexBuffer->Define(BufferUsage::DYNAMIC, 256, 
+        m_VertexBuffer->Define(BufferUsage::DYNAMIC, 256 * 4, 
             VertexLayout{ // use z as font index.
                 {VertexElementType::FLOAT3, VertexElementSemantic::POSITION}
             },
@@ -117,7 +117,7 @@ public:
 
         graphics->DrawIndexed(PrimitiveType::TRIANGLES, 0, m_IndexBuffer->NumIndices());
     }
-private:
+
     SharedPtr<VertexBuffer> m_VertexBuffer;
     SharedPtr<IndexBuffer> m_IndexBuffer;
     SharedPtr<ShaderProgram> m_Program;

@@ -28,7 +28,7 @@ private:
     IntV2 m_LastPosition;
 
     SharedPtr<ShaderProgram> m_Program;
-    SharedPtr<Texture> m_FontSheet;
+    SharedPtr<Texture> m_FontSheetTex;
 
     internal::TextPlane m_TextPlane;
     Vector3* m_Vertices;

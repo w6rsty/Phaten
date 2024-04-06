@@ -73,6 +73,7 @@ const std::string VertexAttributeName[]
     "aTangent",
     "aVertexColor",
     "aTexCoord",
+    ""
 };
 
 const std::string VertexElementSemanticName[]
