@@ -1,6 +1,7 @@
 #pragma once
 
 #include <thread>
+#include <mutex>
 
 #include "Input/Window.hpp"
 #include "Graphics/Graphics.hpp"

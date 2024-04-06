@@ -43,11 +43,8 @@ std::string Replace(std::string_view str, char from, char to);
 /// Replace a string in a string
 void ReplaceIn(std::string& str, std::string_view from, std::string_view to);
 
-
-/// FIXME: Not works on Windows
 /// Comment out a function in shader source code.
 void CommentFunction(std::string& sourceCode, std::string_view signature);
-/// FIXME: Not works on Windows
 /// Remove a function in shader source code.
 void RemoveFunction(std::string& sourceCode, std::string_view signature);
 
