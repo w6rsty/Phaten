@@ -91,7 +91,7 @@ enum class VertexElementSemantic : size_t
     NORMAL,
     TANGENT,
     VERTEX_COLOR,
-    TEXCOORD,
+    TEX_COORD,
     MAX_ELEMENT_SEMANTIC
 };
 
@@ -101,7 +101,7 @@ enum class VertexAttributeType : size_t
     NORMAL,
     TANGENT,
     VERTEX_COLOR,
-    TEXCOORD,
+    TEX_COORD,
     MAX_ATTRIBUTE
 };
 

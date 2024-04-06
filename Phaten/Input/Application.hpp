@@ -6,6 +6,7 @@
 #include "Graphics/Graphics.hpp"
 #include "Input/Input.hpp"
 #include "Scene/SceneCameraController.hpp"
+#include "Renderer/Text.hpp"
 
 
 namespace Pt {
@@ -29,6 +30,8 @@ private:
     // Temporary data for rendering.
     SharedPtr<Camera> m_Camera;
     SharedPtr<SceneCameraController> m_CameraController;
+
+    SharedPtr<TextRenderer> m_TextRenderer;
 
     /// Applicat state.
     bool m_Running;

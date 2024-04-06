@@ -31,11 +31,20 @@ public:
     SharedPtr<Shader> LoadShader(std::string_view name);
     /// Create a shader program from the shader soure code.
     SharedPtr<ShaderProgram> CreateProgram(std::string_view name, std::string_view vsDefines, std::string_view fsDefines);
+    void SetUniform(ShaderProgram* program, PresetUniform uniform, int value);
+    void SetUniform(ShaderProgram* program, PresetUniform uniform, int* values, size_t count);
     void SetUniform(ShaderProgram* program, PresetUniform uniform, float value);
     void SetUniform(ShaderProgram* program, PresetUniform uniform, const Vector2& value);
     void SetUniform(ShaderProgram* program, PresetUniform uniform, const Vector3& value);
     void SetUniform(ShaderProgram* program, PresetUniform uniform, const Vector4& value);
     void SetUniform(ShaderProgram* program, PresetUniform uniform, const Matrix4& value);
+
+    void SetUniform(ShaderProgram* program, std::string_view name, int value);
+    void SetUniform(ShaderProgram* program, std::string_view name, int* values, size_t count);
+    void SetUniform(ShaderProgram* program, std::string_view name, float value);
+    void SetUniform(ShaderProgram* program, std::string_view name, const Vector2& value);
+    void SetUniform(ShaderProgram* program, std::string_view name, const Vector3& value);
+    void SetUniform(ShaderProgram* program, std::string_view name, const Vector4& value);
 
     void SetFrameBuffer(FrameBuffer* frameBuffer);
 

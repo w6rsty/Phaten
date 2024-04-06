@@ -68,9 +68,25 @@ bool ShaderProgram::Bind()
     return true;
 }
 
-int ShaderProgram::Uniform(std::string_view name) const
+int ShaderProgram::Uniform(std::string_view name)
 {
-    return Uniform(StringHash(name));
+    int location = Uniform(StringHash(name));
+    if (location >= 0)
+    {
+        // preset uniforms
+        return location;
+    }
+
+    location = glGetUniformLocation(m_Handle, name.data());
+    if (location < 0)
+    {
+        PT_TAG_WARN("Shader", "Uniform not found: ", name);
+        return -1;
+    }
+
+    // cache uniform location
+    m_Uniforms[StringHash(name)] = location;
+    return location;
 }
 
 int ShaderProgram::Uniform(StringHash name) const

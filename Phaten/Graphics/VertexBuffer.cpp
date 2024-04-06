@@ -51,7 +51,7 @@ bool VertexBuffer::SetData(size_t startIdx, size_t numbVertices, const void *dat
         PT_LOG_ERROR("Index buffer has not been created");
         return false;
     }
-    if (data)
+    if (!data)
     {   
         PT_LOG_ERROR("Vertex data is null, you fool!");
         return false;

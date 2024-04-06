@@ -52,6 +52,11 @@ void Texture::Define(TextureType type, const IntV3& size, ImageFormat format, co
     Create(data);
 }
 
+void Texture::Define(TextureType type, const SharedPtr<Image>& image)
+{
+    Define(type, image->Size(), image->Format(), image->Data());
+}
+
 void Texture::SetData(const void* data)
 {
     if (!m_Handle)

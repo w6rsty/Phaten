@@ -6,15 +6,16 @@
 #include "ImGuiPlugin.hpp"
 #include "IO/Logger.hpp"
 
+#include "Object/Ptr.hpp"
+
 #include "Graphics/GraphicsDefs.hpp"
 #include "Graphics/UniformBuffer.hpp"
 #include "Graphics/Texture.hpp"
-#include "Object/Ptr.hpp"
+
 #include "Renderer/StaticGeometry.hpp"
-#include "Resource/Image.hpp"
+#include "Renderer/Text.hpp"
 
 #include "Math/Transform.hpp"
-#include "Math/Quaternion.hpp"
 
 namespace Pt {
 
@@ -102,8 +103,11 @@ void Application::OnRender()
 
     auto program = m_Graphics->CreateProgram("Basic", "", "");
 
-    auto plane = Plane(program, ScaleMatrix4({10.0f, 1.0f, 10.0f}));
-    auto cube = Cube(program, TranslateMatrix4({0.0f, 0.5f, 0.0f}));
+    m_TextRenderer = CreateShared<TextRenderer>(
+        m_Graphics->CreateProgram("Text", "", "")
+    );
+
+    auto cube = Cube(program);
 
     m_Camera = CreateShared<Camera>();
     m_Camera->SetPerspective(60.0f, 0.1f, 100.0f);
@@ -133,8 +137,8 @@ void Application::OnRender()
         /// ====================================================================
         m_Graphics->Clear(BufferBitType::COLOR | BufferBitType::DEPTH);
 
-        plane.Draw(m_Graphics);
-        cube.Draw(m_Graphics);
+        // cube.Draw(m_Graphics);
+        m_TextRenderer->Render(m_Graphics, "Rust", {100, 100});
         /// ====================================================================
         ImGuiBegin();
         ImGui::Begin("Settings");

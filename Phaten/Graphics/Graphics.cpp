@@ -65,6 +65,30 @@ SharedPtr<ShaderProgram> Graphics::CreateProgram(std::string_view name, std::str
     return shader->CreateProgram(name, vsDefines, fsDefines);
 }
 
+void Graphics::SetUniform(ShaderProgram* program, PresetUniform uniform, int value)
+{
+    if (program)
+    {
+        int location = program->Uniform(uniform);
+        if (location >= 0)
+        {
+            glUniform1i(location, value);
+        }
+    }
+}
+
+void Graphics::SetUniform(ShaderProgram* program, PresetUniform uniform, int* values, size_t count)
+{
+    if (program)
+    {
+        int location = program->Uniform(uniform);
+        if (location >= 0)
+        {
+            glUniform1iv(location, count, values);
+        }
+    }
+}
+
 void Graphics::SetUniform(ShaderProgram* program, PresetUniform uniform, float value)
 {
     if (program)
@@ -121,6 +145,42 @@ void Graphics::SetUniform(ShaderProgram* program, PresetUniform uniform, const M
         if (location >= 0)
         {
             glUniformMatrix4fv(location, 1, GL_FALSE, value.Data());
+        }
+    }
+}
+
+void Graphics::SetUniform(ShaderProgram* program, std::string_view name, int value)
+{
+    if (program)
+    {
+        int location = program->Uniform(name);
+        if (location >= 0)
+        {
+            glUniform1i(location, value);
+        }
+    }
+}
+
+void Graphics::SetUniform(ShaderProgram* program, std::string_view name, int* values, size_t count)
+{
+    if (program)
+    {
+        int location = program->Uniform(name);
+        if (location >= 0)
+        {
+            glUniform1iv(location, count, values);
+        }
+    }
+}
+
+void Graphics::SetUniform(ShaderProgram* program, std::string_view name, float value)
+{
+    if (program)
+    {
+        int location = program->Uniform(name);
+        if (location >= 0)
+        {
+            glUniform1f(location, value);
         }
     }
 }
