@@ -24,6 +24,7 @@ GraphicsContext::GraphicsContext(SDL_Window* windowHandle) :
     m_IsValid = true;
 
     PT_LOG_INFO("OpenGL version: ", glGetString(GL_VERSION));
+    PT_LOG_INFO("Renderer: ", glGetString(GL_RENDERER));
 }
 
 GraphicsContext::~GraphicsContext()

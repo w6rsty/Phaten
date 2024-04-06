@@ -4,7 +4,6 @@
 #include "Math/Space.hpp"
 #include "Math/Transform.hpp"
 #include "Math/Vector.hpp"
-#include <dlfcn.h>
 
 namespace Pt {
 

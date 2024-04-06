@@ -15,17 +15,19 @@ namespace Pt {
 
 std::string ReadFile(std::string_view path)
 {
-    std::ifstream file(path.data(), std::ios::in | std::ios::ate);
+    std::ifstream file(path.data());
     if (!file.is_open())
     {
+        PT_ASSERT_MSG(false, "Failed to open file: ", path);
         return "";
     }
+
     std::string content;
-    size_t size = file.tellg();
-    content.resize(size);
-    file.seekg(0, std::ios::beg);
-    file.read(&content[0], size);
-    file.close();
+    std::string line;
+    while (std::getline(file, line))
+    {
+        content += line + "\n";
+    }
     return content;
 }
 
@@ -123,7 +125,7 @@ void CommentFunction(std::string& sourceCode, std::string_view signature)
 }
 
 void RemoveFunction(std::string& sourceCode, std::string_view signature)
-{
+{    
     size_t startPos = sourceCode.find(signature);
     if (startPos == std::string::npos)
     {
