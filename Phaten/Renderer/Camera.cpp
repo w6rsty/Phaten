@@ -1,5 +1,6 @@
 #include "Camera.hpp"
 
+#include "Input/Application.hpp"
 #include "Math/Quaternion.hpp"
 #include "Math/Space.hpp"
 #include "Math/Transform.hpp"
@@ -9,7 +10,7 @@ namespace Pt {
 
 static const bool DEFAULT_PROJ_MODE = true;
 static const float DEFAULT_FOV = 45.0f;
-static const float DEFAULT_ASPECT_RATIO = 1280.0f / 720.0f;
+static const float DEFAULT_ASPECT_RATIO = Application::sWindowSize.x / Application::sWindowSize.y;
 static const float DEFAULT_ORTHO_SIZE = 1.0f;
 static const Vector2 DEFAULT_PERSP_NEAR_FAR = { 0.1f, 100.0f };
 static const Vector2 DEFAULT_ORTHO_NEAR_FAR = { -1.0f, 1.0f };

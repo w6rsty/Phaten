@@ -63,7 +63,7 @@ const unsigned VertexAttributeIdx[]
     1, // NORMAL
     2, // TANGENT
     3, // VERTEX_COLOR
-    4, // TEXCOORD
+    4, // TEX_COORD
 };
 
 const std::string VertexAttributeName[]
@@ -72,7 +72,8 @@ const std::string VertexAttributeName[]
     "aNormal",
     "aTangent",
     "aVertexColor",
-    "aTexCoord"
+    "aTexCoord",
+    ""
 };
 
 const std::string VertexElementSemanticName[]
@@ -81,7 +82,7 @@ const std::string VertexElementSemanticName[]
     "NORMAL",
     "TANGENT",
     "VERTEX_COLOR",
-    "TEXCOORD",
+    "TEX_COORD",
     ""
 };
 

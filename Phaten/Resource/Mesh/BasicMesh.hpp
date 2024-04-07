@@ -4,7 +4,7 @@
 
 namespace Pt {
 
-struct PlaneMesh
+namespace PlaneMesh
 {
     static const size_t VertexCount = 4;
 
@@ -19,14 +19,12 @@ struct PlaneMesh
 
     static constexpr size_t IndexCount = 6;
 
-    static constexpr unsigned int Indices[] = {
+    static constexpr unsigned Indices[] = {
         0, 1, 2, 2, 3, 0
     };
-
-    PlaneMesh() = delete;
 };
 
-struct CubeMesh
+namespace CubeMesh
 {
     static const size_t VertexCount = 24;
 
@@ -66,7 +64,7 @@ struct CubeMesh
 
     static constexpr size_t IndexCount = 36;
 
-    static constexpr unsigned int Indices[] = {
+    static constexpr unsigned Indices[] = {
         0, 1, 2, 2, 3, 0,
         4, 5, 6, 6, 7, 4,
         8, 9, 10, 10, 11, 8,
@@ -74,8 +72,6 @@ struct CubeMesh
         16, 17, 18, 18, 19, 16,
         20, 21, 22, 22, 23, 20
     };
-
-    CubeMesh() = delete;
 };
 
 } // namespace Pt

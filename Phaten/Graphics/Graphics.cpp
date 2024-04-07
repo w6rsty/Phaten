@@ -10,7 +10,8 @@ namespace Pt {
 
 Graphics::Graphics(const SharedPtr<Window>& window) :
     m_Window(window),
-    m_VSync(true)
+    m_VSync(true),
+    m_DepthTest(true)
 {
     PT_TAG_INFO("Graphics", "Created graphics system");
     // Use the window handle to create the graphics context.
@@ -23,7 +24,7 @@ Graphics::Graphics(const SharedPtr<Window>& window) :
 
     SetVSync(m_VSync);
     // Initialization Done ====================================================
-    glEnable(GL_DEPTH_TEST);
+    SetDepthTest(m_DepthTest);
     glDepthFunc(GL_LEQUAL);
 }
 
@@ -43,6 +44,18 @@ void Graphics::SetClearColor(const Vector4& color)
     glClearColor(color.x, color.y, color.z, color.w);
 }
 
+void Graphics::SetDepthTest(bool enable)
+{    
+    if (enable)
+    {
+        glEnable(GL_DEPTH_TEST);
+    }
+    else
+    {
+        glDisable(GL_DEPTH_TEST);
+    }
+    m_DepthTest = enable;
+}
 
 SharedPtr<Shader> Graphics::LoadShader(std::string_view name)
 {
@@ -63,6 +76,30 @@ SharedPtr<ShaderProgram> Graphics::CreateProgram(std::string_view name, std::str
 {
     auto shader = LoadShader(name);
     return shader->CreateProgram(name, vsDefines, fsDefines);
+}
+
+void Graphics::SetUniform(ShaderProgram* program, PresetUniform uniform, int value)
+{
+    if (program)
+    {
+        int location = program->Uniform(uniform);
+        if (location >= 0)
+        {
+            glUniform1i(location, value);
+        }
+    }
+}
+
+void Graphics::SetUniform(ShaderProgram* program, PresetUniform uniform, int* values, size_t count)
+{
+    if (program)
+    {
+        int location = program->Uniform(uniform);
+        if (location >= 0)
+        {
+            glUniform1iv(location, count, values);
+        }
+    }
 }
 
 void Graphics::SetUniform(ShaderProgram* program, PresetUniform uniform, float value)
@@ -121,6 +158,42 @@ void Graphics::SetUniform(ShaderProgram* program, PresetUniform uniform, const M
         if (location >= 0)
         {
             glUniformMatrix4fv(location, 1, GL_FALSE, value.Data());
+        }
+    }
+}
+
+void Graphics::SetUniform(ShaderProgram* program, std::string_view name, int value)
+{
+    if (program)
+    {
+        int location = program->Uniform(name);
+        if (location >= 0)
+        {
+            glUniform1i(location, value);
+        }
+    }
+}
+
+void Graphics::SetUniform(ShaderProgram* program, std::string_view name, int* values, size_t count)
+{
+    if (program)
+    {
+        int location = program->Uniform(name);
+        if (location >= 0)
+        {
+            glUniform1iv(location, count, values);
+        }
+    }
+}
+
+void Graphics::SetUniform(ShaderProgram* program, std::string_view name, float value)
+{
+    if (program)
+    {
+        int location = program->Uniform(name);
+        if (location >= 0)
+        {
+            glUniform1f(location, value);
         }
     }
 }

@@ -7,6 +7,9 @@
 
 namespace Pt {
 
+class Vector2;
+class Vector3;
+
 class IntV2
 {
 public:
@@ -41,6 +44,8 @@ public:
     {
         FromString(str);
     }
+
+    IntV2(const Vector2& vector);
 
     IntV2& operator = (const IntV2& rhs)
     {
@@ -148,6 +153,8 @@ public:
         z(z_)
     {
     }
+
+    IntV3(const Vector3& vector);
 
     IntV3& operator += (const IntV3& rhs)
     {

@@ -17,6 +17,8 @@ static const size_t MAX_TEXTURE_SLOTS = 16;
 static const size_t MAX_TEXTURE_SLOTS = 32;
 #endif
 
+static constexpr size_t MAX_TEXT_SIZE = 256;
+
 enum BufferBitType : unsigned
 {
     COLOR = 1 << 0,
@@ -91,7 +93,7 @@ enum class VertexElementSemantic : size_t
     NORMAL,
     TANGENT,
     VERTEX_COLOR,
-    TEXCOORD,
+    TEX_COORD,
     MAX_ELEMENT_SEMANTIC
 };
 
@@ -101,7 +103,7 @@ enum class VertexAttributeType : size_t
     NORMAL,
     TANGENT,
     VERTEX_COLOR,
-    TEXCOORD,
+    TEX_COORD,
     MAX_ATTRIBUTE
 };
 

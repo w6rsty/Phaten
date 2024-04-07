@@ -5,6 +5,7 @@
 #include "Object/Ptr.hpp"
 #include "Math/IntVector.hpp"
 #include "GraphicsDefs.hpp"
+#include "Resource/Image.hpp"
 
 namespace Pt {
 
@@ -19,6 +20,7 @@ public:
     /// Create texture
     void Define(TextureType type, const IntV2& size, ImageFormat format, const void* data);
     void Define(TextureType type, const IntV3& size, ImageFormat format, const void* data);
+    void Define(TextureType type, const SharedPtr<Image>& image);
     void SetData(const void* data);
     /// Auto bind texture
     void Bind(size_t index) const;

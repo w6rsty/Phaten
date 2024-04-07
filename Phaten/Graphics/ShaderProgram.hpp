@@ -46,7 +46,7 @@ public:
     const std::map<StringHash, int>& Uniforms() const { return m_Uniforms; }
 
     /// Get uniform location by name. Negative means not found.
-    int Uniform(std::string_view name) const;
+    int Uniform(std::string_view name);
     /// Get uniform location by string hash. Negative means not found.
     int Uniform(StringHash name) const;
     /// Get preset unfiorm location.

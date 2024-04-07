@@ -6,8 +6,8 @@
 #include "Input/Window.hpp"
 #include "Graphics/Graphics.hpp"
 #include "Input/Input.hpp"
+#include "Math/Vector.hpp"
 #include "Scene/SceneCameraController.hpp"
-
 
 namespace Pt {
 
@@ -21,6 +21,8 @@ public:
     
     void OnEvent();
     void OnRender();
+
+    static Vector2 sWindowSize;
 private:
     SharedPtr<Window> m_Window;
 

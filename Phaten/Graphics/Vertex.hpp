@@ -35,6 +35,7 @@ struct VertexElement
 /// 2 TANGENT.
 /// 3 VERTEX_COLOR.
 /// 4 TEXCOORD.
+/// 5 FONT_INDEX.
 class VertexLayout
 {
 public:

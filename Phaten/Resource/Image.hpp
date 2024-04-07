@@ -8,7 +8,7 @@
 namespace Pt {
 
 /// Reusable image class.
-class Image
+class Image : public RefCounted
 {
 public:
     Image();

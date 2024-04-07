@@ -2,12 +2,20 @@
 
 #include <string>
 
+#include "Vector.hpp"
+
 namespace Pt {
 
 const IntV2 IntV2::ZERO {0, 0};
 const IntV2 IntV2::ONE {1, 1};
 const IntV2 IntV2::X {1, 0};
 const IntV2 IntV2::Y {0, 1};
+
+IntV2::IntV2(const Vector2& vector) :
+    x(static_cast<int32_t>(vector.x)),
+    y(static_cast<int32_t>(vector.y))
+{
+}
 
 bool IntV2::FromString(std::string_view str)
 {
@@ -31,6 +39,13 @@ const IntV3 IntV3::ONE = IntV3{1, 1, 1};
 const IntV3 IntV3::X = IntV3{1, 0, 0};
 const IntV3 IntV3::Y = IntV3{0, 1, 0};
 const IntV3 IntV3::Z = IntV3{0, 0, 1};
+
+IntV3::IntV3(const Vector3& vector) :
+    x(static_cast<int32_t>(vector.x)),
+    y(static_cast<int32_t>(vector.y)),
+    z(static_cast<int32_t>(vector.z))
+{
+}
 
 bool IntV3::FromString(std::string_view str)
 {

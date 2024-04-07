@@ -1,29 +1,31 @@
 #include "Application.hpp"
 
 #include <SDL.h>
-#include <imgui.h>
 
-#include "ImGuiPlugin.hpp"
+#include "Object/Ptr.hpp"
+
+#include "IO/StringUtils.hpp"
 #include "IO/Logger.hpp"
 
 #include "Graphics/GraphicsDefs.hpp"
 #include "Graphics/UniformBuffer.hpp"
 #include "Graphics/Texture.hpp"
-#include "Object/Ptr.hpp"
+
 #include "Renderer/StaticGeometry.hpp"
-#include "Resource/Image.hpp"
+#include "Renderer/TextRenderer.hpp"
 
 #include "Math/Transform.hpp"
-#include "Math/Quaternion.hpp"
+#include "Resource/Mesh/BasicMesh.hpp"
 
 namespace Pt {
+
+Vector2 Application::sWindowSize {1280, 720};
 
 Application::Application() :
     m_Running(false),
     m_RenderState(false)
 {
-    m_Window = CreateShared<Window>(
-        WindowCreateInfo{"Phaten", IntV2{1280, 720}, ScreenMode::WINDOWED});
+    m_Window = CreateShared<Window>(WindowCreateInfo{"Phaten", sWindowSize, ScreenMode::WINDOWED});
 
     m_Input = CreateScoped<Input>();
 }
@@ -87,11 +89,6 @@ void Application::OnRender()
     m_Running = false;
     });
 
-    ImGuiInit();
-    m_Input->SetPluginUpdate([this](const SDL_Event& event) {
-        ImGuiProcessEvent(event);
-    });
-
     m_Frequency = (double)SDL_GetPerformanceFrequency();
 
     auto ubo = CreateShared<UniformBuffer>();
@@ -102,8 +99,9 @@ void Application::OnRender()
 
     auto program = m_Graphics->CreateProgram("Basic", "", "");
 
-    auto plane = Plane(program, ScaleMatrix4({10.0f, 1.0f, 10.0f}));
-    auto cube = Cube(program, TranslateMatrix4({0.0f, 0.5f, 0.0f}));
+    auto textRenderer = CreateScoped<TextRenderer>(m_Graphics->CreateProgram("Text", "", ""), 3.0f);
+
+    auto cube = Cube(program);
 
     m_Camera = CreateShared<Camera>();
     m_Camera->SetPerspective(60.0f, 0.1f, 100.0f);
@@ -117,6 +115,7 @@ void Application::OnRender()
         m_RenderState = true;
     }
 
+    // Static uniform data
     ubo->Bind(0);
     ubo->SetData(0, sizeof(Matrix4), m_Camera->GetProjection().Data());
 
@@ -133,29 +132,16 @@ void Application::OnRender()
         /// ====================================================================
         m_Graphics->Clear(BufferBitType::COLOR | BufferBitType::DEPTH);
 
-        plane.Draw(m_Graphics);
+        m_Graphics->SetDepthTest(true);
         cube.Draw(m_Graphics);
+
+        m_Graphics->SetDepthTest(false);
+        textRenderer->Render({8}, m_Graphics, FormatString("FPS:%.2f", m_FPS));
         /// ====================================================================
-        ImGuiBegin();
-        ImGui::Begin("Settings");
-        bool vsync = m_Graphics->IsVSync();
-        if (ImGui::Checkbox("VSync", &vsync))
-        {
-            m_Graphics->SetVSync(vsync);
-        } 
-        ImGui::Separator();
-        ImGui::Text("Position: %.2f, %.2f, %.2f",
-            m_Camera->GetPosition().x, m_Camera->GetPosition().y, m_Camera->GetPosition().z);
-        ImGui::Text("FPS: %.2f", m_FPS);
-        ImGui::Separator();
-        ImGui::End();
-        ImGuiEnd();
 
         // Call window to swap buffers.
         m_Graphics->Present();
     }
-
-    ImGuiShutdown();
 }
 
 } // namespace Pt

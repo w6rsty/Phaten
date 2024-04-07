@@ -46,7 +46,7 @@ bool IndexBuffer::SetData(size_t startIdx, size_t numIndices, const void *data, 
         PT_LOG_ERROR("Index buffer has not been created");
         return false;
     }
-    if (data)
+    if (!data)
     {   
         PT_LOG_ERROR("Index data is null, you fool!");
         return false;
@@ -63,17 +63,17 @@ bool IndexBuffer::SetData(size_t startIdx, size_t numIndices, const void *data, 
     GLenum usage = m_Usage == BufferUsage::DYNAMIC ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW;
     if (numIndices == m_NumIndices)
     {
-        glBufferData(GL_ARRAY_BUFFER, totalIndexSize, data, usage);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, totalIndexSize, data, usage);
     }
     else
     {
         if (discard)
         {
-            glBufferData( GL_ARRAY_BUFFER, totalIndexSize, nullptr, usage);
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER, totalIndexSize, nullptr, usage);
         }
 
         glBufferSubData(
-            GL_ARRAY_BUFFER,
+            GL_ELEMENT_ARRAY_BUFFER,
             startIdx * sizeof(unsigned),
             numIndices * sizeof(unsigned), 
             data
