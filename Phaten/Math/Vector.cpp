@@ -1,7 +1,9 @@
 #include "Vector.hpp"
-#include "IO/StringUtils.hpp"
 
 #include <string>
+
+#include "IO/StringUtils.hpp"
+#include "IntVector.hpp"
 
 namespace Pt {
 
@@ -9,6 +11,12 @@ const Vector2 Vector2::ZERO     {0, 0};
 const Vector2 Vector2::ONE      {1, 1};
 const Vector2 Vector2::X        {1, 0};
 const Vector2 Vector2::Y        {0, 1};
+
+Vector2::Vector2(const IntV2& vector) :
+    x(static_cast<float>(vector.x)),
+    y(static_cast<float>(vector.y))
+{
+}
 
 bool Vector2::FromString(std::string_view str)
 {
@@ -62,6 +70,13 @@ Vector3::Vector3(const Vector4& vector) :
     x(vector.x),
     y(vector.y),
     z(vector.z)
+{
+}
+
+Vector3::Vector3(const IntV3& vector) :
+    x(static_cast<float>(vector.x)),
+    y(static_cast<float>(vector.y)),
+    z(static_cast<float>(vector.z))
 {
 }
 

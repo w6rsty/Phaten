@@ -26,6 +26,7 @@ public:
 
     void SetVSync(bool enable);
     void SetClearColor(const Vector4& color = Vector4(0.0f, 0.0f, 0.0f, 1.0f));
+    void SetDepthTest(bool enable);
 
     /// Load a shader from file. Or return the existing one.
     SharedPtr<Shader> LoadShader(std::string_view name);
@@ -61,6 +62,7 @@ public:
     static void Clear(unsigned bits = 1);
 private:
     bool m_VSync;
+    bool m_DepthTest;
 
     SharedPtr<Window> m_Window;
     ScopedPtr<GraphicsContext> m_GraphicsContext;

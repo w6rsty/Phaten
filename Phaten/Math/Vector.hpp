@@ -10,6 +10,8 @@ namespace Pt {
 class Vector2;
 class Vector3;
 class Vector4;
+class IntV2;
+class IntV3;
 
 class Vector2
 {
@@ -48,6 +50,8 @@ public:
         y(data[1])
     {
     }
+
+    Vector2(const IntV2& vector);
 
     Vector2(std::string_view str)
     {
@@ -96,6 +100,7 @@ public:
     Vector2 operator - (const Vector2& rhs) const { return Vector2(x - rhs.x, y - rhs.y); }
     Vector2 operator * (float rhs) const { return Vector2(x * rhs, y * rhs); }
     Vector2 operator / (float rhs) const { return Vector2(x / rhs, y / rhs); }
+    Vector2 operator / (const Vector2& rhs) const { return Vector2(x / rhs.x, y / rhs.y); }
     
     Vector2 operator * (const Vector2& rhs) const { return Vector2(x * rhs.x, y * rhs.y); }
 
@@ -205,6 +210,8 @@ public:
         z(vector.y)
     {
     }
+
+    Vector3(const IntV3& vector);
 
     Vector3(const Vector4& vector);
 

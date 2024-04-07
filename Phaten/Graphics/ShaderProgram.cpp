@@ -146,7 +146,7 @@ void ShaderProgram::Create(
     // Buffer for queried name.
     char nameBuffer[MAX_NAME_LENGTH];
     // Number of attributes.
-    int numAttrbutes;
+    int numAttributes;
     // Number of uniforms.
     int numUniforms;
     // Number of uniform blocks.
@@ -160,9 +160,9 @@ void ShaderProgram::Create(
 
     m_Attributes = 0; // Reset attributes.
     // Querying number of used attributes.
-    glGetProgramiv(m_Handle, GL_ACTIVE_ATTRIBUTES, &numAttrbutes);
+    glGetProgramiv(m_Handle, GL_ACTIVE_ATTRIBUTES, &numAttributes);
 
-    for (int idx = 0; idx < numAttrbutes; ++idx)
+    for (int idx = 0; idx < numAttributes; ++idx)
     {
         glGetActiveAttrib(
             m_Handle,

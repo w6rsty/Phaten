@@ -10,7 +10,8 @@ namespace Pt {
 
 Graphics::Graphics(const SharedPtr<Window>& window) :
     m_Window(window),
-    m_VSync(true)
+    m_VSync(true),
+    m_DepthTest(true)
 {
     PT_TAG_INFO("Graphics", "Created graphics system");
     // Use the window handle to create the graphics context.
@@ -23,7 +24,7 @@ Graphics::Graphics(const SharedPtr<Window>& window) :
 
     SetVSync(m_VSync);
     // Initialization Done ====================================================
-    glEnable(GL_DEPTH_TEST);
+    SetDepthTest(m_DepthTest);
     glDepthFunc(GL_LEQUAL);
 }
 
@@ -43,6 +44,18 @@ void Graphics::SetClearColor(const Vector4& color)
     glClearColor(color.x, color.y, color.z, color.w);
 }
 
+void Graphics::SetDepthTest(bool enable)
+{    
+    if (enable)
+    {
+        glEnable(GL_DEPTH_TEST);
+    }
+    else
+    {
+        glDisable(GL_DEPTH_TEST);
+    }
+    m_DepthTest = enable;
+}
 
 SharedPtr<Shader> Graphics::LoadShader(std::string_view name)
 {

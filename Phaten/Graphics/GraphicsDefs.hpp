@@ -17,6 +17,8 @@ static const size_t MAX_TEXTURE_SLOTS = 16;
 static const size_t MAX_TEXTURE_SLOTS = 32;
 #endif
 
+static constexpr size_t MAX_TEXT_SIZE = 256;
+
 enum BufferBitType : unsigned
 {
     COLOR = 1 << 0,

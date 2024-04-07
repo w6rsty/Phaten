@@ -6,9 +6,8 @@
 #include "Input/Window.hpp"
 #include "Graphics/Graphics.hpp"
 #include "Input/Input.hpp"
+#include "Math/Vector.hpp"
 #include "Scene/SceneCameraController.hpp"
-#include "Renderer/Text.hpp"
-
 
 namespace Pt {
 
@@ -22,6 +21,8 @@ public:
     
     void OnEvent();
     void OnRender();
+
+    static Vector2 sWindowSize;
 private:
     SharedPtr<Window> m_Window;
 
@@ -31,8 +32,6 @@ private:
     // Temporary data for rendering.
     SharedPtr<Camera> m_Camera;
     SharedPtr<SceneCameraController> m_CameraController;
-
-    SharedPtr<TextRenderer> m_TextRenderer;
 
     /// Applicat state.
     bool m_Running;

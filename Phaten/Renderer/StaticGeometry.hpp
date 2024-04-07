@@ -54,13 +54,14 @@ public:
 };
 
 namespace internal {
+/// Only used by TextRenderer.
 class TextPlane
 {
 public:
     TextPlane() 
     {
         m_VertexBuffer = CreateShared<VertexBuffer>();
-        m_VertexBuffer->Define(BufferUsage::DYNAMIC, 256 * 4, 
+        m_VertexBuffer->Define(BufferUsage::DYNAMIC, MAX_TEXT_SIZE * 4, 
             VertexLayout{ // use z as font index.
                 {VertexElementType::FLOAT3, VertexElementSemantic::POSITION}
             },
@@ -68,7 +69,7 @@ public:
         );
 
         m_IndexBuffer = CreateShared<IndexBuffer>();
-        m_IndexBuffer->Define(BufferUsage::STATIC, 256 * 6, nullptr);
+        m_IndexBuffer->Define(BufferUsage::STATIC, MAX_TEXT_SIZE * 6, nullptr);
     }
 
     void Draw(Graphics* graphics, size_t count)
