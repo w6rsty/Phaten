@@ -5,7 +5,6 @@
 #include "IO/StringUtils.hpp"
 
 #include "Graphics/UniformBuffer.hpp"
-#include "Graphics/Texture.hpp"
 
 #include "Renderer/StaticGeometry.hpp"
 #include "Renderer/TextRenderer.hpp"
@@ -66,7 +65,6 @@ void Application::OnRender()
     // Static uniform data
     ubo->Bind(0);
     ubo->SetData(0, sizeof(Matrix4), m_Camera->GetProjection().Data());
-
     SDL_GL_MakeCurrent(SDL_GL_GetCurrentWindow(), SDL_GL_GetCurrentContext());
     while (m_RenderState & !m_Input->ShouldExit())
     {
@@ -105,10 +103,10 @@ void Application::OnRender()
         graphics->Clear(BufferBitType::COLOR | BufferBitType::DEPTH);
 
         graphics->SetDepthTest(true);
-        cube.Draw(graphics);
+        cube.Draw();
 
         graphics->SetDepthTest(false);
-        textRenderer->Render({8}, graphics, FormatString("Phaten Engine\nFPS:%.2f", m_FPS));
+        textRenderer->Render({8}, FormatString("Phaten Engine\nFPS:%.2f", m_FPS));
         /// ====================================================================
         // Call window to swap buffers.
         graphics->Present();

@@ -2,8 +2,8 @@
 
 #include <glad/glad.h>
 
-#include "Graphics/GraphicsDefs.hpp"
-#include "IO/Logger.hpp"
+#include "IO/Assert.hpp"
+#include "Graphics/Graphics.hpp"
 
 namespace Pt {
 
@@ -27,12 +27,15 @@ Texture::Texture() :
     m_WrapModes{TextureWrapMode::REPEAT, TextureWrapMode::REPEAT, TextureWrapMode::REPEAT},
     m_FilterMode(TextureFilterMode::LINEAR)
 {
-    // Check graphics loaded
+    PT_ASSERT_MSG(Object::Subsystem<Graphics>()->IsInitialized(), "Graphics system not loaded");
 }
 
 Texture::~Texture()
 {
-    Release();
+    if (Object::Subsystem<Graphics>())
+    {
+        Release();
+    }
 }
 
 void Texture::RegisterObject()

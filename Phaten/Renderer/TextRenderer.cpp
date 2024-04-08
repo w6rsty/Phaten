@@ -72,7 +72,7 @@ void TextRenderer::SetupText(const Vector2& position, std::string_view text)
     m_TextPlane.m_VertexBuffer->SetData(0, text.size() * 4, m_Vertices);
 }
 
-void TextRenderer::Render(const Vector2 &position, Graphics *graphics, std::string_view text)
+void TextRenderer::Render(const Vector2 &position, std::string_view text)
 {
     if (text != m_LastText || position != m_LastPosition)
     {
@@ -82,7 +82,7 @@ void TextRenderer::Render(const Vector2 &position, Graphics *graphics, std::stri
     m_Program->Bind();
     m_FontSheetTex->Bind(0);
 
-    m_TextPlane.Draw(graphics, text.size() * 6);
+    m_TextPlane.Draw(text.size() * 6);
 }
 
 void TextRenderer::Initialize()
