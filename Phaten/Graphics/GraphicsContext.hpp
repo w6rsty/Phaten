@@ -6,7 +6,7 @@ struct SDL_Window;
 namespace Pt {
 
 /// Consists of a window handle and an OpenGL context handle.
-class GraphicsContext : public RefCounted
+class GraphicsContext
 {
     friend class Graphics;
 public:

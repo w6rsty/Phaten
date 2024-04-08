@@ -19,7 +19,7 @@ public:
     TextRenderer(const SharedPtr<ShaderProgram>& program, float scale = 2.0f, float spacing = 0.2f);
     ~TextRenderer();
     // Render text.(Pixel position)
-    void Render(const Vector2& position, Graphics* graphics, std::string_view text);
+    void Render(const Vector2& position, std::string_view text);
 private:
     /// Setup vertices data of text.
     // For static text, you and pre setup the text and position.

@@ -1,23 +1,23 @@
 #pragma once
 
-#include "Graphics/GraphicsDefs.hpp"
 #include "Object/Ptr.hpp"
 #include "Graphics/Graphics.hpp"
 #include "Graphics/IndexBuffer.hpp"
-#include "Graphics/ShaderProgram.hpp"
 #include "Graphics/VertexBuffer.hpp"
-#include "Math/Matrix.hpp"
 #include "Resource/Mesh/BasicMesh.hpp"
-#include <cstddef>
 
 namespace Pt {
 
 class Plane
-{
+{   
 public:
     Plane(const SharedPtr<ShaderProgram>& program, const Matrix4& model = Matrix4::IDENTITY) :
-        m_Model(model)
+        m_Model(model),
+        m_Graphics(nullptr)
     {
+        PT_ASSERT_MSG(Object::Subsystem<Graphics>()->IsInitialized(), "Graphics system not loaded");
+        m_Graphics = Object::Subsystem<Graphics>();
+
         m_VertexBuffer = CreateShared<VertexBuffer>();
         m_VertexBuffer->Define(BufferUsage::STATIC, PlaneMesh::VertexCount,
             VertexLayout{
@@ -34,16 +34,15 @@ public:
         m_Program = program;
     }
 
-    void Draw(Graphics* graphics)
-    
+    void Draw()
     {
         m_Program->Bind();
-        graphics->SetUniform(m_Program, PresetUniform::U_MODEL, m_Model);
+        m_Graphics->SetUniform(m_Program, PresetUniform::U_MODEL, m_Model);
 
         m_VertexBuffer->Bind(m_VertexBuffer->Attributes());
         m_IndexBuffer->Bind();
 
-        graphics->DrawIndexed(PrimitiveType::TRIANGLES, 0, m_IndexBuffer->NumIndices());
+        m_Graphics->DrawIndexed(PrimitiveType::TRIANGLES, 0, m_IndexBuffer->NumIndices());
     }
 
     SharedPtr<VertexBuffer> m_VertexBuffer;
@@ -51,6 +50,7 @@ public:
     SharedPtr<ShaderProgram> m_Program;
 
     Matrix4 m_Model;
+    Graphics* m_Graphics;
 };
 
 namespace internal {
@@ -58,8 +58,12 @@ namespace internal {
 class TextPlane
 {
 public:
-    TextPlane() 
+    TextPlane() :
+        m_Graphics(nullptr)
     {
+        PT_ASSERT_MSG(Object::Subsystem<Graphics>()->IsInitialized(), "Graphics system not loaded");
+        m_Graphics = Object::Subsystem<Graphics>();
+
         m_VertexBuffer = CreateShared<VertexBuffer>();
         m_VertexBuffer->Define(BufferUsage::DYNAMIC, MAX_TEXT_SIZE * 4, 
             VertexLayout{ // use z as font index.
@@ -72,17 +76,17 @@ public:
         m_IndexBuffer->Define(BufferUsage::STATIC, MAX_TEXT_SIZE * 6, nullptr);
     }
 
-    void Draw(Graphics* graphics, size_t count)
+    void Draw(size_t count)
     {
-        // Enable only position and texcoord.
         m_VertexBuffer->Bind(m_VertexBuffer->Attributes());
         m_IndexBuffer->Bind();
 
-        graphics->DrawIndexed(PrimitiveType::TRIANGLES, 0, count);
+        m_Graphics->DrawIndexed(PrimitiveType::TRIANGLES, 0, count);
     }
 
     SharedPtr<VertexBuffer> m_VertexBuffer;
     SharedPtr<IndexBuffer> m_IndexBuffer;
+    Graphics* m_Graphics;
 };
 }
 
@@ -131,8 +135,12 @@ class Cube
 {
 public:
     Cube(const SharedPtr<ShaderProgram>& program, const Matrix4& model = Matrix4::IDENTITY) :
-        m_Model(model)
+        m_Model(model),
+        m_Graphics(nullptr)
     {
+        PT_ASSERT_MSG(Object::Subsystem<Graphics>()->IsInitialized(), "Graphics system not loaded");
+        m_Graphics = Object::Subsystem<Graphics>();
+
         m_VertexBuffer = CreateShared<VertexBuffer>();
         m_VertexBuffer->Define(BufferUsage::STATIC, CubeMesh::VertexCount,
             VertexLayout{
@@ -149,15 +157,15 @@ public:
         m_Program = program;
     }
 
-    void Draw(Graphics* graphics)
+    void Draw()
     {
         m_Program->Bind();
-        graphics->SetUniform(m_Program, PresetUniform::U_MODEL, m_Model);
+        m_Graphics->SetUniform(m_Program, PresetUniform::U_MODEL, m_Model);
 
         m_VertexBuffer->Bind(m_VertexBuffer->Attributes());
         m_IndexBuffer->Bind();
 
-        graphics->DrawIndexed(PrimitiveType::TRIANGLES, 0, m_IndexBuffer->NumIndices());
+        m_Graphics->DrawIndexed(PrimitiveType::TRIANGLES, 0, m_IndexBuffer->NumIndices());
     }
 
     SharedPtr<VertexBuffer> m_VertexBuffer;
@@ -165,6 +173,7 @@ public:
     SharedPtr<ShaderProgram> m_Program;
 
     Matrix4 m_Model;
+    Graphics* m_Graphics;
 };
 
 } // namespace Pt

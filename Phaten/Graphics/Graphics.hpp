@@ -66,7 +66,9 @@ public:
     void* GetNativeWindow() const;
     WeakPtr<Window> GetWindow() const { return m_Window; }
 
+    /// Swap window buffer.
     void Present();
+    /// Clear the screen.
     static void Clear(unsigned bits = 1);
 private:
     bool m_VSync;

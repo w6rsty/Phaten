@@ -7,7 +7,6 @@
 #include "IO/StringUtils.hpp"
 
 #include "Graphics/UniformBuffer.hpp"
-#include "Graphics/Texture.hpp"
 
 #include "Object/Ptr.hpp"
 #include "Renderer/StaticGeometry.hpp"
@@ -88,7 +87,6 @@ void Application::OnRender()
     // Static uniform data
     ubo->Bind(0);
     ubo->SetData(0, sizeof(Matrix4), m_Camera->GetProjection().Data());
-
     SDL_GL_MakeCurrent(SDL_GL_GetCurrentWindow(), SDL_GL_GetCurrentContext());
     bool showDebug = false;
     std::string debugString = "Phaten Engine\nFPS:%.2f\nVSync:%s\nCamera Rotation:%s\nCamera Position:%s";
