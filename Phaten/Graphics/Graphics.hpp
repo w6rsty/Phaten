@@ -29,8 +29,9 @@ public:
     ~Graphics();
 
     void SetVSync(bool enable);
-    void SetClearColor(const Vector4& color = Vector4(0.0f, 0.0f, 0.0f, 1.0f));
-    void SetDepthTest(bool enable);
+    static void SetClearColor(const Vector4& color = Vector4(0.0f, 0.0f, 0.0f, 1.0f));
+    static void SetDepthTest(bool enable);
+    static void SetWireframe(bool enable);
 
     /// Load a shader from file. Or return the existing one.
     SharedPtr<Shader> LoadShader(std::string_view name);
@@ -51,10 +52,12 @@ public:
     void SetUniform(const SharedPtr<ShaderProgram>& program, std::string_view name, const Vector3& value);
     void SetUniform(const SharedPtr<ShaderProgram>& program, std::string_view name, const Vector4& value);
 
-    void SetFrameBuffer(const SharedPtr<FrameBuffer>& frameBuffer);
+    static void SetFrameBuffer(const SharedPtr<FrameBuffer>& frameBuffer);
 
     bool IsInitialized() const { return m_GraphicsContext != nullptr; }
     bool IsVSync() const { return m_VSync; }
+    static bool IsDepthTest() { return sDepthTest; }
+    static bool IsWireframe() { return sWireframe; }
 
     static void Draw(PrimitiveType type, size_t first, size_t count);
     static void DrawIndexed(PrimitiveType type, size_t first, size_t count);
@@ -67,7 +70,8 @@ public:
     static void Clear(unsigned bits = 1);
 private:
     bool m_VSync;
-    bool m_DepthTest;
+    static bool sDepthTest;
+    static bool sWireframe;
 
     SharedPtr<Window> m_Window;
     ScopedPtr<GraphicsContext> m_GraphicsContext;

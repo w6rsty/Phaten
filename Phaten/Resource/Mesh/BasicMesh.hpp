@@ -24,6 +24,26 @@ namespace PlaneMesh
     };
 };
 
+namespace ScreenPlaneMesh
+{
+    static const size_t VertexCount = 4;
+
+    /// Position, TexCoord
+    static constexpr float Vertices[] = {
+        // Position          // TexCoord
+        -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+         1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+         1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
+        -1.0f,  1.0f, 0.0f, 0.0f, 1.0f
+    };
+
+    static constexpr size_t IndexCount = 6;
+
+    static constexpr unsigned Indices[] = {
+        0, 1, 2, 2, 3, 0
+    };
+}
+
 namespace CubeMesh
 {
     static const size_t VertexCount = 24;

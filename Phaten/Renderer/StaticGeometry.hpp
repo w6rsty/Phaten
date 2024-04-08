@@ -86,6 +86,47 @@ public:
 };
 }
 
+class ScreenPlane
+{
+public:
+    ScreenPlane(const SharedPtr<ShaderProgram>& program) :
+        m_Graphics(nullptr)
+    {
+        PT_ASSERT_MSG(Object::Subsystem<Graphics>()->IsInitialized(), "Graphics system not loaded");
+        m_Graphics = Object::Subsystem<Graphics>();
+
+        m_VertexBuffer = CreateShared<VertexBuffer>();
+        m_VertexBuffer->Define(BufferUsage::STATIC, ScreenPlaneMesh::VertexCount,
+            VertexLayout{
+                {VertexElementType::FLOAT3, VertexElementSemantic::POSITION}, // 0
+                {VertexElementType::FLOAT2, VertexElementSemantic::TEX_COORD}, // 4
+            },
+            ScreenPlaneMesh::Vertices
+        );
+
+        m_IndexBuffer = CreateShared<IndexBuffer>();
+        m_IndexBuffer->Define(BufferUsage::STATIC, ScreenPlaneMesh::IndexCount, ScreenPlaneMesh::Indices);
+
+        m_Program = program;
+    }
+
+    void Draw()
+    {
+        m_Program->Bind();
+
+        m_VertexBuffer->Bind(m_VertexBuffer->Attributes());
+        m_IndexBuffer->Bind();
+
+        m_Graphics->DrawIndexed(PrimitiveType::TRIANGLES, 0, m_IndexBuffer->NumIndices());
+    }
+
+    SharedPtr<VertexBuffer> m_VertexBuffer;
+    SharedPtr<IndexBuffer> m_IndexBuffer;
+    SharedPtr<ShaderProgram> m_Program;
+
+    Graphics* m_Graphics;
+};
+
 class Cube
 {
 public:

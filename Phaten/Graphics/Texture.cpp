@@ -90,9 +90,19 @@ void Texture::Bind(size_t index) const
         return;
     }
 
+    // Already bound
     if (boundTextureSlot[index] == this)
     {
         return;
+    }
+
+    // Unbind previous texture
+    for (auto& slot : boundTextureSlot)
+    {
+        if (slot == this)
+        {
+            slot = nullptr;
+        }
     }
 
     glActiveTexture(GL_TEXTURE0 + index);

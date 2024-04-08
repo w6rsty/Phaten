@@ -2,11 +2,14 @@
 
 #include <SDL.h>
 
+#include "Graphics/GraphicsDefs.hpp"
+#include "Graphics/Texture.hpp"
 #include "IO/StringUtils.hpp"
 
 #include "Graphics/UniformBuffer.hpp"
 #include "Graphics/Texture.hpp"
 
+#include "Object/Ptr.hpp"
 #include "Renderer/StaticGeometry.hpp"
 #include "Renderer/TextRenderer.hpp"
 
@@ -41,6 +44,15 @@ void Application::OnRender()
 
     m_Frequency = (double)SDL_GetPerformanceFrequency();
 
+    SharedPtr<Texture> colorAttachment = Object::FactoryCreate<Texture>();
+    colorAttachment->Define(TextureType::TEX_2D, sWindowSize * 2, ImageFormat::RGBA8, nullptr);
+
+    SharedPtr<Texture> depthAttachment = Object::FactoryCreate<Texture>();
+    depthAttachment->Define(TextureType::TEX_2D, sWindowSize * 2, ImageFormat::D24S8, nullptr);
+
+    auto fbo = CreateShared<FrameBuffer>();
+    fbo->Define(colorAttachment, depthAttachment);
+
     auto ubo = CreateShared<UniformBuffer>();
     ubo->Define(BufferUsage::DYNAMIC, 
         sizeof(Matrix4) * 2     // Projection + View
@@ -49,9 +61,19 @@ void Application::OnRender()
 
     auto program = graphics->CreateProgram("Basic", "", "");
     auto textProgram = graphics->CreateProgram("Text", "", "");
+    auto postProgram = graphics->CreateProgram("Post", "", "ENABLE");
 
-    auto cube = Cube(program);
+    auto demoCube = Cube(program);
+    auto screen = ScreenPlane(postProgram);
     auto textRenderer = CreateScoped<TextRenderer>(textProgram, 3.0f);
+
+    // for demo
+    SharedPtr<Image> demoImage = Object::FactoryCreate<Image>();
+    demoImage->Load("Assets/Textures/player.png");
+
+    SharedPtr<Texture> demoTexture = Object::FactoryCreate<Texture>();
+    demoTexture->Define(TextureType::TEX_2D, demoImage);
+    demoTexture->SetFilterMode(TextureFilterMode::NEAREST);
 
     m_Camera = CreateShared<Camera>();
     m_Camera->SetPerspective(60.0f, 0.1f, 100.0f);
@@ -68,16 +90,27 @@ void Application::OnRender()
     ubo->SetData(0, sizeof(Matrix4), m_Camera->GetProjection().Data());
 
     SDL_GL_MakeCurrent(SDL_GL_GetCurrentWindow(), SDL_GL_GetCurrentContext());
+    bool showDebug = false;
+    std::string debugString = "Phaten Engine\nFPS:%.2f\nVSync:%s\nCamera Rotation:%s\nCamera Position:%s";
     while (m_RenderState & !m_Input->ShouldExit())
     {
         // Poll input events.
         {        
             m_Input->Update();
             
+            if (m_Input->KeyPressed(SDLK_ESCAPE))
+                m_RenderState = false;
+
+            if (m_Input->KeyPressed(SDLK_F1))
+                Graphics::SetWireframe(!Graphics::IsWireframe());
+            if (m_Input->KeyPressed(SDLK_F2))
+                graphics->SetVSync(!graphics->IsVSync());
+            if (m_Input->KeyPressed(SDLK_F3))
+                showDebug = !showDebug;
+
             float speed = m_DeltaTime;
             if (m_Input->KeyDown(SDLK_LSHIFT))
                 speed *= 2.0f;
-
             if (m_Input->KeyDown(SDLK_w))
                 m_CameraController->Move(SceneCameraMovement::FORWARD, speed);
             if (m_Input->KeyDown(SDLK_s))
@@ -102,13 +135,33 @@ void Application::OnRender()
         ubo->Bind(0);
         ubo->SetData(sizeof(Matrix4), sizeof(Matrix4), m_Camera->GetView().Data());
         /// ====================================================================
-        graphics->Clear(BufferBitType::COLOR | BufferBitType::DEPTH);
+        Graphics::SetFrameBuffer(fbo);
+        Graphics::Clear(BufferBitType::COLOR | BufferBitType::DEPTH);
 
-        graphics->SetDepthTest(true);
-        cube.Draw(graphics);
+        demoTexture->Bind(1);
+        Graphics::SetDepthTest(true);
+        demoCube.Draw();
+        /// ====================================================================
+        if (showDebug)
+        {
+            Graphics::Clear(BufferBitType::DEPTH);
+            Graphics::SetDepthTest(true);
+            textRenderer->Render({8}, 
+                FormatString(debugString.c_str(), 
+                    m_FPS, 
+                    graphics->IsVSync() ? "On" : "Off",
+                    m_Camera->GetRotation().ToString().c_str(),
+                    m_Camera->GetPosition().ToString().c_str()
+                )
+            );
+        }
+        /// ====================================================================
+        Graphics::SetFrameBuffer(nullptr);
+        Graphics::Clear(BufferBitType::COLOR);
 
-        graphics->SetDepthTest(false);
-        textRenderer->Render({8}, graphics, FormatString("Phaten Engine\nFPS:%.2f", m_FPS));
+        colorAttachment->Bind(2);
+        Graphics::SetDepthTest(false);
+        screen.Draw();
         /// ====================================================================
         // Call window to swap buffers.
         graphics->Present();

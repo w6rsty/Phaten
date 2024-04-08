@@ -57,6 +57,12 @@ void TextRenderer::SetupText(const Vector2& position, std::string_view text)
             lineIndex = 0;
             continue;
         }
+        else if (text[mainIndex] == '\t')
+        {
+            lineIndex += 4;
+            mainIndex++;
+            continue;
+        }
 
         float index = text[mainIndex] - FontSheet[0];
         // Vertex coordinates. Not texture coordinates.
@@ -72,17 +78,27 @@ void TextRenderer::SetupText(const Vector2& position, std::string_view text)
     m_TextPlane.m_VertexBuffer->SetData(0, text.size() * 4, m_Vertices);
 }
 
-void TextRenderer::Render(const Vector2 &position, Graphics *graphics, std::string_view text)
+void TextRenderer::Render(const Vector2 &position, std::string_view text)
 {
-    if (text != m_LastText || position != m_LastPosition)
+    // Disable wireframe mode if enabled.
+    bool wireframe = Graphics::IsWireframe();
+    if (wireframe) Graphics::SetWireframe(false);
+
     {
-        SetupText(position, text);
+        if (text != m_LastText || position != m_LastPosition)
+        {
+            SetupText(position, text);
+        }
+
+        m_Program->Bind();
+        // Use the last texture slot.
+        m_FontSheetTex->Bind(15);
+
+        m_TextPlane.Draw(text.size() * 6);
     }
 
-    m_Program->Bind();
-    m_FontSheetTex->Bind(0);
-
-    m_TextPlane.Draw(graphics, text.size() * 6);
+    // Restore wireframe mode.
+    if(wireframe) Graphics::SetWireframe(true);
 }
 
 void TextRenderer::Initialize()

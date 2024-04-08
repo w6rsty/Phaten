@@ -33,12 +33,15 @@ void FrameBuffer::Define(Texture* colorTex, Texture* depthStencilTex)
         colorTex->GLHandle(),
         0);
 
-    glFramebufferTexture2D(
-        GL_FRAMEBUFFER,
-        GL_DEPTH_STENCIL_ATTACHMENT,
-        depthStencilTex->GLTarget(),
-        depthStencilTex->GLHandle(),
-        0);
+    if (depthStencilTex)
+    {
+        glFramebufferTexture2D(
+            GL_FRAMEBUFFER,
+            GL_DEPTH_STENCIL_ATTACHMENT,
+            depthStencilTex->GLTarget(),
+            depthStencilTex->GLHandle(),
+            0);
+    }
 
     if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         PT_LOG_ERROR("Framebuffer is not complete!");

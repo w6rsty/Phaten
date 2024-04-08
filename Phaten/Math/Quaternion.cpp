@@ -161,7 +161,7 @@ Quaternion Quaternion::Slerp(Quaternion rhs, float t) const
 
 std::string Quaternion::ToString() const
 {
-    return FormatString("Quaternion(%f, %f, %f, %f)", w, x, y, z);
+    return FormatString("%f, %f, %f, %f", w, x, y, z);
 }
 
 } // namespace Pt

@@ -11,7 +11,8 @@ const float SHEET_GTRID_Y = 10.0;
 vec2 FontTexCoord(float index, float vertexID)
 {
     // Find row and column in the font sheet
-    float x = float(int(index) % int(SHEET_GTRID_X));
+
+    float x = mod(index, SHEET_GTRID_X);
     float y = 10 - float(int(index) / int(SHEET_GTRID_Y)) - 1;
     // Find corner by index
     float corner = int(vertexID) % 4;
@@ -36,7 +37,7 @@ void vert()
 
 void frag()
 {
-    vec4 color = texture(uTexture0, vTexCoord);
+    vec4 color = texture(uTexture15, vTexCoord);
     if (color.a < 0.1)
         discard;
     FragColor = vec4(color.rgb, 1.0);

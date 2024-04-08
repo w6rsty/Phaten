@@ -15,14 +15,8 @@ layout (location = 0) out vec4 FragColor;
 in vec3 vPos;
 in vec2 vTexCoord;
 
-const float offset = 1.0 / 200.0;
-
-// Gaussian blur
-const float kernel[9] = float[](
-    1.0 / 16.0, 2.0 / 16.0, 1.0/ 16.0,
-    2.0 / 16.0, 4.0 / 16.0, 2.0/ 16.0,
-    1.0 / 16.0, 2.0 / 16.0, 1.0/ 16.0
-);
+const float pb = 0.5; // affect brightness
+const float sclV = 0.0; // scanline brightness
 
 #endif
 
@@ -35,33 +29,23 @@ void vert()
 
 void frag()
 {
+#if defined(ENABLE)
+    vec3 texColor = texture(uTexture2, vTexCoord).rgb;
 
-#if defined(KERNEL)
-    vec2 offsets[9] = vec2[](
-        vec2(-offset, offset), // top-left
-        vec2(0.0f, offset), // top-center
-        vec2(offset, offset), // top-right
-        vec2(-offset, 0.0f), // center-left
-        vec2(0.0f, 0.0f), // center-center
-        vec2(offset, 0.0f), // center-right
-        vec2(-offset, -offset), // bottom-left
-        vec2(0.0f, -offset), // bottom-center
-        vec2(offset, -offset) // bottom-right
-    );
+    vec3 lcdColor = vec3(pb);
 
-    vec3 sampleTex[9];
-    for (int i = 0; i < 9; i++)
-    {
-        sampleTex[i] = texture(uTexture1, vTexCoord + offsets[i]).rgb;
-    }
+    int px = int(mod(gl_FragCoord.x, 3.0));
+    int py = int(mod(gl_FragCoord.y, 3.0));
 
-    vec3 col = vec3(0.0);
-    for (int i = 0; i < 9; i++)
-    {
-        col += sampleTex[i] * kernel[i];
-    }
+	if (px == 1) lcdColor.r = 1.0;
+    else if (px == 2) lcdColor.g = 1.0;
+    else lcdColor.b = 1.0;
+
+    if (py == 0) lcdColor.rgb = vec3(sclV);
+
+    vec3 col = texColor * lcdColor;
 #else
-    vec3 col = texture(uTexture1, vTexCoord).rgb;
+    vec3 col = texture(uTexture2, vTexCoord).rgb;
 #endif
     FragColor = vec4(col, 1.0);
 }

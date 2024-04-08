@@ -8,9 +8,11 @@
 
 namespace Pt {
 
+bool Graphics::sDepthTest = true;
+bool Graphics::sWireframe = false;
+
 Graphics::Graphics(const SharedPtr<Window>& window) :
     m_VSync(true),
-    m_DepthTest(true),
     m_Window(window)
 {
     Object::RegisterSubsystem(this);
@@ -27,8 +29,7 @@ Graphics::Graphics(const SharedPtr<Window>& window) :
 
     SetVSync(m_VSync);
     // Initialization Done ====================================================
-    SetDepthTest(m_DepthTest);
-    glDepthFunc(GL_LEQUAL);
+    SetDepthTest(sDepthTest);
 }
 
 Graphics::~Graphics()
@@ -53,12 +54,26 @@ void Graphics::SetDepthTest(bool enable)
     if (enable)
     {
         glEnable(GL_DEPTH_TEST);
+        glDepthFunc(GL_LEQUAL);
     }
     else
     {
         glDisable(GL_DEPTH_TEST);
     }
-    m_DepthTest = enable;
+    sDepthTest = enable;
+}
+
+void Graphics::SetWireframe(bool enable)
+{
+    if (enable)
+    {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    }
+    else
+    {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    }
+    sWireframe = enable;
 }
 
 SharedPtr<Shader> Graphics::LoadShader(std::string_view name)
