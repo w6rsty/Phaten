@@ -8,7 +8,6 @@ Input::Input() :
     m_ShouldExit(false),
     m_MouseMove(IntV2::ZERO)
 {
-
 }
 
 Input::~Input()

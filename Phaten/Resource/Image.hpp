@@ -2,17 +2,21 @@
 
 #include <string_view>
 
+#include "Object/Object.hpp"
 #include "Math/IntVector.hpp"
 #include "Graphics/GraphicsDefs.hpp"
 
 namespace Pt {
 
 /// Reusable image class.
-class Image : public RefCounted
+class Image : public Object
 {
+    OBJECT(Image);
 public:
     Image();
     virtual ~Image();
+
+    static void RegisterObject();
 
     virtual void Load(std::string_view path);
 

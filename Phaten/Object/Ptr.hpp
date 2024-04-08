@@ -52,6 +52,7 @@ struct RefCount
 /// Base class for reference counting.
 class RefCounted
 {
+    friend class Object;
 public:
     /// Construct. RefCount is not allocated now but when needed.
     RefCounted();
@@ -742,7 +743,7 @@ public:
     operator T* () const { return ptr; }
 
     T* Get() const { return ptr; }
-    bool IsNull() const { return ptr == nullptr; } 
+    bool IsNull() const { return ptr == nullptr; }
 private:
     /// Pointer to the object.
     T* ptr;

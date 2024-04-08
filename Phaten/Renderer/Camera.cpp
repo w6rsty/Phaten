@@ -17,8 +17,8 @@ static const Vector2 DEFAULT_ORTHO_NEAR_FAR = { -1.0f, 1.0f };
 
 Camera::Camera() : 
     m_IsPerspective(DEFAULT_PROJ_MODE),
-    m_Fov(DEFAULT_FOV),
     m_AspectRatio(DEFAULT_ASPECT_RATIO),
+    m_Fov(DEFAULT_FOV),
     m_OrthoSize(DEFAULT_ORTHO_SIZE),
     m_NearPersp(DEFAULT_PERSP_NEAR_FAR.x),
     m_FarPersp(DEFAULT_PERSP_NEAR_FAR.y),
@@ -28,8 +28,8 @@ Camera::Camera() :
     m_ProjectionOrtho(1.0f),
     m_View(1.0f),
     m_Position(Vector3::ZERO),
-    m_Rotation(Quaternion::IDENTITY),
     m_Direction(Vector3::FORWARD),
+    m_Rotation(Quaternion::IDENTITY),
     m_Up(Vector3::UP)
 {
     UpdateProjection();

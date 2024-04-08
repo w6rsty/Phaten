@@ -1,6 +1,7 @@
 .*
 build
 3rdlibs/SDL2
+Docs/html
 
 !.gitignore
 !.gitmodules

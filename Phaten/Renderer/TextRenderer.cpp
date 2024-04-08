@@ -2,7 +2,6 @@
 
 #include "IO/Assert.hpp"
 #include "Input/Application.hpp"
-#include "Resource/Image.hpp"
 
 namespace Pt {
 
@@ -11,23 +10,24 @@ static constexpr std::string_view FontSheetPath = "Assets/Textures/fontsheet_rgb
 static constexpr char FontSheet[] = " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
 static const Vector2 FontSize {10.0f, 12.0f};
 
-
-TextRenderer::TextRenderer(const SharedPtr<ShaderProgram>& program, float scale) :
+TextRenderer::TextRenderer(const SharedPtr<ShaderProgram>& program, float scale, float spacing) :
     m_LastText(""),
     m_LastPosition(Vector2::ZERO),
     m_Scale(scale),
+    m_Spacing(spacing),
     m_FontSize(Vector2::ZERO),
     m_Program(program),
     m_Vertices(nullptr)
 {   
+    Object::RegisterSubsystem(this);
+    PT_ASSERT_MSG(Object::Subsystem<Graphics>()->IsInitialized(), "Graphics system not loaded");
     Initialize();
-    m_FontSize.x = 1.0f / Application::sWindowSize.x * FontSize.x * scale;
-    m_FontSize.y = m_FontSize.x * Application::sWindowSize.x / Application::sWindowSize.y;
 }
 
 TextRenderer::~TextRenderer()
 {
     delete[] m_Vertices;
+    Object::RemoveSubsystem(this);
 }
 
 void TextRenderer::SetupText(const Vector2& position, std::string_view text)
@@ -52,7 +52,7 @@ void TextRenderer::SetupText(const Vector2& position, std::string_view text)
     {
         if (text[mainIndex] == '\n')
         {
-            pos.y -= m_FontSize.y * 1.1f;
+            pos.y -= m_FontSize.y * (m_Spacing + 1.0f);
             mainIndex++;
             lineIndex = 0;
             continue;
@@ -88,10 +88,10 @@ void TextRenderer::Render(const Vector2 &position, Graphics *graphics, std::stri
 void TextRenderer::Initialize()
 {
     // Load font sheet and create texture.    
-    auto image = CreateShared<Image>();
+    SharedPtr<Image> image = Object::FactoryCreate<Image>();
     image->Load(FontSheetPath);
 
-    m_FontSheetTex = CreateShared<Texture>();
+    m_FontSheetTex = Object::FactoryCreate<Texture>();
     m_FontSheetTex->Define(TextureType::TEX_2D, image);
     m_FontSheetTex->SetFilterMode(TextureFilterMode::NEAREST);
 
@@ -114,6 +114,9 @@ void TextRenderer::Initialize()
     }
     m_TextPlane.m_IndexBuffer->SetData(0, MAX_TEXT_SIZE * 6, indices);
     delete[] indices;
+
+    m_FontSize.x = 1.0f / Application::sWindowSize.x * FontSize.x * m_Scale;
+    m_FontSize.y = m_FontSize.x * Application::sWindowSize.x / Application::sWindowSize.y;
 }
 
 } // namespace Pt

@@ -2,17 +2,20 @@
 
 #include <glad/glad.h>
 
-#include "Graphics/GraphicsDefs.hpp"
 #include "IO/Assert.hpp"
+#include "GraphicsDefs.hpp"
 #include "ShaderProgram.hpp"
 
 namespace Pt {
 
 Graphics::Graphics(const SharedPtr<Window>& window) :
-    m_Window(window),
     m_VSync(true),
-    m_DepthTest(true)
+    m_DepthTest(true),
+    m_Window(window)
 {
+    Object::RegisterSubsystem(this);
+    RegisterGraphcisLibrary();
+
     PT_TAG_INFO("Graphics", "Created graphics system");
     // Use the window handle to create the graphics context.
     m_GraphicsContext = CreateScoped<GraphicsContext>(m_Window->SDLHandle());
@@ -31,6 +34,7 @@ Graphics::Graphics(const SharedPtr<Window>& window) :
 Graphics::~Graphics()
 {
     PT_TAG_INFO("Graphics", "Exited graphics system");
+    Object::RemoveSubsystem(this);
 }
 
 void Graphics::SetVSync(bool enable)
@@ -65,7 +69,7 @@ SharedPtr<Shader> Graphics::LoadShader(std::string_view name)
     {
         return it->second;
     }
-    auto shader = CreateShared<Shader>();
+    SharedPtr shader = Object::FactoryCreate<Shader>();
     std::string path = "Phaten/Shaders/" + std::string(name) + ".glsl";
     shader->Define(path);
     m_Shaders[hash] = shader;
@@ -78,7 +82,7 @@ SharedPtr<ShaderProgram> Graphics::CreateProgram(std::string_view name, std::str
     return shader->CreateProgram(name, vsDefines, fsDefines);
 }
 
-void Graphics::SetUniform(ShaderProgram* program, PresetUniform uniform, int value)
+void Graphics::SetUniform(const SharedPtr<ShaderProgram>& program, PresetUniform uniform, int value)
 {
     if (program)
     {
@@ -90,7 +94,7 @@ void Graphics::SetUniform(ShaderProgram* program, PresetUniform uniform, int val
     }
 }
 
-void Graphics::SetUniform(ShaderProgram* program, PresetUniform uniform, int* values, size_t count)
+void Graphics::SetUniform(const SharedPtr<ShaderProgram>& program, PresetUniform uniform, int* values, size_t count)
 {
     if (program)
     {
@@ -102,7 +106,7 @@ void Graphics::SetUniform(ShaderProgram* program, PresetUniform uniform, int* va
     }
 }
 
-void Graphics::SetUniform(ShaderProgram* program, PresetUniform uniform, float value)
+void Graphics::SetUniform(const SharedPtr<ShaderProgram>& program, PresetUniform uniform, float value)
 {
     if (program)
     {
@@ -114,7 +118,7 @@ void Graphics::SetUniform(ShaderProgram* program, PresetUniform uniform, float v
     }
 }
 
-void Graphics::SetUniform(ShaderProgram* program, PresetUniform uniform, const Vector2& value)
+void Graphics::SetUniform(const SharedPtr<ShaderProgram>& program, PresetUniform uniform, const Vector2& value)
 {
     if (program)
     {
@@ -126,7 +130,7 @@ void Graphics::SetUniform(ShaderProgram* program, PresetUniform uniform, const V
     }
 }
 
-void Graphics::SetUniform(ShaderProgram* program, PresetUniform uniform, const Vector3& value)
+void Graphics::SetUniform(const SharedPtr<ShaderProgram>& program, PresetUniform uniform, const Vector3& value)
 {
     if (program)
     {
@@ -138,7 +142,7 @@ void Graphics::SetUniform(ShaderProgram* program, PresetUniform uniform, const V
     }
 }
 
-void Graphics::SetUniform(ShaderProgram* program, PresetUniform uniform, const Vector4& value)
+void Graphics::SetUniform(const SharedPtr<ShaderProgram>& program, PresetUniform uniform, const Vector4& value)
 {
     if (program)
     {
@@ -150,7 +154,7 @@ void Graphics::SetUniform(ShaderProgram* program, PresetUniform uniform, const V
     }
 }
 
-void Graphics::SetUniform(ShaderProgram* program, PresetUniform uniform, const Matrix4& value)
+void Graphics::SetUniform(const SharedPtr<ShaderProgram>& program, PresetUniform uniform, const Matrix4& value)
 {
     if (program)
     {
@@ -162,7 +166,7 @@ void Graphics::SetUniform(ShaderProgram* program, PresetUniform uniform, const M
     }
 }
 
-void Graphics::SetUniform(ShaderProgram* program, std::string_view name, int value)
+void Graphics::SetUniform(const SharedPtr<ShaderProgram>& program, std::string_view name, int value)
 {
     if (program)
     {
@@ -174,7 +178,7 @@ void Graphics::SetUniform(ShaderProgram* program, std::string_view name, int val
     }
 }
 
-void Graphics::SetUniform(ShaderProgram* program, std::string_view name, int* values, size_t count)
+void Graphics::SetUniform(const SharedPtr<ShaderProgram>& program, std::string_view name, int* values, size_t count)
 {
     if (program)
     {
@@ -186,7 +190,7 @@ void Graphics::SetUniform(ShaderProgram* program, std::string_view name, int* va
     }
 }
 
-void Graphics::SetUniform(ShaderProgram* program, std::string_view name, float value)
+void Graphics::SetUniform(const SharedPtr<ShaderProgram>& program, std::string_view name, float value)
 {
     if (program)
     {
@@ -198,7 +202,7 @@ void Graphics::SetUniform(ShaderProgram* program, std::string_view name, float v
     }
 }
 
-void Graphics::SetFrameBuffer(FrameBuffer* frameBuffer)
+void Graphics::SetFrameBuffer(const SharedPtr<FrameBuffer>& frameBuffer)
 {
     if (frameBuffer)
     {
@@ -243,6 +247,14 @@ void Graphics::Present()
 void Graphics::Clear(unsigned bits)
 {
     glClear(BufferBitsToGLBits(bits));
+}
+
+void RegisterGraphcisLibrary()
+{
+    Shader::RegisterObject();
+    Texture::RegisterObject();
+    // TODO: Move to asset manager.
+    Image::RegisterObject();
 }
 
 } // namespace Pt

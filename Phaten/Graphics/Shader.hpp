@@ -4,6 +4,7 @@
 #include <utility>
 
 #include "Object/Ptr.hpp"
+#include "Object/Object.hpp"
 #include "IO/StringHash.hpp"
 #include "ShaderProgram.hpp"
 #include "GraphicsDefs.hpp"
@@ -11,11 +12,14 @@
 namespace Pt {
 
 /// Shader soure code class that manages shader programs variations.
-class Shader : public RefCounted
+class Shader : public Object
 {
+    OBJECT(Shader)
 public:
     Shader();
     ~Shader();
+
+    static void RegisterObject();
 
     void Define(std::string_view path);
 

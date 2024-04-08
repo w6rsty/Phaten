@@ -4,6 +4,7 @@
 #include <functional>
 
 #include "Math/IntVector.hpp"
+#include "Object/Object.hpp"
 
 union SDL_Event;
 
@@ -17,8 +18,9 @@ enum ButtonState
     RELEASED,
 };
 
-class Input
+class Input : public Object
 {
+    OBJECT(Input)
 public:
     Input();
     ~Input();
@@ -38,7 +40,7 @@ public:
     const IntV2& MouseMove() const { return m_MouseMove; }
 
     void SetOnExit(std::function<void()> onExit) { m_OnExit = onExit; }
-    bool ShouldExit() const {return m_ShouldExit; }
+    bool ShouldExit() const { return m_ShouldExit; }
 
     void SetPluginUpdate(std::function<void(const SDL_Event&)> pluginUpdate) { m_PluginUpdate = pluginUpdate; }
 private:

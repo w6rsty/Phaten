@@ -2,7 +2,9 @@
 
 #include <glad/glad.h>
 
-#include "IO/Logger.hpp"
+#include "Graphics/Graphics.hpp"
+#include "IO/Assert.hpp"
+#include "Object/Object.hpp"
 
 namespace Pt {
 
@@ -17,13 +19,15 @@ VertexBuffer::VertexBuffer() :
     m_NumVertices(0),
     m_Attributes(0)
 {
-    // TODO: Ensure graphics system loaded.
+    PT_ASSERT_MSG(Object::Subsystem<Graphics>()->IsInitialized(), "Graphics system not loaded");
 }
 
 VertexBuffer::~VertexBuffer()
 {
-    // TODO: Ensure graphics system loaded.
-    Release();    
+    if (Object::Subsystem<Graphics>())
+    {
+        Release();    
+    }
 }
 
 bool VertexBuffer::Define(BufferUsage usage, size_t numVertices, const VertexLayout &layout, const void* data)

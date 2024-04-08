@@ -3,12 +3,15 @@
 #include <map>
 
 #include "Object/Ptr.hpp"
+#include "Object/Object.hpp"
 #include "IO/StringHash.hpp"
 #include "Input/Window.hpp"
+
 #include "Math/IntVector.hpp"
 #include "Math/Matrix.hpp"
-#include "Shader.hpp"
+
 #include "GraphicsContext.hpp"
+#include "Shader.hpp"
 #include "FrameBuffer.hpp"
 
 struct SDL_Window;
@@ -18,8 +21,9 @@ namespace Pt {
 class ShaderProgram;
 
 /// Graphics API interface.
-class Graphics
+class Graphics : public Object
 {
+    OBJECT(Graphics);
 public:
     Graphics(const SharedPtr<Window>& window);
     ~Graphics();
@@ -32,23 +36,24 @@ public:
     SharedPtr<Shader> LoadShader(std::string_view name);
     /// Create a shader program from the shader soure code.
     SharedPtr<ShaderProgram> CreateProgram(std::string_view name, std::string_view vsDefines, std::string_view fsDefines);
-    void SetUniform(ShaderProgram* program, PresetUniform uniform, int value);
-    void SetUniform(ShaderProgram* program, PresetUniform uniform, int* values, size_t count);
-    void SetUniform(ShaderProgram* program, PresetUniform uniform, float value);
-    void SetUniform(ShaderProgram* program, PresetUniform uniform, const Vector2& value);
-    void SetUniform(ShaderProgram* program, PresetUniform uniform, const Vector3& value);
-    void SetUniform(ShaderProgram* program, PresetUniform uniform, const Vector4& value);
-    void SetUniform(ShaderProgram* program, PresetUniform uniform, const Matrix4& value);
+    void SetUniform(const SharedPtr<ShaderProgram>& program, PresetUniform uniform, int value);
+    void SetUniform(const SharedPtr<ShaderProgram>& program, PresetUniform uniform, int* values, size_t count);
+    void SetUniform(const SharedPtr<ShaderProgram>& program, PresetUniform uniform, float value);
+    void SetUniform(const SharedPtr<ShaderProgram>& program, PresetUniform uniform, const Vector2& value);
+    void SetUniform(const SharedPtr<ShaderProgram>& program, PresetUniform uniform, const Vector3& value);
+    void SetUniform(const SharedPtr<ShaderProgram>& program, PresetUniform uniform, const Vector4& value);
+    void SetUniform(const SharedPtr<ShaderProgram>& program, PresetUniform uniform, const Matrix4& value);
 
-    void SetUniform(ShaderProgram* program, std::string_view name, int value);
-    void SetUniform(ShaderProgram* program, std::string_view name, int* values, size_t count);
-    void SetUniform(ShaderProgram* program, std::string_view name, float value);
-    void SetUniform(ShaderProgram* program, std::string_view name, const Vector2& value);
-    void SetUniform(ShaderProgram* program, std::string_view name, const Vector3& value);
-    void SetUniform(ShaderProgram* program, std::string_view name, const Vector4& value);
+    void SetUniform(const SharedPtr<ShaderProgram>& program, std::string_view name, int value);
+    void SetUniform(const SharedPtr<ShaderProgram>& program, std::string_view name, int* values, size_t count);
+    void SetUniform(const SharedPtr<ShaderProgram>& program, std::string_view name, float value);
+    void SetUniform(const SharedPtr<ShaderProgram>& program, std::string_view name, const Vector2& value);
+    void SetUniform(const SharedPtr<ShaderProgram>& program, std::string_view name, const Vector3& value);
+    void SetUniform(const SharedPtr<ShaderProgram>& program, std::string_view name, const Vector4& value);
 
-    void SetFrameBuffer(FrameBuffer* frameBuffer);
+    void SetFrameBuffer(const SharedPtr<FrameBuffer>& frameBuffer);
 
+    bool IsInitialized() const { return m_GraphicsContext != nullptr; }
     bool IsVSync() const { return m_VSync; }
 
     static void Draw(PrimitiveType type, size_t first, size_t count);
@@ -69,5 +74,7 @@ private:
 
     std::map<StringHash, SharedPtr<Shader>> m_Shaders;
 };
+
+void RegisterGraphcisLibrary();
 
 } // namespace Pt

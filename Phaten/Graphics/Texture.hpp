@@ -3,6 +3,7 @@
 #include <string_view>
 
 #include "Object/Ptr.hpp"
+#include "Object/Object.hpp"
 #include "Math/IntVector.hpp"
 #include "GraphicsDefs.hpp"
 #include "Resource/Image.hpp"
@@ -11,11 +12,14 @@ namespace Pt {
 
 // TODO: Support resource manager
 /// Texture
-class Texture : public RefCounted
+class Texture : public Object
 {
+    OBJECT(Texture);
 public:
     Texture();
     ~Texture();
+
+    static void RegisterObject();
 
     /// Create texture
     void Define(TextureType type, const IntV2& size, ImageFormat format, const void* data);

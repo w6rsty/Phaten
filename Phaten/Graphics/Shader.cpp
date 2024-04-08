@@ -7,12 +7,15 @@ namespace Pt {
 
 Shader::Shader()
 {
-
 }
 
 Shader::~Shader()
 {
+}
 
+void Shader::RegisterObject()
+{
+    Object::RegisterFactory<Shader>();
 }
 
 void Shader::Define(std::string_view path)

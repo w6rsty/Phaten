@@ -35,6 +35,11 @@ Texture::~Texture()
     Release();
 }
 
+void Texture::RegisterObject()
+{
+    Object::RegisterFactory<Texture>();
+}
+
 void Texture::Define(TextureType type, const IntV2& size, ImageFormat format, const void* data)
 {
     Define(type, IntV3 {size, 1}, format, data);

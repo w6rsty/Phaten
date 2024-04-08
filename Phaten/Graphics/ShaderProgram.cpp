@@ -7,6 +7,8 @@
 #include "Core/Core.hpp"
 #include "IO/Assert.hpp"
 #include "IO/StringUtils.hpp"
+#include "Object/Object.hpp"
+#include "Graphics/Graphics.hpp"
 
 namespace Pt {
 
@@ -35,7 +37,7 @@ ShaderProgram::ShaderProgram(
     m_Handle(0),
     m_Attributes(0)
 {
-    // TODO: Ensure graphics system loaded.
+    PT_ASSERT_MSG(Object::Subsystem<Graphics>()->IsInitialized(), "Graphics system not loaded");
     m_ShaderName = vsDefines.length() ? 
         StringViewConcatenate('_', shaderName, vsDefines, fsDefines) : 
         StringViewConcatenate('_', shaderName, fsDefines);
@@ -45,8 +47,10 @@ ShaderProgram::ShaderProgram(
 
 ShaderProgram::~ShaderProgram()
 {
-    // TODO: Ensure graphics system loaded.
-    Release();
+    if (Object::Subsystem<Graphics>())
+    {
+        Release();
+    }
 }
 
 bool ShaderProgram::Bind()

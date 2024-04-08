@@ -2,7 +2,9 @@
 
 #include <glad/glad.h>
 
-#include "IO/Logger.hpp"
+#include "IO/Assert.hpp"
+#include "Object/Object.hpp"
+#include "Graphics/Graphics.hpp"
 
 namespace Pt {
 
@@ -14,13 +16,15 @@ IndexBuffer::IndexBuffer() :
     m_Usage(BufferUsage::STATIC),
     m_NumIndices(0)
 {
-    // TODO: Ensure graphics system loaded.
+    PT_ASSERT_MSG(Object::Subsystem<Graphics>()->IsInitialized(), "Graphics system not loaded");
 }
 
 IndexBuffer::~IndexBuffer()
 {
-    // TODO: Ensure graphics system loaded.
-    Release();
+    if (Object::Subsystem<Graphics>())
+    {
+        Release();
+    }
 }
 
 bool IndexBuffer::Define(BufferUsage usage, size_t numIndices, const void* data)

@@ -29,6 +29,11 @@ Image::~Image()
     Release();
 }
 
+void Image::RegisterObject()
+{
+    Object::RegisterFactory<Image>();
+}
+
 void Image::Load(std::string_view path)
 {
     Release();

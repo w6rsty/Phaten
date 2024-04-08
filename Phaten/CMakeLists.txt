@@ -18,6 +18,8 @@ set(PT_LIBS
     STB
 )
 
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-invalid-offsetof -ffast-math")
+
 if (WIN32)
     list(APPEND PT_LIBS SDL2main)
 endif()

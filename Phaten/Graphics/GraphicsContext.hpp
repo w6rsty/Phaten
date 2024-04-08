@@ -1,16 +1,17 @@
 #pragma once
 
+#include "Object/Ptr.hpp"
 struct SDL_Window;
 
 namespace Pt {
 
 /// Consists of a window handle and an OpenGL context handle.
-class GraphicsContext
+class GraphicsContext : public RefCounted
 {
     friend class Graphics;
 public:
     GraphicsContext(SDL_Window* windowHandle);
-    ~GraphicsContext();
+    virtual ~GraphicsContext();
 
     bool IsValid() const { return m_IsValid; }
 private:
