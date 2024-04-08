@@ -11,7 +11,7 @@ namespace Pt {
 class Plane
 {   
 public:
-    Plane(const SharedPtr<ShaderProgram>& program, const Matrix4& model = Matrix4::IDENTITY) :
+    Plane(const Matrix4& model = Matrix4::IDENTITY) :
         m_Model(model),
         m_Graphics(nullptr)
     {
@@ -30,14 +30,12 @@ public:
 
         m_IndexBuffer = CreateShared<IndexBuffer>();
         m_IndexBuffer->Define(BufferUsage::STATIC, PlaneMesh::IndexCount, PlaneMesh::Indices);
-
-        m_Program = program;
     }
 
-    void Draw()
+    void Draw(const SharedPtr<ShaderProgram>& program)
     {
-        m_Program->Bind();
-        m_Graphics->SetUniform(m_Program, PresetUniform::U_MODEL, m_Model);
+        program->Bind();
+        m_Graphics->SetUniform(program, PresetUniform::U_MODEL, m_Model);
 
         m_VertexBuffer->Bind(m_VertexBuffer->Attributes());
         m_IndexBuffer->Bind();
@@ -47,7 +45,6 @@ public:
 
     SharedPtr<VertexBuffer> m_VertexBuffer;
     SharedPtr<IndexBuffer> m_IndexBuffer;
-    SharedPtr<ShaderProgram> m_Program;
 
     Matrix4 m_Model;
     Graphics* m_Graphics;
@@ -93,7 +90,7 @@ public:
 class ScreenPlane
 {
 public:
-    ScreenPlane(const SharedPtr<ShaderProgram>& program) :
+    ScreenPlane() :
         m_Graphics(nullptr)
     {
         PT_ASSERT_MSG(Object::Subsystem<Graphics>()->IsInitialized(), "Graphics system not loaded");
@@ -110,13 +107,11 @@ public:
 
         m_IndexBuffer = CreateShared<IndexBuffer>();
         m_IndexBuffer->Define(BufferUsage::STATIC, ScreenPlaneMesh::IndexCount, ScreenPlaneMesh::Indices);
-
-        m_Program = program;
     }
 
-    void Draw()
+    void Draw(const SharedPtr<ShaderProgram>& program)
     {
-        m_Program->Bind();
+        program->Bind();
 
         m_VertexBuffer->Bind(m_VertexBuffer->Attributes());
         m_IndexBuffer->Bind();
@@ -126,7 +121,6 @@ public:
 
     SharedPtr<VertexBuffer> m_VertexBuffer;
     SharedPtr<IndexBuffer> m_IndexBuffer;
-    SharedPtr<ShaderProgram> m_Program;
 
     Graphics* m_Graphics;
 };
@@ -134,7 +128,7 @@ public:
 class Cube
 {
 public:
-    Cube(const SharedPtr<ShaderProgram>& program, const Matrix4& model = Matrix4::IDENTITY) :
+    Cube(const Matrix4& model = Matrix4::IDENTITY) :
         m_Model(model),
         m_Graphics(nullptr)
     {
@@ -153,14 +147,12 @@ public:
 
         m_IndexBuffer = CreateShared<IndexBuffer>();
         m_IndexBuffer->Define(BufferUsage::STATIC, CubeMesh::IndexCount, CubeMesh::Indices);
-
-        m_Program = program;
     }
 
-    void Draw()
+    void Draw(const SharedPtr<ShaderProgram>& program)
     {
-        m_Program->Bind();
-        m_Graphics->SetUniform(m_Program, PresetUniform::U_MODEL, m_Model);
+        program->Bind();
+        m_Graphics->SetUniform(program, PresetUniform::U_MODEL, m_Model);
 
         m_VertexBuffer->Bind(m_VertexBuffer->Attributes());
         m_IndexBuffer->Bind();
@@ -170,7 +162,6 @@ public:
 
     SharedPtr<VertexBuffer> m_VertexBuffer;
     SharedPtr<IndexBuffer> m_IndexBuffer;
-    SharedPtr<ShaderProgram> m_Program;
 
     Matrix4 m_Model;
     Graphics* m_Graphics;

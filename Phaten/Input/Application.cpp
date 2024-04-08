@@ -44,10 +44,10 @@ void Application::OnRender()
     m_Frequency = (double)SDL_GetPerformanceFrequency();
 
     SharedPtr<Texture> colorAttachment = Object::FactoryCreate<Texture>();
-    colorAttachment->Define(TextureType::TEX_2D, sWindowSize * 2, ImageFormat::RGBA8, nullptr);
+    colorAttachment->Define(TextureType::TEX_2D, sWindowSize * 1, ImageFormat::RGBA8, nullptr);
 
     SharedPtr<Texture> depthAttachment = Object::FactoryCreate<Texture>();
-    depthAttachment->Define(TextureType::TEX_2D, sWindowSize * 2, ImageFormat::D24S8, nullptr);
+    depthAttachment->Define(TextureType::TEX_2D, sWindowSize * 1, ImageFormat::D24S8, nullptr);
 
     auto fbo = CreateShared<FrameBuffer>();
     fbo->Define(colorAttachment, depthAttachment);
@@ -58,12 +58,13 @@ void Application::OnRender()
         + sizeof(Vector3)       // Camera Position
         + sizeof(float) * 4);   // Coefficients for debuging
 
-    auto program = graphics->CreateProgram("Basic", "", "");
+    auto basicProgram = graphics->CreateProgram("Basic", "", "");
     auto textProgram = graphics->CreateProgram("Text", "", "");
-    auto postProgram = graphics->CreateProgram("Post", "", "ENABLE");
+    auto postProgramEnable = graphics->CreateProgram("Post", "", "ENABLE");
+    auto postProgramDisable = graphics->CreateProgram("Post", "", "");
 
-    auto demoCube = Cube(program);
-    auto screen = ScreenPlane(postProgram);
+    auto demoCube = Cube();
+    auto screen = ScreenPlane();
     auto textRenderer = CreateScoped<TextRenderer>(textProgram, 3.0f);
 
     // for demo
@@ -88,6 +89,7 @@ void Application::OnRender()
     ubo->Bind(0);
     ubo->SetData(0, sizeof(Matrix4), m_Camera->GetProjection().Data());
     SDL_GL_MakeCurrent(SDL_GL_GetCurrentWindow(), SDL_GL_GetCurrentContext());
+    bool enablePostEffect = false;
     bool showDebug = false;
     std::string debugString = "Phaten Engine\nFPS:%.2f\nVSync:%s\nCamera Rotation:%s\nCamera Position:%s";
     while (m_RenderState & !m_Input->ShouldExit())
@@ -105,6 +107,8 @@ void Application::OnRender()
                 graphics->SetVSync(!graphics->IsVSync());
             if (m_Input->KeyPressed(SDLK_F3))
                 showDebug = !showDebug;
+            if (m_Input->KeyPressed(SDLK_e))
+                enablePostEffect = !enablePostEffect;
 
             float speed = m_DeltaTime;
             if (m_Input->KeyDown(SDLK_LSHIFT))
@@ -138,7 +142,7 @@ void Application::OnRender()
 
         demoTexture->Bind(1);
         Graphics::SetDepthTest(true);
-        demoCube.Draw();
+        demoCube.Draw(basicProgram);
         /// ====================================================================
         if (showDebug)
         {
@@ -154,12 +158,15 @@ void Application::OnRender()
             );
         }
         /// ====================================================================
+        bool wireframe = Graphics::IsWireframe();
+        if (wireframe) Graphics::SetWireframe(false);
         Graphics::SetFrameBuffer(nullptr);
         Graphics::Clear(BufferBitType::COLOR);
 
         colorAttachment->Bind(2);
         Graphics::SetDepthTest(false);
-        screen.Draw();
+        screen.Draw(enablePostEffect ? postProgramEnable : postProgramDisable);
+        if(wireframe) Graphics::SetWireframe(true);
         /// ====================================================================
         // Call window to swap buffers.
         graphics->Present();

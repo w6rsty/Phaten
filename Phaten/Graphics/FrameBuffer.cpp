@@ -42,7 +42,7 @@ void FrameBuffer::Define(Texture* colorTex, Texture* depthStencilTex)
             depthStencilTex->GLHandle(),
             0);
     }
-
+    /// FIXME: D16 and D32 not works.
     if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         PT_LOG_ERROR("Framebuffer is not complete!");
 
@@ -58,6 +58,7 @@ void FrameBuffer::Bind()
     }
     
     glBindFramebuffer(GL_FRAMEBUFFER, m_Handle);
+    // FIXME: Viewport set.
     // glViewport(0, 0, m_Size.x, m_Size.y);
     boundFrameBuffer = this;
 }
