@@ -70,6 +70,8 @@ public:
     void Present();
     /// Clear the screen.
     static void Clear(unsigned bits = 1);
+
+    static size_t& NumDrawCalls() { return sNumDrawCalls; }
 private:
     bool m_VSync;
     static bool sDepthTest;
@@ -79,6 +81,8 @@ private:
     ScopedPtr<GraphicsContext> m_GraphicsContext;
 
     std::map<StringHash, SharedPtr<Shader>> m_Shaders;
+
+    static size_t sNumDrawCalls;
 };
 
 void RegisterGraphcisLibrary();

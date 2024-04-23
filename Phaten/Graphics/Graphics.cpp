@@ -11,6 +11,8 @@ namespace Pt {
 bool Graphics::sDepthTest = true;
 bool Graphics::sWireframe = false;
 
+size_t Graphics::sNumDrawCalls = 0;
+
 Graphics::Graphics(const SharedPtr<Window>& window) :
     m_VSync(true),
     m_Window(window)
@@ -243,6 +245,7 @@ void* Graphics::GetNativeWindow() const
 void Graphics::Draw(PrimitiveType type, size_t first, size_t count)
 {
     glDrawArrays(PrimitiveGLType[EnumAsIndex(type)], first, count);
+    sNumDrawCalls++;
 }
 void Graphics::DrawIndexed(PrimitiveType type, size_t first, size_t count)
 {   
@@ -252,6 +255,7 @@ void Graphics::DrawIndexed(PrimitiveType type, size_t first, size_t count)
         GL_UNSIGNED_INT,
         (void*)(first * sizeof(unsigned))
     );
+    sNumDrawCalls++;
 }
 
 void Graphics::Present()

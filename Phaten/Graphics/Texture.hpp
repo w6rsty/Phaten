@@ -45,6 +45,8 @@ public:
     TextureType GLType() const { return m_Type; }
     /// Get texture GL target
     unsigned GLTarget() const { return m_Target; }
+    /// Get texture format
+    ImageFormat Format() const { return m_Format; }
 private:
     void ForceBind() const;
 

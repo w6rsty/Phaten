@@ -25,14 +25,23 @@ void vert()
     vec4 pos = uModel * vec4(aPosition, 1.0);
     vPosition = pos.xyz;
     vNormal = aNormal;
+#if defined(TILED)
+    vTexCoord = aTexCoord * vec2(uModel[0][0], uModel[2][2]);
+#else
     vTexCoord = aTexCoord;
+#endif
     gl_Position = uProjection * uView * pos;
 }
 
 void frag()
 {
+#if defined(TEXTURE)
     vec4 color = texture(uTexture1, vTexCoord);
     if (color.a < 0.1)
         discard;
+#else
+    /// No texture warning, you will always use texture, right? :D
+    vec4 color = vec4(1.0, 0.0, 1.0, 1.0);
+#endif
     FragColor = vec4(color.rgb, 1.0);
 }

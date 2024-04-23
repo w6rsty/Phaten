@@ -9,14 +9,7 @@ namespace Pt {
 
 static const std::string PT_GL_VERSION = "410 core";
 static const size_t MAX_UNIFORM_BUFFER_SLOTS = 16;
-
-// FIXME: Use query to get the max texture slots.
-#ifdef __APPLE__
 static const size_t MAX_TEXTURE_SLOTS = 16;
-#else
-static const size_t MAX_TEXTURE_SLOTS = 32;
-#endif
-
 static constexpr size_t MAX_TEXT_SIZE = 256;
 
 enum BufferBitType : unsigned

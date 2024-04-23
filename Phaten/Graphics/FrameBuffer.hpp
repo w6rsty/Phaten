@@ -13,6 +13,7 @@ public:
     ~FrameBuffer();
 
     void Define(Texture* colorTex, Texture* depthStencilTex);
+    void Define(std::vector<Texture*> colorTexs);
 
     void Bind();
 

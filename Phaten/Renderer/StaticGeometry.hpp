@@ -11,22 +11,39 @@ namespace Pt {
 class Plane
 {   
 public:
-    Plane(const Matrix4& model = Matrix4::IDENTITY) :
+    Plane(const Matrix4& model = Matrix4::IDENTITY, const Vector2& scale = Vector2(1.0f, 1.0f)) :
         m_Model(model),
         m_Graphics(nullptr)
     {
         PT_ASSERT_MSG(Object::Subsystem<Graphics>()->IsInitialized(), "Graphics system not loaded");
         m_Graphics = Object::Subsystem<Graphics>();
+        
+        auto layout = VertexLayout {
+            {VertexElementType::FLOAT3, VertexElementSemantic::POSITION}, // 0
+            {VertexElementType::FLOAT3, VertexElementSemantic::NORMAL},   // 1
+            {VertexElementType::FLOAT2, VertexElementSemantic::TEX_COORD}, // 4
+        };
+
+        float* data = new float[PlaneMesh::VertexCount * layout.Stride()];
+        memcpy(data, PlaneMesh::Vertices, PlaneMesh::VertexCount * layout.Stride());
+
+        if (scale != Vector2(1.0f, 1.0f))
+        {
+            // modify texcoord
+            for (size_t i = 0; i < PlaneMesh::VertexCount; ++i)
+            {
+                data[i * 8 + 3 * 2 + 0] *= scale.x;
+                data[i * 8 + 3 * 2 + 1] *= scale.y;
+            }
+        }
 
         m_VertexBuffer = CreateShared<VertexBuffer>();
         m_VertexBuffer->Define(BufferUsage::STATIC, PlaneMesh::VertexCount,
-            VertexLayout{
-                {VertexElementType::FLOAT3, VertexElementSemantic::POSITION}, // 0
-                {VertexElementType::FLOAT3, VertexElementSemantic::NORMAL},   // 1
-                {VertexElementType::FLOAT2, VertexElementSemantic::TEX_COORD}, // 4
-            },
-            PlaneMesh::Vertices
+            layout,
+            data
         );
+
+        delete[] data;
 
         m_IndexBuffer = CreateShared<IndexBuffer>();
         m_IndexBuffer->Define(BufferUsage::STATIC, PlaneMesh::IndexCount, PlaneMesh::Indices);

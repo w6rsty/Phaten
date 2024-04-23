@@ -2,6 +2,7 @@
 
 #include <glad/glad.h>
 
+#include "Graphics/GraphicsDefs.hpp"
 #include "Math/IntVector.hpp"
 
 namespace Pt {
@@ -37,17 +38,30 @@ void FrameBuffer::Define(Texture* colorTex, Texture* depthStencilTex)
     {
         glFramebufferTexture2D(
             GL_FRAMEBUFFER,
-            GL_DEPTH_STENCIL_ATTACHMENT,
+            GL_DEPTH_ATTACHMENT,
             depthStencilTex->GLTarget(),
             depthStencilTex->GLHandle(),
             0);
+        if (depthStencilTex->Format() == ImageFormat::D24S8) {
+            glFramebufferTexture2D(
+                GL_FRAMEBUFFER,
+                GL_STENCIL_ATTACHMENT,
+                depthStencilTex->GLTarget(),
+                depthStencilTex->GLHandle(),
+                0);
+        }
     }
-    /// FIXME: D16 and D32 not works.
+
     if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         PT_LOG_ERROR("Framebuffer is not complete!");
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     PT_LOG_INFO("Created framebuffer: width: ", m_Size.x, ", height: ", m_Size.y);
+}
+
+void FrameBuffer::Define(std::vector<Texture*> colorTexs)
+{
+
 }
 
 void FrameBuffer::Bind()
